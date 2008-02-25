@@ -105,11 +105,22 @@ var Snippely = {
 		
 		//drag that panel
 		
+		var adaptFooter = function(){
+			$('panel-footer').setStyle('width', $('panel').clientWidth);
+		};
+		
 		new Drag($('panel'), {
 			handle: $$('#splitter, #panel-resizer'),
 			modifiers: {x: 'width', y: null},
-			limit: {x: [100, 400]}
+			limit: {x: [100, 400]},
+			onDrag: adaptFooter
 		});
+		
+		adaptFooter();
+		
+		//end drag
+		
+		//select those tags
 		
 		var tags = $$('.tag'); 
 		
@@ -117,6 +128,8 @@ var Snippely = {
 			tags.removeClass('selected');
 			this.addClass('selected');
 		});
+		
+		//end select
 	},
 	
 	activate: function(){
