@@ -85,7 +85,7 @@ var Snippely = {
 		
 		nativeWindow.addEventListener('deactivate', this.blur);
 		
-		$('panel-cell').addEvent('mousedown', function(event){ //disables selection on the whole panel
+		$('panel').addEvent('mousedown', function(event){ //disables selection on the whole panel
 			event.preventDefault();
 		});
 		
