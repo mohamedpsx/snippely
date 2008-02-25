@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>AIR APP TEST</title>
+	
+	<script type="text/javascript" src="/scripts/air.aliases.js"></script>
+	<script type="text/javascript" src="/scripts/air.introspector.js"></script>
+	
+	<script type="text/javascript" src="/scripts/mootools.js"></script>
+	<script type="text/javascript" src="/scripts/art.air.js"></script>
+	
+	<script type="text/javascript">
+	
+		var AIR = air;
+		var console = AIR.Introspector.Console;
+	
+		console.log('app started');
+		
+		// menu
+
+	    var menu = new AIR.NativeMenu();
+	
+		var command = menu.addItem(new AIR.NativeMenuItem("Custom command"));
+	
+		command.addEventListener('select', onCommand);
+	
+		var edit = new AIR.NativeMenu();
+		
+		menu.addSubmenu(edit, "Edit");
+		
+		var paste = edit.addItem(new AIR.NativeMenuItem("Paste"));
+		var copy = edit.addItem(new AIR.NativeMenuItem("Copy"));
+		
+		paste.keyEquivalent = "v";
+		paste.keyEquivalentModifiers = [AIR.Keyboard.COMMAND];
+		
+		copy.keyEquivalent = "c";
+		copy.keyEquivalentModifiers = [AIR.Keyboard.COMMAND];
+		
+		function showContextMenu(event){
+		    event.stop();
+		    menu.display(nativeWindow.stage, 0, 0);
+		}
+		
+		function onCommand(){
+			console.log('clicked command');
+		}
+		
+		window.addEvent('load', function(){
+			$('invoker').addEvent('mousedown', showContextMenu);
+		});
+		
+		
+		//ah ah
+		
+		//nativeWindow.stage.frameRate = 10;
+		
+		//htmlLoader.filters = [new runtime.flash.filters.DropShadowFilter()];
+
+		// end menu
+		
+		nativeWindow.visible = true;
+		nativeWindow.activate();
+		
+		var options = new AIR.NativeWindowInitOptions();
+		options.systemChrome = "standard";
+		options.type = "normal";
+
+		var windowBounds = new AIR.Rectangle(200,250,300,300);
+		var htmlWin = AIR.HTMLLoader.createRootWindow(true, options, true, windowBounds);
+		htmlWin.load(new AIR.URLRequest("/pages/test.html"));
+		
+		console.log(htmlWin);
+		
+		//window.addEvent('load', function(){
+
+
+			// nativeWindow.addEventListener('resizing', function(event){
+			// 	var width = htmlLoader.contentWidth;
+			// 	var height = htmlLoader.contentHeight;
+			// 	console.log(width, height);
+			// 	main.setStyles({height: height, width: width});
+			// });
+
+		//});
+		
+		
+	</script>
+	
+	<style type="text/css" media="screen">
+	
+		body, html {
+			overflow: hidden;
+			background: #ff3300;
+		}
+		
+		#container {
+			padding: 10px;
+		}
+		
+	</style>
+	
+</head>
+
+<body>
+
+<h1>Hello World</h1>
+
+	<div id="invoker">
+		click here please.
+	</div>
+
+<div id="form">
+	
+	text: <input type="text" name="some_name" value="" id="some_name" />
+	<br />
+	<br />
+	submit: <input type="submit" name="some_name2" value="submit this shit" id="some_name2" />
+	<br />
+	<br />
+	check: <input type="checkbox" name="some_name3" value="" id="some_name3" />
+	<br />
+	<br />
+	radio: <input type="radio" name="some_name4" value="" id="some_name4" />
+	<br />
+	<br />
+	search: <input type="searcg" name="some_name5" value="" id="some_name5" />
+	
+</div>
+
+<div id="container">
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+</div>
+
+
+</body>
+</html>
