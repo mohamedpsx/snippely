@@ -85,7 +85,7 @@ var Snippely = {
 		
 		nativeWindow.addEventListener('deactivate', this.blur);
 		
-		$('panel').addEvent('mousedown', function(event){ //disables selection on the whole panel
+		$$('#panel, #list').addEvent('mousedown', function(event){ //disables selection on the whole panel
 			event.preventDefault();
 		});
 		
@@ -116,6 +116,14 @@ var Snippely = {
 			onDrag: adaptFooter
 		});
 		
+		new Drag($('list'), {
+			handle: $('content-resizer'),
+			modifiers: {x: null, y: 'height'},
+			limit: {y: [38, function(){
+				return $('list').scrollHeight;
+			}]}
+		});
+		
 		adaptFooter();
 		
 		//end drag
@@ -128,6 +136,15 @@ var Snippely = {
 			tags.removeClass('selected');
 			this.addClass('selected');
 		});
+		
+		var items = $$('.item'); 
+		
+		items.addEvent('mouseup', function(){
+			items.removeClass('selected');
+			this.addClass('selected');
+		});
+		
+		console.log(true);
 		
 		//end select
 	},
