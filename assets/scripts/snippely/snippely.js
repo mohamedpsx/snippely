@@ -72,11 +72,11 @@ var Snippely = {
 	},
 	
 	focus: function(){
-		$(document.body).set('id', 'focus');
+		$(document.body).set('class', 'focus');
 	},
 	
 	blur: function(){
-		$(document.body).set('id', 'blur');
+		$(document.body).set('class', 'blur');
 	},
 	
 	domReady: function(){
