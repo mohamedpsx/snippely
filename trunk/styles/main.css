@@ -177,15 +177,13 @@ td {
 	color: #fff;
 }
 
-#content-resizer-cell {
-	background: #fff url(/images/content-resizer-bg.png) center left repeat-x;
-}
-
 #content-resizer {
 	height: 5px;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
-	background: url(/images/content-resizer-ball.png) center center no-repeat;
+	background:
+		url(/images/content-resizer-ball.png) center center no-repeat, 
+		url(/images/content-resizer-bg.png) center left repeat-x;
 }
 
 /* @end */
