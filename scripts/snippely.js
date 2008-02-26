@@ -92,7 +92,7 @@ var Snippely = {
 		$('button-add').addEvent('mousedown', function(event){
 			event.preventDefault(); //if we dont block the event, the mouse will be recognized as down by air, therefore selecting text.
 			this.addClass('active');
-			Snippely.addMenu.display({x: 0, y: 0}); //he doesnt care about my passed positions.. whoa.
+			Snippely.addMenu.display(event.client); //he doesnt care about my passed positions.. whoa.
 			this.removeClass('active'); //apparently, the menu blocks all activity.
 		});
 		
