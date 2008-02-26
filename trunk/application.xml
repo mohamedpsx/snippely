@@ -30,7 +30,7 @@
 	<description>An application for storing and organizing bits of information.</description>
 
 	<!-- Copyright information. Optional -->
-	<copyright>Valerio Proietti (http://mad4milk.net). Tom Occhino.</copyright>
+	<copyright>Valerio Proietti (http://mad4milk.net). Tom Occhino (http://tomocchino.com).</copyright>
 
 	<!-- Settings for the application's initial window. Required. -->
 	<initialWindow>
@@ -87,10 +87,10 @@
 	<!-- The icon the system uses for the application. For at least one resolution,
 		 specify the path to a PNG file included in the AIR package. Optional. -->
 	<icon>
-		<image16x16>snippely.icon/16.png</image16x16>
-		<image32x32>snippely.icon/32.png</image32x32>
-		<image48x48>snippely.icon/48.png</image48x48>
-		<image128x128>snippely.icon/128.png</image128x128>
+		<image16x16>assets/icons/16.png</image16x16>
+		<image32x32>assets/icons/32.png</image32x32>
+		<image48x48>assets/icons/48.png</image48x48>
+		<image128x128>assets/icons/128.png</image128x128>
 	</icon>
 
 	<!-- Whether the application handles the update when a user double-clicks an update version
