@@ -4,7 +4,7 @@ var console = AIR.Introspector.Console;
 
 // Configuration
 
-Application.autoExit = false;
+Application.autoExit = true;
 
 // Snippely Object
 
@@ -13,27 +13,14 @@ var Snippely = {
 	createMenus: function(){ //create the menus
 		
 		this.mainMenu = new ART.Menu('MainMenu');
-
+		
 		this.saveItem = new ART.Menu.Item('Save');
-		this.loadItem = new ART.Menu.Item('Load');
-
-		// this.saveItem.addEvent('onSelect', function(){
-		// 	console.log('saving...');
-		// });
-
 		this.saveItem.shortcut = 'command+s';
+		
+		this.loadItem = new ART.Menu.Item('Load');
 		this.loadItem.shortcut = 'command+l';
 
-		// this.loadItem.addEvent('onSelect', function(){
-		// 	console.log('loading...');
-		// });
-
-		this.fileMenu = new ART.Menu('File').addItem(
-			this.saveItem
-		).addItem(
-			this.loadItem
-		);
-
+		this.fileMenu = new ART.Menu('File').addItem(this.saveItem).addItem(this.loadItem);
 		this.mainMenu.addMenu(this.fileMenu);
 		
 		//add menu

@@ -50,9 +50,9 @@ ART.Menu = new Class({
 		return this;
 	},
 	
-	display: function(xy){
+	display: function(pos){
 		var activeWindow = Application.activeWindow;
-		if (activeWindow) this.menu.display(activeWindow.stage, xy.x, xy.y);
+		if (activeWindow) this.menu.display(activeWindow.stage, pos.x, pos.y);
 		return this;
 	},
 	
@@ -66,11 +66,9 @@ ART.Menu = new Class({
 
 ART.Menu.Item = new Class({
 	
-	Implements: [Events, Options],
-	
-	//new mutator in action
-	
 	Exposes: ['checked', 'disabled', 'shortcut'],
+	
+	Implements: [Events, Options],
 	
 	options: {
 		checked: undefined,
@@ -107,7 +105,7 @@ ART.Menu.Item = new Class({
 		return new ART.Menu.Item(this.name, $extend(this.options, {_item: this.item}));
 	},
 	
-	// These three methods are exposed as properties. How cool, right?
+	// Exposed class properties
 	
 	shortcut: function(shortcut){
 		if (shortcut === undefined) return this._shortcut;
