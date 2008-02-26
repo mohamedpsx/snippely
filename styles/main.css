@@ -61,9 +61,7 @@ td {
 
 #panel-resizer {
 	width: 1px;
-	/*background: #A5A5A5;*/
 	border-left: 1px solid #A5A5A5;
-	/*border-right: 4px solid #fff;*/
 }
 
 /* @end */
@@ -131,27 +129,76 @@ td {
 	font-size: 11px;
 }
 
-.selected {
+.tag.selected {
 	font-weight: bold;
 	color: #fff;
 	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5);
 }
 
-#focus .selected {
+#focus .tag.selected {
 	background-image: url(/images/selected-focus.png);
 }
 
-#blur .selected {
+#blur .tag.selected {
 	background-image: url(/images/selected-blur.png);
 }
 
 /* @end */
 
+/* @group List */
+
+#list {
+	background: #fff;
+	height: 38px;
+	overflow: hidden;
+	/*overflow: auto;*/
+}
+
+#list ul {
+	list-style: none;
+}
+
+#list li {
+	padding: 4px 20px;
+	background: #fff;
+}
+
+#list li.odd {
+	background: #f5f5f5;
+}
+
+#focus #list .item.selected {
+	background-color: #637282;
+	color: #fff;
+}
+
+#blur #list .item.selected {
+	background-color: #828282;
+	color: #fff;
+}
+
+#content-resizer {
+	height: 5px;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	background: #fff url(/images/snip-grad.png) center left repeat-x;
+}
+
+/* @end */
+
+
+
 /* @group Content */
 
+.last {
+	height: 10px;
+}
+
 #content {
+	padding: 10px;
 	height: 100%;
-	padding: 10px 10px;
+	overflow: hidden;
+	/*overflow: auto;*/
 }
 
 .snippet-title {
