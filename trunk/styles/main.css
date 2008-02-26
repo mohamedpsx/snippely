@@ -71,8 +71,8 @@ td {
 /* @group Buttons */
 
 .button {
-	width: 28px;
 	height: 22px;
+	width: 28px;
 	background-repeat: no-repeat;
 }
 
@@ -81,17 +81,17 @@ td {
 }
 
 #button-add {
-	background-image: url(/images/add.png);
+	background-image: url(/images/button-add.png);
 }
 
 #button-action {
-	background-image: url(/images/minus.png);
+	background-image: url(/images/button-remove.png);
 }
 
 #splitter {
-	width: 15px;
+	width: 17px;
 	height: 22px;
-	background-image: url(/images/handle.png);
+	background-image: url(/images/button-splitter.png);
 }
 
 /* @end */
@@ -159,15 +159,48 @@ td {
 	font-family: Helvetica;
 	font-size: 20px;
 	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1);
+	padding-bottom: 10px;
+	border-bottom: 1px dotted #bbb;
+}
+
+.snip.code, .snip .info {
+	font-family: Andale Mono, Monaco;
 }
 
 .snip {
-	font-family: Andale Mono, Monaco;
 	line-height: 1.5;
-	background: #fff;
-	-webkit-border-radius: 8px;
-	padding: 10px;
+	padding: 6px 10px;
 	margin: 10px 0;
+	-webkit-border-radius: 6px;
+	border: 1px solid #bbb;
+	-webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+	background: #fff url(/images/snip-grad.png) bottom left repeat-x;
+}
+
+.info {
+	padding-bottom: 5px;
+	margin-bottom: 6px;
+	border-bottom: 1px solid #eee;
+	font-size: 9px;
+	color: #888;
+}
+
+.description {
+	font-size: 12px;
+	line-height: 1.6;
+	margin: 10px 0;
+	padding-bottom: 10px;
+	border-bottom: 1px dotted #bbb;
+}
+
+.note {
+	font-size: 11px;
+	line-height: 1.6;
+	margin: 10px 0;
+	padding: 6px 10px;
+	
+	-webkit-border-radius: 6px;
+	border: 1px solid #ddd;
 }
 
 
