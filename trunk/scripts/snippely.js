@@ -14,9 +14,9 @@ var Snippely = {
 		nativeWindow.addEventListener('activate', this.focus);
 		nativeWindow.addEventListener('deactivate', this.blur);
 		
-		$$('#sidebar, #snippets, #content').addEvent('mousedown', function(event){ //disables selection on the whole panel
-			event.preventDefault();
-		});
+		// $$('#sidebar, #snippets, #content').addEvent('mousedown', function(event){ //disables selection on the whole panel
+		// 	event.preventDefault();
+		// });
 		
 		$('button-add').addEvent('mousedown', function(event){
 			event.preventDefault(); //if we dont block the event, the mouse will be recognized as down by air, therefore selecting text.
@@ -56,12 +56,12 @@ var Snippely = {
 		
 		//selectable items
 		var tags = $$('#tags li');
-		tags.addEvent('mouseup', function(){
+		tags.addEvent('click', function(){
 			tags.removeClass('selected');
 			this.addClass('selected');
 		});
 		var items = $$('#snippets-list li');
-		items.addEvent('mouseup', function(){
+		items.addEvent('click', function(){
 			items.removeClass('selected');
 			this.addClass('selected');
 		});
@@ -76,6 +76,18 @@ var Snippely = {
 		});
 		document.addEvent('mouseup', function(){
 			metaButtons.removeClass('active');
+		});
+		
+		new ART.ScrollBar('content', {
+			autoHide: false
+		});
+		
+		new ART.ScrollBar('sidebar', {
+			autoHide: false
+		});
+		
+		new ART.ScrollBar('snippets', {
+			autoHide: false
 		});
 
 		this.activate(); //activates the window, and sets it visible.
