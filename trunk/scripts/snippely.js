@@ -11,16 +11,17 @@ Application.autoExit = true;
 var Snippely = {
 	
 	createScrollBars: function(){
-		
-		//console.log(true);
-		
 		this.contentScrollbar = new ART.ScrollBar('content', 'content-wrap');
 		this.tagsScrollbar = new ART.ScrollBar('tags', 'tags-wrap');
 		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
-		
 	},
 	
 	redraw: function(){
+		
+		this.contentScrollbar.update();
+		this.snippetsScrollbar.update();
+		this.tagsScrollbar.update();
+		
 		this.content.setStyle('left', this.tags.offsetWidth);
 		this.snippets.setStyle('left', this.tags.offsetWidth);
 		this.footer.setStyle('width', this.tags.clientWidth);
@@ -28,10 +29,6 @@ var Snippely = {
 		
 		this.topResizer.setStyle('top', this.snippets.offsetHeight);
 		this.content.setStyle('top', this.topResizer.offsetHeight + this.snippets.offsetHeight);
-		
-		this.contentScrollbar.update();
-		this.snippetsScrollbar.update();
-		this.tagsScrollbar.update();
 	},
 	
 	initialize: function(){
@@ -80,10 +77,13 @@ var Snippely = {
 			onDrag: this.redraw.bind(this)
 		});
 		
-		this.redraw();
-		
 		//redraw on resize
 		nativeWindow.addEventListener('resize', this.redraw.bind(this));
+		nativeWindow.addEventListener('activate', this.redraw.bind(this));
+		nativeWindow.addEventListener('deactivate', this.redraw.bind(this));
+		
+		// this.redraw();
+		this.redraw();
 		
 		//selectable items
 		var tagElements = $$('#tags li');
@@ -146,8 +146,8 @@ var Snippely = {
 	},
 	
 	activate: function(){
-		
 		(function(){
+			Snippely.redraw();
 			nativeWindow.visible = true;
 			nativeWindow.activate();
 		}).delay(100); //give some time to render, or else garbage will be displayed
