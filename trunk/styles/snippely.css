@@ -33,6 +33,10 @@ body {
 #blur  #sidebar { background-color: #e8e8e8; }
 #focus #sidebar { background-color: #d5dde6; }
 
+#sidebar-wrap {
+	height:100%;
+}
+
 #sidebar h3 {
 	padding: 0px 12px;
 	margin: 8px 0px 6px;
@@ -127,6 +131,10 @@ body {
 	background-color: #fff;
 }
 
+#snippets-wrap {
+	height:100%;
+}
+
 #snippets-list {
 	list-style: none;
 }
@@ -177,6 +185,10 @@ body {
 	font-size: 12px;
 	overflow: hidden;
 	position: absolute;
+}
+
+#content-wrap {
+	height:100%;
 }
 
 #content h1 {
