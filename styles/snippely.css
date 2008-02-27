@@ -298,4 +298,16 @@ div.snippet.code, div.snippet div.info {
 	background: url(../images/thumb-bottom.png) top left no-repeat;
 }
 
+#blur .art-scrollbar-paint-bottom {
+	background-image: url(../images/thumb-bottom-blur.png);
+}
+
+#blur .art-scrollbar-paint-top {
+	background-image: url(../images/thumb-top-blur.png);
+}
+
+#blur .art-scrollbar-paint-center {
+	background-image: url(../images/thumb-center-blur.png);
+}
+
 /* @end */
