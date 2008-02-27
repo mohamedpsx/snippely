@@ -14,14 +14,16 @@ ART.ScrollBar = new Class({
 		morph: {duration: 200, link: 'cancel'}
 	},
 
-	initialize: function(content, options){
+	initialize: function(scrolling, content, options){
+		
 		this.setOptions(options);
+
+		this.scrolling = $(scrolling);
+		this.document = this.scrolling.getDocument();
 		
 		this.content = $(content);
 		
-		this.document = this.content.getDocument();
-		
-		this.container = new Element('div').addClass('art-scrollbar').inject(this.content);
+		this.container = new Element('div').addClass('art-scrollbar').inject(this.scrolling);
 		
 		if (this.options.id) this.container.set('id', this.options.id);
 		if (this.options.className) this.container.addClass(this.options.className);
@@ -70,12 +72,12 @@ ART.ScrollBar = new Class({
 
 	attach: function(){
 		if (this.options.autoHide){
-			this.content.addEvent('mouseenter', this.bound.show);
-			this.content.addEvent('mouseleave', this.bound.hide);
+			this.scrolling.addEvent('mouseenter', this.bound.show);
+			this.scrolling.addEvent('mouseleave', this.bound.hide);
 		}
 		
 		this.thumb.addEvent('mousedown', this.bound.start);
-		if (this.options.wheel) this.content.addEvent('mousewheel', this.bound.wheel);
+		if (this.options.wheel) this.scrolling.addEvent('mousewheel', this.bound.wheel);
 		this.container.addEvent('mouseup', this.bound.page);
 	},
 	
@@ -168,7 +170,7 @@ ART.ScrollBar = new Class({
 
 	end: function(event){
 		this.mousedown = false;
-		if (this.options.autoHide && event.target != this.content && !this.content.hasChild(event.target)) this.hide();
+		if (this.options.autoHide && event.target != this.scrolling && !this.scrolling.hasChild(event.target)) this.hide();
 		this.document.removeEvent('mousemove', this.bound.drag);
 		this.document.removeEvent('mouseup', this.bound.end);
 		this.document.removeEvent(this.selection, this.bound.stopSelection);

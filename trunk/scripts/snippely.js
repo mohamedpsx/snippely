@@ -78,15 +78,15 @@ var Snippely = {
 			metaButtons.removeClass('active');
 		});
 		
-		new ART.ScrollBar('content', {
+		new ART.ScrollBar('content', 'content-wrapper', {
 			autoHide: false
 		});
 		
-		new ART.ScrollBar('sidebar', {
+		new ART.ScrollBar('sidebar', 'sidebar-wrapper', {
 			autoHide: false
 		});
 		
-		new ART.ScrollBar('snippets', {
+		new ART.ScrollBar('snippets', 'snippets-wrapper', {
 			autoHide: false
 		});
 
