@@ -10,13 +10,35 @@ Application.autoExit = true;
 
 var Snippely = {
 	
+	createScrollBars: function(){
+		
+		//console.log(true);
+		
+		this.contentScrollbar = new ART.ScrollBar('content', 'content-wrap');
+		this.tagsScrollbar = new ART.ScrollBar('tags', 'tags-wrap');
+		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
+		
+	},
+	
+	redraw: function(){
+
+		
+		this.content.setStyle('left', this.tags.offsetWidth);
+		this.snippets.setStyle('left', this.tags.offsetWidth);
+		this.footer.setStyle('width', this.tags.clientWidth);
+		this.topResizer.setStyle('left', this.tags.offsetWidth);
+		
+		this.topResizer.setStyle('top', this.snippets.offsetHeight);
+		this.content.setStyle('top', this.topResizer.offsetHeight + this.snippets.offsetHeight);
+		
+		this.contentScrollbar.update();
+		this.snippetsScrollbar.update();
+		this.tagsScrollbar.update();
+	},
+	
 	initialize: function(){
 		nativeWindow.addEventListener('activate', this.focus);
 		nativeWindow.addEventListener('deactivate', this.blur);
-		
-		// $$('#sidebar, #snippets, #content').addEvent('mousedown', function(event){ //disables selection on the whole panel
-		// 	event.preventDefault();
-		// });
 		
 		$('button-add').addEvent('mousedown', function(event){
 			event.preventDefault(); //if we dont block the event, the mouse will be recognized as down by air, therefore selecting text.
@@ -33,64 +55,62 @@ var Snippely = {
 		});
 		
 		//drag instances
-		new Draggable([
-			{ subject: 'content', property: 'left' },
-			{ subject: 'sidebar', property: 'width' },
-			{ subject: 'snippets', property: 'left' }
-		], {
-			min: 150,
-			max: 300,
-			axis: 'x',
-			handle: 'sidebar-resizer'
+		
+		this.content = $('content');
+		this.snippets = $('snippets');
+		this.tags = $('tags');
+		this.footer = $('footer');
+		
+		this.topResizer = $('top-resizer');
+		this.leftResizer = $('left-resizer');
+		
+		this.createScrollBars();
+		
+		new Drag(this.tags, {
+			modifiers: {y: null, x: 'width'},
+			handle: this.leftResizer,
+			limit: {x: [150, 300]},
+			onDrag: this.redraw.bind(this)
+		});
+
+		new Drag('snippets', {
+			modifiers: {y: 'height', x: null},
+			handle: this.topResizer,
+			limit: {y: [38, function(){
+				return $('snippets-wrap').scrollHeight;
+			}]},
+			onDrag: this.redraw.bind(this)
 		});
 		
-		new Draggable([
-			{ subject: 'content', property: 'top' },
-			{ subject: 'snippets', property: 'height' }
-		], {
-			min: 150,
-			max: 300,
-			axis: 'y',
-			handle: 'snippets-resizer'
-		});
+		this.redraw();
+		
+		nativeWindow.addEventListener('resizing', this.redraw.bind(this));
 		
 		//selectable items
-		var tags = $$('#tags li');
-		tags.addEvent('click', function(){
-			tags.removeClass('selected');
+		var tagElements = $$('#tags li');
+		tagElements.addEvent('click', function(){
+			tagElements.removeClass('selected');
 			this.addClass('selected');
 		});
-		var items = $$('#snippets-list li');
-		items.addEvent('click', function(){
-			items.removeClass('selected');
+		var snippetElements = $$('#snippets li');
+		snippetElements.addEvent('click', function(){
+			snippetElements.removeClass('selected');
 			this.addClass('selected');
 		});
 		
 		//zebra striping
-		$$('#snippets-list li:odd').addClass('odd');
+		$$('#snippets li:odd').addClass('odd');
 		
 		//meta buttons
-		var metaButtons = $$('#meta .button');
-		metaButtons.addEvent('mousedown', function(){
-			this.addClass('active');
-		});
-		document.addEvent('mouseup', function(){
-			metaButtons.removeClass('active');
-		});
-		
-		new ART.ScrollBar('content', 'content-wrap', {
-			autoHide: false
-		});
-		
-		new ART.ScrollBar('sidebar', 'sidebar-wrap', {
-			autoHide: false
-		});
-		
-		new ART.ScrollBar('snippets', 'snippets-wrap', {
-			autoHide: false
-		});
-
-		this.activate(); //activates the window, and sets it visible.
+		// var metaButtons = $$('#meta .button');
+		// 
+		// metaButtons.addEvent('mousedown', function(){
+		// 	this.addClass('active');
+		// });
+		// 
+		// document.addEvent('mouseup', function(){
+		// 	metaButtons.removeClass('active');
+		// });
 	},
 	
 	createMenus: function(){
@@ -127,11 +147,19 @@ var Snippely = {
 	},
 	
 	activate: function(){
-		nativeWindow.activate();
-		nativeWindow.visible = true;
+		
+		(function(){
+			nativeWindow.visible = true;
+			nativeWindow.activate();
+		}).delay(100); //give some time to render, or else garbage will be displayed
+		
 	}
 	
 };
 
 Snippely.createMenus();
-window.addEvent('load', Snippely.initialize.bind(Snippely));
+
+window.addEvent('load', function(){
+	Snippely.initialize();
+	Snippely.activate();
+});

@@ -1,8 +1,8 @@
 /* @group Main */
 
 * {
-	margin: 0px;
-	padding: 0px;
+	margin: 0;
+	padding: 0;
 	line-height: 1;
 }
 
@@ -19,36 +19,51 @@ body {
 
 /* @end */
 
-/* @group Sidebar */
+/* @group Tags */
 
-#sidebar {
-	top: 0px;
-	left: 0px;
-	bottom: 0px;
+#tags {
+	top: 0;
+	left: 0;
+	bottom: 0;
 	width: 200px;
-	overflow: hidden;
 	position: fixed;
 	border-right: 1px solid #a5a5a5;
-}
-#blur  #sidebar { background-color: #e8e8e8; }
-#focus #sidebar { background-color: #d5dde6; }
-
-#sidebar-wrap {
-	height:100%;
+	margin-bottom: 22px;
 }
 
-#sidebar h3 {
-	padding: 0px 12px;
-	margin: 8px 0px 6px;
+#tags-wrap {
+	height: 100%;
+	overflow: hidden;
+}
+
+#tags-pad {
+	
+}
+
+#blur #tags {
+	background-color: #e8e8e8;
+}
+
+#focus #tags {
+	background-color: #d5dde6;
+}
+
+#tags h3 {
+	padding: 0 12px;
+	margin: 8px 0 6px;
 	font-size: 11px;
 	font-weight: bold;
 	text-transform: uppercase;
-	text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.5);
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
-#blur  #sidebar h3 { color: #606060; }
-#focus #sidebar h3 { color: #58697a; }
 
-/* @group Tags */
+#blur  #tags h3 {
+	color: #606060;
+}
+
+#focus #tags h3 {
+	color: #58697a;
+}
 
 #tags li {
 	color: #222;
@@ -61,7 +76,7 @@ body {
 #tags li.selected {
 	color: #fff;
 	font-weight: bold;
-	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5);
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 #blur  #tags li.selected {
@@ -74,29 +89,30 @@ body {
 
 /* @end */
 
-/* @group Sidebar Footer */
+/* @group Footer */
 
-#sidebar-footer {
-	bottom: 0px;
+#footer {
+	bottom: 0;
 	width: 100%;
 	height: 22px;
 	position: absolute;
 	border-top: 1px solid #cacaca;
 	background: #fff url(../images/footer-normal.png) repeat-x top left;
+	border-right: 1px solid #a5a5a5;
 }
 
-#sidebar-footer div {
+#footer div {
 	height: 22px;
 	background-repeat: no-repeat;
 	background-position: center top;
 }
 
-#sidebar-footer div.button {
+#footer div.button {
 	width: 28px;
 	float: left;
 }
 
-#sidebar-footer div.active {
+#footer div.active {
 	background-position: center bottom;
 }
 
@@ -108,7 +124,7 @@ body {
 	background-image: url(../images/button-remove.png);
 }
 
-#sidebar-resizer {
+#left-resizer {
 	float: right;
 	width: 17px;
 	cursor: col-resize;
@@ -117,57 +133,52 @@ body {
 
 /* @end */
 
-/* @end */
-
 /* @group Snippets Panel */
 
 #snippets {
-	top: 0px;
-	left: 200px;
-	right: 0px;
-	height: 200px;
-	overflow: hidden;
+	top: 0;
+	right: 0;
+	height: 100px;
 	position: fixed;
 	background-color: #fff;
 }
 
 #snippets-wrap {
-	height:100%;
+	height: 100%;
+	overflow: hidden;
 }
 
-#snippets-list {
-	list-style: none;
-}
+/*#snippets-pad {
+	padding-right: 15px;
+}*/
 
-#snippets-list li {
+#snippets li {
 	cursor: pointer;
 	padding: 4px 20px;
 	background-color: #fff;
 }
 
-#snippets-list li.odd {
+#snippets li.odd {
 	background: #f5f5f5;
 }
 
-#focus #snippets-list li.selected {
+#focus #snippets li.selected {
 	color: #fff;
 	background-color: #637282;
 }
 
-#blur #snippets-list li.selected {
+#blur #snippets li.selected {
 	color: #fff;
 	background-color: #828282;
 }
 
-#snippets-resizer {
+#top-resizer {
 	height: 5px;
-	bottom: 0px;
-	width: 100%;
+	right: 0;
 	position: absolute;
-	cursor: row-resize;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
-	background: 
+	background:
 		url(../images/content-resizer-ball.png) center center no-repeat,
 		url(../images/content-resizer-bg.png) left center repeat-x;
 }
@@ -177,18 +188,19 @@ body {
 /* @group Content */
 
 #content {
-	top: 200px;
-	left: 200px;
-	right: 0px;
-	bottom: 0px;
-	padding: 10px;
+	right: 0;
+	bottom: 0;
 	font-size: 12px;
-	overflow: hidden;
 	position: absolute;
 }
 
 #content-wrap {
-	height:100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+#content-pad {
+	padding: 10px;
 }
 
 #content h1 {
@@ -197,12 +209,12 @@ body {
 	font-family: Helvetica;
 	padding-bottom: 10px;
 	border-bottom: 1px dotted #bbb;
-	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1);
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
 
 #content div.description {
 	font-size: 12px;
-	margin: 10px 0px;
+	margin: 10px 0;
 	line-height: 1.6;
 	padding-bottom: 10px;
 	border-bottom: 1px dotted #bbb;
@@ -211,11 +223,11 @@ body {
 div.snippet {
 	position: relative;
 	line-height: 1.5;
-	margin: 10px 0px;
+	margin: 10px 0;
 	padding: 6px 10px;
 	border: 1px solid #bbb;
 	-webkit-border-radius: 6px;
-	-webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	background: #fff url(../images/grad.png) bottom left repeat-x;
 }
 
@@ -230,7 +242,7 @@ div.info {
 div.note {
 	font-size: 11px;
 	line-height: 1.6;
-	margin: 10px 0px;
+	margin: 10px 0;
 	padding: 6px 10px;
 	border: 1px solid #ddd;
 	-webkit-border-radius: 6px;
