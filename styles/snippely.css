@@ -4,15 +4,15 @@
 	margin: 0;
 	padding: 0;
 	line-height: 1;
+	cursor: default;
 }
 
 html, body {
+	height: 100%;
 	overflow: hidden;
 }
 
 body {
-	height: 100%;
-	cursor: default;
 	font: 11px/1 Lucida Grande, Arial;
 	background-color: #eee;
 }
@@ -67,7 +67,6 @@ body {
 
 #tags li {
 	color: #222;
-	cursor: pointer;
 	font-size: 11px;
 	line-height: 11px;
 	padding: 4px 6px 5px 25px;
@@ -127,7 +126,6 @@ body {
 #left-resizer {
 	float: right;
 	width: 17px;
-	cursor: col-resize;
 	background-image: url(../images/button-splitter.png);
 }
 
@@ -153,7 +151,6 @@ body {
 }*/
 
 #snippets li {
-	cursor: pointer;
 	padding: 4px 20px;
 	background-color: #fff;
 }
