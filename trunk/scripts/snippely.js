@@ -59,11 +59,11 @@ var Snippely = {
 	},
 	
 	focus: function(){
-		$(document.body).set('class', 'focus');
+		document.body.id = 'focus';
 	},
 	
 	blur: function(){
-		$(document.body).set('class', 'blur');
+		document.body.id = 'blur';
 	},
 	
 	domReady: function(){
@@ -72,7 +72,7 @@ var Snippely = {
 		
 		nativeWindow.addEventListener('deactivate', this.blur);
 		
-		$$('#panel, #list').addEvent('mousedown', function(event){ //disables selection on the whole panel
+		$$('#panel, #list, #meta').addEvent('mousedown', function(event){ //disables selection on the whole panel
 			event.preventDefault();
 		});
 		
@@ -126,14 +126,22 @@ var Snippely = {
 		
 		var items = $$('.item'); 
 		
-		items.addEvent('mouseup', function(){
+		items.addEvent('click', function(){
 			items.removeClass('selected');
 			this.addClass('selected');
 		});
 		
-		console.log(true);
-		
 		//end select
+		
+		var metaButtons = $$('#meta .button');
+		
+		metaButtons.addEvent('mousedown', function(){
+			this.addClass('active');
+		});
+		
+		document.addEvent('mouseup', function(){
+			metaButtons.removeClass('active');
+		});
 	},
 	
 	activate: function(){
