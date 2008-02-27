@@ -79,17 +79,17 @@ body.blur #panel-cell {
 }
 
 #button-add {
-	background-image: url(/assets/images/button-add.png);
+	background-image: url(/images/button-add.png);
 }
 
 #button-action {
-	background-image: url(/assets/images/button-remove.png);
+	background-image: url(/images/button-remove.png);
 }
 
 #splitter {
 	width: 17px;
 	height: 22px;
-	background-image: url(/assets/images/button-splitter.png);
+	background-image: url(/images/button-splitter.png);
 }
 
 /* @end */
@@ -110,7 +110,7 @@ body.blur .panel-title {
 
 #panel-footer {
 	border-top: 1px solid #cacaca;
-	background: url(/assets/images/footer-normal.png) top left repeat-x;
+	background: url(/images/footer-normal.png) top left repeat-x;
 	position: fixed;
 	bottom: 0;
 }
@@ -136,11 +136,11 @@ body.blur .panel-title {
 }
 
 body.focus .tag.selected {
-	background-image: url(/assets/images/selected-focus.png);
+	background-image: url(/images/selected-focus.png);
 }
 
 body.blur .tag.selected {
-	background-image: url(/assets/images/selected-blur.png);
+	background-image: url(/images/selected-blur.png);
 }
 
 /* @end */
@@ -182,8 +182,8 @@ body.blur #list .item.selected {
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 	background:
-		url(/assets/images/content-resizer-ball.png) center center no-repeat, 
-		url(/assets/images/content-resizer-bg.png) center left repeat-x;
+		url(/images/content-resizer-ball.png) center center no-repeat, 
+		url(/images/content-resizer-bg.png) center left repeat-x;
 }
 
 /* @end */
@@ -221,7 +221,7 @@ body.blur #list .item.selected {
 	-webkit-border-radius: 6px;
 	border: 1px solid #bbb;
 	-webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-	background: #fff url(/assets/images/snip-grad.png) bottom left repeat-x;
+	background: #fff url(/images/snip-grad.png) bottom left repeat-x;
 }
 
 .info {
