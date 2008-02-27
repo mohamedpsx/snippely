@@ -21,8 +21,6 @@ var Snippely = {
 	},
 	
 	redraw: function(){
-
-		
 		this.content.setStyle('left', this.tags.offsetWidth);
 		this.snippets.setStyle('left', this.tags.offsetWidth);
 		this.footer.setStyle('width', this.tags.clientWidth);
@@ -84,7 +82,8 @@ var Snippely = {
 		
 		this.redraw();
 		
-		nativeWindow.addEventListener('resizing', this.redraw.bind(this));
+		//redraw on resize
+		nativeWindow.addEventListener('resize', this.redraw.bind(this));
 		
 		//selectable items
 		var tagElements = $$('#tags li');
