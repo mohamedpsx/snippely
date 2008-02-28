@@ -22,16 +22,68 @@ var Snippely = {
 		this.snippetsScrollbar.update();
 		this.tagsScrollbar.update();
 		
-		this.content.setStyle('left', this.tags.offsetWidth);
-		this.snippets.setStyle('left', this.tags.offsetWidth);
+		var left = this.tags.offsetWidth;
+		
+		$$(this.snippets, this.topResizer, this.meta, this.content).setStyle('left', left);
+		
 		this.footer.setStyle('width', this.tags.clientWidth);
-		this.topResizer.setStyle('left', this.tags.offsetWidth);
+		
 		
 		this.topResizer.setStyle('top', this.snippets.offsetHeight);
-		this.content.setStyle('top', this.topResizer.offsetHeight + this.snippets.offsetHeight);
+		this.meta.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight);
+		this.content.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
 	},
 	
 	initialize: function(){
+		
+		var makeEditable = function(){
+			if (this.editing) return;
+			this.addClass('editing');
+			this.getElement('.contents').contentEditable = true;
+			this.editing = true;
+		};
+		
+		var makeUnEditable = function(){
+			if (!this.editing) return;
+			this.removeClass('editing');
+			this.getElement('.contents').contentEditable = false;
+			this.editing = false;
+		};
+		
+		$$('#content div.contents').each(function(element){
+			element.setHTML(element.getHTML().trim());
+			
+			element.history = [element.getHTML()];
+			
+			element.addEvent('keydown', function(event){
+				if (event.meta && event.key == 'z'){
+					event.preventDefault();
+					var start = this.selectionStart;
+					var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
+					this.setHTML(previous);
+				} else {
+					if (this.getHTML() != this.history.getLast()) this.history.push(this.getHTML());
+				}
+			});
+		});
+		
+		$$('#content div.snippet').each(function(element){
+			element.addEvent('mouseenter', makeEditable);
+			element.addEvent('mouseleave', makeUnEditable);
+		});
+		//elements
+		
+		this.content = $('content');
+		this.snippets = $('snippets');
+		this.tags = $('tags');
+		this.footer = $('footer');
+		
+		this.meta = $('meta');
+		
+		this.topResizer = $('top-resizer');
+		this.leftResizer = $('left-resizer');
+		
+		
 		nativeWindow.addEventListener('activate', this.focus);
 		nativeWindow.addEventListener('deactivate', this.blur);
 		
@@ -50,14 +102,6 @@ var Snippely = {
 		});
 		
 		//drag instances
-		
-		this.content = $('content');
-		this.snippets = $('snippets');
-		this.tags = $('tags');
-		this.footer = $('footer');
-		
-		this.topResizer = $('top-resizer');
-		this.leftResizer = $('left-resizer');
 		
 		this.createScrollBars();
 		
@@ -101,15 +145,15 @@ var Snippely = {
 		$$('#snippets li:odd').addClass('odd');
 		
 		//meta buttons
-		// var metaButtons = $$('#meta .button');
-		// 
-		// metaButtons.addEvent('mousedown', function(){
-		// 	this.addClass('active');
-		// });
-		// 
-		// document.addEvent('mouseup', function(){
-		// 	metaButtons.removeClass('active');
-		// });
+		var metaButtons = $$('#meta .button');
+		
+		metaButtons.addEvent('mousedown', function(){
+			this.addClass('active');
+		});
+		
+		document.addEvent('mouseup', function(){
+			metaButtons.removeClass('active');
+		});
 	},
 	
 	createMenus: function(){

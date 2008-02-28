@@ -69,7 +69,7 @@ ART.ScrollBar = new Class({
 	attach: function(){
 		this.thumb.addEvent('mousedown', this.bound.start);
 		if (this.options.wheel) this.scrolling.addEvent('mousewheel', this.bound.wheel);
-		this.container.addEvent('mouseup', this.bound.page);
+		this.container.addEvent('click', this.bound.page);
 	},
 	
 	show: function(force){
