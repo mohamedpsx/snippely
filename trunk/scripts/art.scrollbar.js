@@ -21,7 +21,7 @@ ART.ScrollBar = new Class({
 		
 		this.content = $(content);
 		
-		this.margin = this.content.getStyle('margin-right').toInt();
+		this.padding = this.scrolling.getStyle('padding-right').toInt();
 		
 		this.container = new Element('div').addClass('art-scrollbar').inject(this.scrolling);
 		
@@ -74,7 +74,7 @@ ART.ScrollBar = new Class({
 	
 	show: function(force){
 		if (this.hidden){
-			this.content.setStyle('margin-right', this.margin + this.track.offsetWidth);
+			this.scrolling.setStyle('padding-right', this.padding + this.track.offsetWidth);
 			this.container.setStyle('visibility', 'visible');
 			this.hidden = false;
 		}
@@ -82,7 +82,7 @@ ART.ScrollBar = new Class({
 	
 	hide: function(force){
 		if (!this.hidden){
-			this.content.setStyle('margin-right', this.margin);
+			this.scrolling.setStyle('padding-right', this.padding);
 			this.container.setStyle('visibility', 'hidden');
 			this.hidden = true;
 		}
@@ -138,10 +138,10 @@ ART.ScrollBar = new Class({
 		this.updateThumbFromContentScroll();
 	},
 
-	page: function(option){
-		if (this.mousedown) return;
+	page: function(event){
+		if (this.track.hasChild(event.target)) return;
 		var height = this.content.offsetHeight;
-		var page = (($type(option) == 'event' && option.page.y > this.thumb.getPosition().y) || option == 'down') ? height : -height;
+		var page = (event.page.y > this.thumb.getPosition().y) ? height : -height;
 		var scroll = this.content.scrollTop + page;
 		this.scroller.start(0, scroll);
 		this.updateThumbFromContentScroll(scroll);
