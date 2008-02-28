@@ -67,10 +67,11 @@ var Snippely = {
 			});
 		});
 		
-		$$('#content div.snippet').each(function(element){
-			element.addEvent('mouseenter', makeEditable);
-			element.addEvent('mouseleave', makeUnEditable);
-		});
+		// $$('#content div.snippet').each(function(element){
+		// 	element.addEvent('mouseenter', makeEditable);
+		// 	element.addEvent('mouseleave', makeUnEditable);
+		// });
+		
 		//elements
 		
 		this.content = $('content');
