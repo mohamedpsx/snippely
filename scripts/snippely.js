@@ -17,11 +17,7 @@ var Snippely = {
 	},
 	
 	redraw: function(){
-		
-		this.contentScrollbar.update();
-		this.snippetsScrollbar.update();
-		this.tagsScrollbar.update();
-		
+
 		var left = this.tags.offsetWidth;
 		
 		$$(this.snippets, this.topResizer, this.meta, this.content).setStyle('left', left);
@@ -32,6 +28,10 @@ var Snippely = {
 		this.topResizer.setStyle('top', this.snippets.offsetHeight);
 		this.meta.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight);
 		this.content.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
+		
+		this.tagsScrollbar.update();
+		this.snippetsScrollbar.update();
+		this.contentScrollbar.update();
 	},
 	
 	initialize: function(){
@@ -192,7 +192,6 @@ var Snippely = {
 	
 	activate: function(){
 		(function(){
-			Snippely.redraw();
 			nativeWindow.visible = true;
 			nativeWindow.activate();
 		}).delay(100); //give some time to render, or else garbage will be displayed
