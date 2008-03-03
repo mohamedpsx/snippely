@@ -17,6 +17,10 @@ body {
 	background-color: #eee;
 }
 
+#snippets, #meta, #tags, #footer {
+	-webkit-user-select:none;
+}
+
 /* @end */
 
 /* @group Tags */

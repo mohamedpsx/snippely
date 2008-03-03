@@ -10,30 +10,6 @@ Application.autoExit = true;
 
 var Snippely = {
 	
-	createScrollBars: function(){
-		this.contentScrollbar = new ART.ScrollBar('content', 'content-wrap');
-		this.tagsScrollbar = new ART.ScrollBar('tags', 'tags-wrap');
-		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
-	},
-	
-	redraw: function(){
-
-		var left = this.tags.offsetWidth;
-		
-		$$(this.snippets, this.topResizer, this.meta, this.content).setStyle('left', left);
-		
-		this.footer.setStyle('width', this.tags.clientWidth);
-		
-		
-		this.topResizer.setStyle('top', this.snippets.offsetHeight);
-		this.meta.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight);
-		this.content.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
-		
-		this.tagsScrollbar.update();
-		this.snippetsScrollbar.update();
-		this.contentScrollbar.update();
-	},
-	
 	initialize: function(){
 		
 		var makeEditable = function(){
@@ -68,7 +44,7 @@ var Snippely = {
 		});
 		
 		// $$('#content div.snippet').each(function(element){
-		// 	element.addEvent('mouseenter', makeEditable);
+		// 	element.addEvent('mousedown', makeEditable);
 		// 	element.addEvent('mouseleave', makeUnEditable);
 		// });
 		
@@ -89,14 +65,12 @@ var Snippely = {
 		nativeWindow.addEventListener('deactivate', this.blur);
 		
 		$('button-add').addEvent('mousedown', function(event){
-			event.preventDefault(); //if we dont block the event, the mouse will be recognized as down by air, therefore selecting text.
 			this.addClass('active');
 			Snippely.addMenu.display(event.client); //he doesnt care about my passed positions.. whoa.
 			this.removeClass('active'); //apparently, the menu blocks all activity.
 		});
 		
 		$('button-action').addEvent('mousedown', function(event){
-			event.preventDefault();
 			this.addClass('active');
 			Snippely.actionMenu.display(event.client);
 			this.removeClass('active');
@@ -157,6 +131,12 @@ var Snippely = {
 		});
 	},
 	
+	createScrollBars: function(){
+		this.tagsScrollbar = new ART.ScrollBar('tags', 'tags-wrap');
+		this.contentScrollbar = new ART.ScrollBar('content', 'content-wrap');
+		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
+	},
+	
 	createMenus: function(){
 		//main menus
 		this.mainMenu = new ART.Menu('MainMenu');
@@ -182,12 +162,18 @@ var Snippely = {
 		this.actionMenu.addItem(this.renameTagItem).addItem(this.removeTagItem).addItem(this.renameSnippetItem).addItem(this.removeSnippetItem);
 	},
 	
-	focus: function(){
-		document.body.id = 'focus';
-	},
-	
-	blur: function(){
-		document.body.id = 'blur';
+	redraw: function(){
+		var left = this.tags.offsetWidth;
+		$$(this.snippets, this.topResizer, this.meta, this.content).setStyle('left', left);
+		
+		this.footer.setStyle('width', this.tags.clientWidth);
+		this.topResizer.setStyle('top', this.snippets.offsetHeight);
+		this.meta.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight);
+		this.content.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
+		
+		this.tagsScrollbar.update();
+		this.contentScrollbar.update();
+		this.snippetsScrollbar.update();
 	},
 	
 	activate: function(){
@@ -195,8 +181,15 @@ var Snippely = {
 			nativeWindow.visible = true;
 			nativeWindow.activate();
 		}).delay(100); //give some time to render, or else garbage will be displayed
-		
-	}
+	},
+
+	focus: function(){
+		document.body.id = 'focus';
+	},
+	
+	blur: function(){
+		document.body.id = 'blur';
+	}	
 	
 };
 
