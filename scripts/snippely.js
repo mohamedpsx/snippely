@@ -147,24 +147,27 @@ var Snippely = {
 	},
 	
 	initializeSnippet: function(){
-		var makeEditable = function(){
-			if (this.editing) return;
-			this.addClass('editing');
-			this.getElement('.contents').contentEditable = true;
-			this.editing = true;
-		};
+		var active = false;
 		
-		var makeUnEditable = function(){
+		var blur = function(){
 			if (!this.editing) return;
-			this.removeClass('editing');
-			this.getElement('.contents').contentEditable = false;
-			this.editing = false;
+			this.editing = active = false;
+			this.removeClass('editing').getElement('.contents').contentEditable = false;
 		};
 		
-		// $$('#content div.snippet').each(function(element){
-		// 	element.addEvent('mousedown', makeEditable);
-		// 	element.addEvent('mouseleave', makeUnEditable);
-		// });
+		var focus = function(event){
+			event.stopPropagation();
+			if (this.editing) return;
+			if (active) blur.call(active);
+			this.addClass('editing').getElement('.contents').contentEditable = true;
+			this.editing = true;
+			active = this;
+		};
+		
+		$$('#content div.snippet').addEvent('mousedown', focus);
+		document.addEvent('mousedown', function(){
+			blur.call(active);
+		});
 	},
 	
 	redraw: function(){
