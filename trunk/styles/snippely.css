@@ -260,6 +260,7 @@ div.snippet.code, div.snippet div.info {
 div.code.snippet div.contents {
 	white-space: pre;
 	overflow: hidden;
+	cursor:text;
 }
 
 div.contents {
