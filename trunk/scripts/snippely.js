@@ -11,133 +11,28 @@ Application.autoExit = true;
 var Snippely = {
 	
 	initialize: function(){
-		
-		var makeEditable = function(){
-			if (this.editing) return;
-			this.addClass('editing');
-			this.getElement('.contents').contentEditable = true;
-			this.editing = true;
-		};
-		
-		var makeUnEditable = function(){
-			if (!this.editing) return;
-			this.removeClass('editing');
-			this.getElement('.contents').contentEditable = false;
-			this.editing = false;
-		};
-		
-		$$('#content div.contents').each(function(element){
-			element.setHTML(element.getHTML().trim());
-			
-			element.history = [element.getHTML()];
-			
-			element.addEvent('keydown', function(event){
-				if (event.meta && event.key == 'z'){
-					event.preventDefault();
-					var start = this.selectionStart;
-					var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
-					this.setHTML(previous);
-				} else {
-					if (this.getHTML() != this.history.getLast()) this.history.push(this.getHTML());
-				}
-			});
-		});
-		
-		// $$('#content div.snippet').each(function(element){
-		// 	element.addEvent('mousedown', makeEditable);
-		// 	element.addEvent('mouseleave', makeUnEditable);
-		// });
-		
-		//elements
-		
-		this.content = $('content');
-		this.snippets = $('snippets');
+		this.meta = $('meta');
 		this.tags = $('tags');
 		this.footer = $('footer');
-		
-		this.meta = $('meta');
-		
+		this.content = $('content');
+		this.snippets = $('snippets');
 		this.topResizer = $('top-resizer');
 		this.leftResizer = $('left-resizer');
 		
+		this.initializeMenus();
+		this.initializeLayout();
+		this.initializeHistory();
 		
-		nativeWindow.addEventListener('activate', this.focus);
-		nativeWindow.addEventListener('deactivate', this.blur);
+		this.initializeTags();
+		this.initializeMetas();
+		this.initializeSnippets();
 		
-		$('button-add').addEvent('mousedown', function(event){
-			this.addClass('active');
-			Snippely.addMenu.display(event.client); //he doesnt care about my passed positions.. whoa.
-			this.removeClass('active'); //apparently, the menu blocks all activity.
-		});
+		this.initializeSnippet();
 		
-		$('button-action').addEvent('mousedown', function(event){
-			this.addClass('active');
-			Snippely.actionMenu.display(event.client);
-			this.removeClass('active');
-		});
-		
-		//drag instances
-		
-		this.createScrollBars();
-		
-		new Drag(this.tags, {
-			modifiers: {y: null, x: 'width'},
-			handle: this.leftResizer,
-			limit: {x: [150, 300]},
-			onDrag: this.redraw.bind(this)
-		});
-
-		new Drag('snippets', {
-			modifiers: {y: 'height', x: null},
-			handle: this.topResizer,
-			limit: {y: [38, function(){
-				return $('snippets-wrap').scrollHeight;
-			}]},
-			onDrag: this.redraw.bind(this)
-		});
-		
-		//redraw on resize
-		nativeWindow.addEventListener('resize', this.redraw.bind(this));
-		nativeWindow.addEventListener('activate', this.redraw.bind(this));
-		nativeWindow.addEventListener('deactivate', this.redraw.bind(this));
-		
-		// this.redraw();
-		this.redraw();
-		
-		//selectable items
-		var tagElements = $$('#tags li');
-		tagElements.addEvent('click', function(){
-			tagElements.removeClass('selected');
-			this.addClass('selected');
-		});
-		var snippetElements = $$('#snippets li');
-		snippetElements.addEvent('click', function(){
-			snippetElements.removeClass('selected');
-			this.addClass('selected');
-		});
-		
-		//zebra striping
-		$$('#snippets li:odd').addClass('odd');
-		
-		//meta buttons
-		var metaButtons = $$('#meta .button');
-		
-		metaButtons.addEvent('mousedown', function(){
-			this.addClass('active');
-		});
-		
-		document.addEvent('mouseup', function(){
-			metaButtons.removeClass('active');
-		});
+		this.activate();
 	},
 	
-	createScrollBars: function(){
-		this.tagsScrollbar = new ART.ScrollBar('tags', 'tags-wrap');
-		this.contentScrollbar = new ART.ScrollBar('content', 'content-wrap');
-		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
-	},
-	
-	createMenus: function(){
+	initializeMenus: function(){
 		//main menus
 		this.mainMenu = new ART.Menu('MainMenu');
 		this.saveItem = new ART.Menu.Item('Save');
@@ -160,6 +55,116 @@ var Snippely = {
 		this.removeSnippetItem = new ART.Menu.Item('Remove Snippet...');
 		this.renameSnippetItem = new ART.Menu.Item('Rename Snippet...');
 		this.actionMenu.addItem(this.renameTagItem).addItem(this.removeTagItem).addItem(this.renameSnippetItem).addItem(this.removeSnippetItem);
+		
+		$('button-add').addEvent('mousedown', function(event){
+			this.addClass('active');
+			Snippely.addMenu.display(event.client); //he doesnt care about my passed positions.. whoa.
+			this.removeClass('active'); //apparently, the menu blocks all activity.
+		});
+		
+		$('button-action').addEvent('mousedown', function(event){
+			this.addClass('active');
+			Snippely.actionMenu.display(event.client);
+			this.removeClass('active');
+		});
+	},
+	
+	initializeLayout: function(){
+		var redraw = this.redraw.bind(this);
+		
+		new Drag(this.tags, {
+			modifiers: {y: null, x: 'width'},
+			handle: this.leftResizer,
+			limit: {x: [150, 300]},
+			onDrag: redraw
+		});
+
+		new Drag(this.snippets, {
+			modifiers: {y: 'height', x: null},
+			handle: this.topResizer,
+			limit: {y: [38, function(){
+				return $('snippets-wrap').scrollHeight;
+			}]},
+			onDrag: redraw
+		});
+		
+		nativeWindow.addEventListener('resize', redraw);
+		nativeWindow.addEventListener('activate', redraw);
+		nativeWindow.addEventListener('deactivate', redraw);
+		nativeWindow.addEventListener('activate', this.focus);
+		nativeWindow.addEventListener('deactivate', this.blur);
+
+		this.tagsScrollbar = new ART.ScrollBar('tags', 'tags-wrap');
+		this.contentScrollbar = new ART.ScrollBar('content', 'content-wrap');
+		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
+		
+		this.redraw();
+	},
+	
+	initializeHistory: function(){
+		$$('#content div.contents').each(function(element){
+			element.setHTML(element.getHTML().trim());
+			element.history = [element.getHTML()];
+			element.addEvent('keydown', function(event){
+				if (event.meta && event.key == 'z'){
+					event.preventDefault();
+					var start = this.selectionStart;
+					var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
+					this.setHTML(previous);
+				} else {
+					if (this.getHTML() != this.history.getLast()) this.history.push(this.getHTML());
+				}
+			});
+		});
+	},
+	
+	initializeTags: function(){
+		var tags = $$('#tags li');
+		tags.addEvent('click', function(){
+			tags.removeClass('selected');
+			this.addClass('selected');
+		});
+	},
+	
+	initializeMetas: function(){
+		var metaButtons = $$('#meta .button');
+		metaButtons.addEvent('mousedown', function(){
+			this.addClass('active');
+		});
+		document.addEvent('mouseup', function(){
+			metaButtons.removeClass('active');
+		});
+	},
+	
+	initializeSnippets: function(){
+		var snippets = $$('#snippets li');
+		snippets.addEvent('click', function(){
+			snippets.removeClass('selected');
+			this.addClass('selected');
+		});
+		
+		$$('#snippets li:odd').addClass('odd');
+	},
+	
+	initializeSnippet: function(){
+		var makeEditable = function(){
+			if (this.editing) return;
+			this.addClass('editing');
+			this.getElement('.contents').contentEditable = true;
+			this.editing = true;
+		};
+		
+		var makeUnEditable = function(){
+			if (!this.editing) return;
+			this.removeClass('editing');
+			this.getElement('.contents').contentEditable = false;
+			this.editing = false;
+		};
+		
+		// $$('#content div.snippet').each(function(element){
+		// 	element.addEvent('mousedown', makeEditable);
+		// 	element.addEvent('mouseleave', makeUnEditable);
+		// });
 	},
 	
 	redraw: function(){
@@ -193,9 +198,4 @@ var Snippely = {
 	
 };
 
-Snippely.createMenus();
-
-window.addEvent('load', function(){
-	Snippely.initialize();
-	Snippely.activate();
-});
+window.addEvent('load', Snippely.initialize.bind(Snippely));
