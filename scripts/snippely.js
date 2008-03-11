@@ -108,8 +108,12 @@ var Snippely = {
 		
 		//add menu
 		this.addMenu = new ART.Menu('AddMenu');
-		this.addTagItem = new ART.Menu.Item('Add Tag...');
-		this.addSnippetItem = new ART.Menu.Item('Add Snippet...');
+		this.addTagItem = new ART.Menu.Item('Add Tag...', {
+			onSelect: this.Tags.add.bind(this.Tags)
+		});
+		this.addSnippetItem = new ART.Menu.Item('Add Snippet...', {
+			onSelect: this.Snippets.add.bind(this.Snippets)
+		});
 		this.addMenu.addItem(this.addTagItem).addItem(this.addSnippetItem);
 		
 		//action menu
@@ -124,12 +128,14 @@ var Snippely = {
 			this.addClass('active');
 			Snippely.addMenu.display(event.client); //he doesnt care about my passed positions.. whoa.
 			this.removeClass('active'); //apparently, the menu blocks all activity.
+			event.stop();
 		});
 		
 		$('button-action').addEvent('mousedown', function(event){
 			this.addClass('active');
 			Snippely.actionMenu.display(event.client);
 			this.removeClass('active');
+			event.stop();
 		});
 	},
 	
@@ -220,19 +226,30 @@ Snippely.Tags = {
 		this.load(TAGS);
 	},
 
+	create: function(tag){
+		var element = new Element('li', { text: tag.name });
+		return element.addEvents({
+			click: this.select.bind(this, element),
+			dblclick: this.edit.bind(this, element),
+			mousedown: function(event){ event.stopPropagation(); }
+		}).store('tag:id', tag.id);
+	},
+	
 	load: function(tags){
 		this.list.empty();
-		var elements = tags.map(function(tag){
-			var element = new Element('li', { text: tag.name });
-			return element.addEvents({
-				click: this.select.bind(this, element),
-				dblclick: this.edit.bind(this, element),
-				mousedown: function(event){ event.stopPropagation(); }
-			}).store('tag:id', tag.id);
-		}, this);
+		var elements = tags.map(this.create, this);
 		
 		this.list.adopt(elements);
 		this.elements = $$(elements);
+	},
+	
+	add: function(){
+		var element = this.create({name: 'New Tag', id: 0});
+		
+		this.list.adopt(element);
+		this.elements.push(element);
+		this.select(element);
+		this.edit(element);
 	},
 	
 	select: function(element){
@@ -242,7 +259,7 @@ Snippely.Tags = {
 		element.addClass('selected');
 
 		var id = element.retrieve('tag:id');
-		var snippets = SNIPPETS[id]; //TEMP - retrieve from database
+		var snippets = SNIPPETS[id] || []; //TEMP - retrieve from database
 		
 		Snippely.Snippets.load(snippets);
 	},
@@ -290,6 +307,10 @@ Snippely.Snippets = {
 		var snippet = SNIPPET[id]; //TEMP - retrieve from database
 		
 		Snippely.Snippet.load(snippet);
+	},
+	
+	add: function(){
+		
 	}
 	
 };
