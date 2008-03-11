@@ -17,7 +17,7 @@ body {
 	background-color: #eee;
 }
 
-#snippets, #meta, #tags, #footer {
+#snippets, #meta, #footer {
 	-webkit-user-select:none;
 }
 
