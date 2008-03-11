@@ -16,21 +16,61 @@ var TAGS = [
 
 var SNIPPETS = {
 	"1": [
-		{ id: 1, name: 'Some Snippet 1' },
-		{ id: 2, name: 'Some Snippet 2' },
-		{ id: 3, name: 'Some Snippet 3' }
+		{ id: 1, title: 'My First Snippet' },
+		{ id: 2, title: 'My Second Snippet' },
+		{ id: 3, title: 'My Third Snippet' }
 	],
 	"2": [
-		{ id: 4, name: 'Some Snippet 4' },
-		{ id: 5, name: 'Some Snippet 5' },
-		{ id: 6, name: 'Some Snippet 6' },
-		{ id: 7, name: 'Some Snippet 7' }
+		{ id: 3, title: 'My Third Snippet' },
+		{ id: 4, title: 'My Fourth Snippet' },
+		{ id: 2, title: 'My Second Snippet' },
+		{ id: 1, title: 'My First Snippet' }
 	],
 	"3": [
-		{ id: 1, name: 'Some Snippet 1' },
-		{ id: 3, name: 'Some Snippet 3' },
-		{ id: 5, name: 'Some Snippet 5' }
+		{ id: 4, title: 'My Fourth Snippet' },
+		{ id: 1, title: 'My First Snippet' },
+		{ id: 2, title: 'My Second Snippet' }
 	]
+};
+
+var SNIPPET = {
+	"1": {
+		title: 'My First Snippet',
+		description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur consectetuer, elit quis gravida mollis, ligula sem cursus leo, lacinia rhoncus mi urna eget felis. Nam non felis id dolor egestas iaculis.',
+		snips: [
+			{ id: 1, type: 'javascript', code: true, content: 'Cras eget eros. Ut enim purus, scelerisque in, eleifend ut, tristique id, elit. Integer sapien. Proin nunc massa, auctor at, fermentum placerat, pulvinar sit amet, enim. Phasellus consequat lobortis nisl. Curabitur sed felis. Donec ultrices, libero at rhoncus blandit, lacus risus dapibus mi, quis fermentum velit erat volutpat lectus. Sed accumsan feugiat nulla. Ut in erat eu nisi sagittis blandit. Ut mauris ligula, pretium in, bibendum ac, bibendum eget, purus. In erat libero, hendrerit ac, faucibus a, pretium nec, diam. Vestibulum nisi. Curabitur tincidunt. Cras elementum justo.' },
+			{ id: 2, type: 'php', code: true, content: 'Donec tincidunt ultricies risus. Donec tempor lacus id sem. Fusce aliquam, pede sed accumsan dapibus, mauris nisi faucibus purus, ut elementum dui arcu molestie tortor. Nunc sagittis iaculis eros. Quisque sodales ipsum et felis. Nulla facilisi. Nulla in mauris in purus condimentum ornare. Phasellus porta ante a purus. In quis diam. Curabitur non leo. Sed facilisis odio condimentum ante. Nam tempor feugiat sem. Praesent sit amet libero sit amet dolor consequat venenatis.' },
+			{ id: 3, type: 'note', code: false, content: 'Nulla facilisi. Duis sem tellus, laoreet quis, hendrerit id, faucibus vel, augue. In hac habitasse platea dictumst. Aenean pretium cursus odio. Phasellus ac libero aliquet enim bibendum condimentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam posuere sodales pede. Vivamus porttitor libero nec pede feugiat consectetuer. Fusce vitae risus eu tortor pharetra dictum. Vivamus sit amet dui. Phasellus at nibh. Curabitur diam justo, convallis non, cursus eu, facilisis non, leo.' }
+		]
+	},
+	"2": {
+		title: 'My Second Snippet',
+		description: 'Fusce gravida nulla nec erat. Fusce euismod nulla a arcu. Vivamus rutrum. Nam ultricies libero ut turpis. Vivamus viverra tempor neque. Aenean felis. Curabitur vel odio sit amet enim posuere blandit. Vivamus consequat sem luctus elit. In ante nisl, euismod sed, interdum at, eleifend id, dolor. Phasellus sit amet ipsum. Etiam augue arcu, suscipit vel, tincidunt ac, congue vel, mauris.',
+		snips: [
+			{ id: 4, type: 'ruby', code: true, content: 'Proin dictum lorem. Sed at lectus. Nullam cursus quam ac turpis. In hac habitasse platea dictumst. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam et tellus vel sem pellentesque bibendum. Maecenas mollis urna ac est. Sed volutpat. Nam molestie turpis ac ante. Cras ultrices ante eget nibh. Integer lobortis interdum eros. Aliquam sapien ante, interdum nec, malesuada et, varius ac, nulla. Aliquam et diam. Maecenas mollis nunc in nunc.' },
+			{ id: 5, type: 'note', code: false, content: 'Duis sem tellus, laoreet quis, hendrerit id, faucibus vel, augue. In hac habitasse platea dictumst. Aenean pretium cursus odio. Phasellus ac libero aliquet enim bibendum condimentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam posuere sodales pede. Vivamus porttitor libero nec pede feugiat consectetuer. Fusce vitae risus eu tortor pharetra dictum. Vivamus sit amet dui. Phasellus at nibh. Curabitur diam justo, convallis non, cursus eu, facilisis non, leo.' },
+			{ id: 6, type: 'javascript', code: true, content: 'Ut enim purus, scelerisque in, eleifend ut, tristique id, elit. Integer sapien. Proin nunc massa, auctor at, fermentum placerat, pulvinar sit amet, enim. Phasellus consequat lobortis nisl. Curabitur sed felis. Donec ultrices, libero at rhoncus blandit, lacus risus dapibus mi, quis fermentum velit erat volutpat lectus. Sed accumsan feugiat nulla. Ut in erat eu nisi sagittis blandit. Ut mauris ligula, pretium in, bibendum ac, bibendum eget, purus. In erat libero, hendrerit ac, faucibus a, pretium nec, diam. Vestibulum nisi. Curabitur tincidunt. Cras elementum justo.' }
+		]
+	},
+	"3": {
+		title: 'My Third Snippet',
+		description: 'Fusce gravida nulla nec erat. Fusce euismod nulla a arcu. Vivamus rutrum. Nam ultricies libero ut turpis. Vivamus viverra tempor neque. Aenean felis. Curabitur vel odio sit amet enim posuere blandit. Vivamus consequat sem luctus elit. In ante nisl, euismod sed, interdum at, eleifend id, dolor. Phasellus sit amet ipsum. Etiam augue arcu, suscipit vel, tincidunt ac, congue vel, mauris.',
+		snips: [
+			{ id: 7, type: 'php', code: true, content: 'In hac habitasse platea dictumst. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam et tellus vel sem pellentesque bibendum. Maecenas mollis urna ac est. Sed volutpat. Nam molestie turpis ac ante. Cras ultrices ante eget nibh. Integer lobortis interdum eros. Aliquam sapien ante, interdum nec, malesuada et, varius ac, nulla. Aliquam et diam. Maecenas mollis nunc in nunc.' },
+			{ id: 8, type: 'note', code: false, content: 'Duis sem tellus, laoreet quis, hendrerit id, faucibus vel, augue. In hac habitasse platea dictumst. Aenean pretium cursus odio. Phasellus ac libero aliquet enim bibendum condimentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam posuere sodales pede. Vivamus porttitor libero nec pede feugiat consectetuer. Fusce vitae risus eu tortor pharetra dictum. Vivamus sit amet dui. Phasellus at nibh. Curabitur diam justo, convallis non, cursus eu, facilisis non, leo.' },
+		]
+	},
+	"4": {
+		title: 'My Fourth Snippet',
+		description: 'This snippet is all about ruby because i love ruby so much.',
+		snips: [
+			{ id: 9, type: 'ruby', code: true, content: 'Curabitur consectetuer, elit quis gravida mollis, ligula sem cursus leo, lacinia rhoncus mi urna eget felis. Nam non felis id dolor egestas iaculis. Fusce gravida nulla nec erat. Fusce euismod nulla a arcu. Vivamus rutrum. Nam ultricies libero ut turpis. Vivamus viverra tempor neque. Aenean felis. Curabitur vel odio sit amet enim posuere blandit. Vivamus consequat sem luctus elit. In ante nisl, euismod sed, interdum at, eleifend id, dolor.' },
+			{ id: 10, type: 'ruby', code: true, content: 'Cras eget eros. Ut enim purus, scelerisque in, eleifend ut, tristique id, elit. Integer sapien. Proin dictum lorem. Sed at lectus. Nullam cursus quam ac turpis. In hac habitasse platea dictumst. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam et tellus vel sem pellentesque bibendum. Maecenas mollis urna ac est. Sed volutpat. Nam molestie turpis ac ante. Cras ultrices ante eget nibh. Integer lobortis interdum eros.' },
+			{ id: 11, type: 'ruby', code: true, content: 'Cras eget eros. Ut enim purus, scelerisque in, eleifend ut, tristique id, elit. Integer sapien. Proin dictum lorem. Sed at lectus. Nullam cursus quam ac turpis. In hac habitasse platea dictumst. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam et tellus vel sem pellentesque bibendum. Maecenas mollis urna ac est. Sed volutpat. Nam molestie turpis ac ante. Cras ultrices ante eget nibh. Integer lobortis interdum eros.' },
+			{ id: 12, type: 'ruby', code: true, content: 'Donec tincidunt ultricies risus. Donec tempor lacus id sem. Fusce aliquam, pede sed accumsan dapibus, mauris nisi faucibus purus, ut elementum dui arcu molestie tortor. Nunc sagittis iaculis eros. Quisque sodales ipsum et felis. Nulla facilisi. Nulla in mauris in purus condimentum ornare. Phasellus porta ante a purus. In quis diam. Curabitur non leo. Sed facilisis odio condimentum ante. Nam tempor feugiat sem. Praesent sit amet libero sit amet dolor consequat venenatis.' },
+			{ id: 13, type: 'ruby', code: true, content: 'Nullam cursus quam ac turpis. In hac habitasse platea dictumst. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam et tellus vel sem pellentesque bibendum. Maecenas mollis urna ac est. Sed volutpat. Nam molestie turpis ac ante. Cras ultrices ante eget nibh. Integer lobortis interdum eros. Aliquam sapien ante, interdum nec, malesuada et, varius ac, nulla. Aliquam et diam. Maecenas mollis nunc in nunc.' },
+		]
+	}
 };
 
 // Snippely Object
@@ -53,8 +93,7 @@ var Snippely = {
 		//TEMP - TAGS should be retrieved from the database
 		this.Tags.load(TAGS);
 		
-		//TEMP - this should be called upon clicking a snippet in the snippets list
-		this.Snippet.load();
+		this.Snippet.initialize();
 		
 		this.activate();
 	},
@@ -191,9 +230,7 @@ Snippely.Tags = {
 		element.addClass('selected');
 
 		var id = element.retrieve('tag:id');
-		var snippets = SNIPPETS[id]; //TEMP
-		
-		//retrieve this tag's snippets from the database and load them
+		var snippets = SNIPPETS[id]; //TEMP - retrieve from database
 		
 		Snippely.Snippets.load(snippets);
 	}
@@ -207,7 +244,7 @@ Snippely.Snippets = {
 	load: function(snippets){
 		var list = $('snippets-list').empty();
 		var elements = snippets.map(function(snippet){
-			var element = new Element('li', { text: snippet.name });
+			var element = new Element('li', { text: snippet.title });
 			element.addEvent('click', this.select.bind(this, element));
 			element.store('snippet:id', snippet.id);
 			return element;
@@ -222,8 +259,9 @@ Snippely.Snippets = {
 		element.addClass('selected');
 		
 		var id = element.retrieve('snippet:id');
+		var snippet = SNIPPET[id]; //TEMP - retrieve from database
 		
-		//retrieve this snippet from the database and load its content
+		Snippely.Snippet.load(snippet);
 	}
 	
 };
@@ -232,31 +270,40 @@ Snippely.Snippets = {
 
 Snippely.Snippet = {
 
-	load: function(){
-		var active = false;
+	initialize: function(){
+		this.active = false;
 		
-		var blur = function(){
-			if (!this.editing) return;
-			this.editing = active = false;
-			this.removeClass('editing').getElement('.contents').contentEditable = false;
-		};
+		this.title = $('snippet-title');
+		this.description = $('snippet-description');
+		this.container = $('snippet-snips');
 		
-		var focus = function(event){
-			event.stopPropagation();
-			if (this.editing) return;
-			if (active) blur.call(active);
-			this.addClass('editing').getElement('.contents').contentEditable = true;
-			this.editing = true;
-			active = this;
-		};
-		
-		$$('#snippet-snips div.snippet').addEvent('mousedown', focus);
 		document.addEvent('mousedown', function(){
-			blur.call(active);
-		});
+			this.blur(this.active);
+		}.bind(this));
+	},
+
+	load: function(snippet){
+		this.container.empty();
+		this.title.set('text', snippet.title);
+		this.description.set('text', snippet.description);
 		
-		//Initialize History
-		$$('#snippet-snips div.contents').each(function(element){
+		snippet.snips.each(function(snip){
+			var type = snip.type + (snip.code ? ' code' : '');
+			var info = new Element('div', {'class': 'info', 'text': type});
+			var content = new Element('div', {
+				'class': 'content',
+				'text': snip.content
+			}).store('snip:id', snip.id);
+
+			content.addEvent('mousedown', this.focus.bindWithEvent(this, content));
+
+			this.container.adopt(new Element('div', {
+				'class': snippet.type + ' snip'
+			}).adopt(info, content));
+		}, this);
+		
+		//initialize history
+		$$('#snippet-snips div.content').each(function(element){
 			element.setHTML(element.getHTML().trim());
 			element.history = [element.getHTML()];
 			element.addEvent('keydown', function(event){
@@ -271,7 +318,27 @@ Snippely.Snippet = {
 			});
 		});
 		
+		//initialize sortables
 		new Sortables('snippet-snips', { handle: 'div.info' });
+	},
+	
+	focus: function(event, element){
+		event.stopPropagation();
+		if (element.contentEditable == true) return;
+		if (this.active) this.blur(this.active);
+		element.getParent().addClass('editing');
+		element.contentEditable = true;
+		this.active = element;
+	},
+	
+	blur: function(element){
+		if (!element.contentEditable) return;
+		element.getParent().removeClass('editing');
+		this.active = element.contentEditable = false;
+	},
+	
+	save: function(){
+		
 	}
 
 };
