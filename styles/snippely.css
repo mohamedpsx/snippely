@@ -66,6 +66,7 @@ body {
 
 #tags li {
 	color: #222;
+	cursor: pointer;
 	font-size: 11px;
 	line-height: 11px;
 	padding: 4px 6px 5px 25px;
@@ -147,6 +148,7 @@ body {
 }
 
 #snippets li {
+  cursor: pointer;
 	padding: 4px 20px;
 	background-color: #fff;
 }
@@ -250,12 +252,15 @@ div.snip.code, div.snip div.info {
 	font-family: "Andale Mono", "Monaco", Courier;
 }
 
-div.snip.code div.contents {
-	cursor:text;
-	outline: none;
+div.snip.code div.content {
 	overflow: hidden;
 	white-space: pre;
 	line-height: 1.4;
+}
+
+div.snip div.content {
+	cursor: text;
+	outline: none;
 }
 
 /* @end */
