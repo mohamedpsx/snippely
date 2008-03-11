@@ -41,22 +41,20 @@ var Snippely = {
 		this.meta = $('meta');
 		this.tags = $('tags');
 		this.footer = $('footer');
-		this.content = $('content');
+		this.snippet = $('snippet');
 		this.snippets = $('snippets');
 		this.topResizer = $('top-resizer');
 		this.leftResizer = $('left-resizer');
 		
 		this.initializeMenus();
 		this.initializeLayout();
-		this.initializeHistory();
 		this.initializeMetas();
-		
-		//TEMP - this should be called upon loading of a snippet,
-		//and will likely be called Snippely.Snippet.load for consistency
-		this.initializeSnippet();
 		
 		//TEMP - TAGS should be retrieved from the database
 		this.Tags.load(TAGS);
+		
+		//TEMP - this should be called upon clicking a snippet in the snippets list
+		this.Snippet.load();
 		
 		this.activate();
 	},
@@ -124,27 +122,10 @@ var Snippely = {
 		nativeWindow.addEventListener('deactivate', this.blur);
 
 		this.tagsScrollbar = new ART.ScrollBar('tags', 'tags-wrap');
-		this.contentScrollbar = new ART.ScrollBar('content', 'content-wrap');
+		this.snippetScrollbar = new ART.ScrollBar('snippet', 'snippet-wrap');
 		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
 		
 		this.redraw();
-	},
-	
-	initializeHistory: function(){
-		$$('#content div.contents').each(function(element){
-			element.setHTML(element.getHTML().trim());
-			element.history = [element.getHTML()];
-			element.addEvent('keydown', function(event){
-				if (event.meta && event.key == 'z'){
-					event.preventDefault();
-					var start = this.selectionStart;
-					var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
-					this.setHTML(previous);
-				} else {
-					if (this.getHTML() != this.history.getLast()) this.history.push(this.getHTML());
-				}
-			});
-		});
 	},
 	
 	initializeMetas: function(){
@@ -157,41 +138,17 @@ var Snippely = {
 		});
 	},
 	
-	initializeSnippet: function(){
-		var active = false;
-		
-		var blur = function(){
-			if (!this.editing) return;
-			this.editing = active = false;
-			this.removeClass('editing').getElement('.contents').contentEditable = false;
-		};
-		
-		var focus = function(event){
-			event.stopPropagation();
-			if (this.editing) return;
-			if (active) blur.call(active);
-			this.addClass('editing').getElement('.contents').contentEditable = true;
-			this.editing = true;
-			active = this;
-		};
-		
-		$$('#content div.snippet').addEvent('mousedown', focus);
-		document.addEvent('mousedown', function(){
-			blur.call(active);
-		});
-	},
-	
 	redraw: function(){
 		var left = this.tags.offsetWidth;
-		$$(this.snippets, this.topResizer, this.meta, this.content).setStyle('left', left);
+		$$(this.snippets, this.topResizer, this.meta, this.snippet).setStyle('left', left);
 		
 		this.footer.setStyle('width', this.tags.clientWidth);
 		this.topResizer.setStyle('top', this.snippets.offsetHeight);
 		this.meta.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight);
-		this.content.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
+		this.snippet.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
 		
 		this.tagsScrollbar.update();
-		this.contentScrollbar.update();
+		this.snippetScrollbar.update();
 		this.snippetsScrollbar.update();
 	},
 	
@@ -211,6 +168,8 @@ var Snippely = {
 	} 
 	
 };
+
+//The Tags List
 
 Snippely.Tags = {
 
@@ -241,6 +200,8 @@ Snippely.Tags = {
 
 };
 
+//The Snippets List
+
 Snippely.Snippets = {
 
 	load: function(snippets){
@@ -265,6 +226,54 @@ Snippely.Snippets = {
 		//retrieve this snippet from the database and load its content
 	}
 	
+};
+
+//The Snippet and all his Snips
+
+Snippely.Snippet = {
+
+	load: function(){
+		var active = false;
+		
+		var blur = function(){
+			if (!this.editing) return;
+			this.editing = active = false;
+			this.removeClass('editing').getElement('.contents').contentEditable = false;
+		};
+		
+		var focus = function(event){
+			event.stopPropagation();
+			if (this.editing) return;
+			if (active) blur.call(active);
+			this.addClass('editing').getElement('.contents').contentEditable = true;
+			this.editing = true;
+			active = this;
+		};
+		
+		$$('#snippet-snips div.snippet').addEvent('mousedown', focus);
+		document.addEvent('mousedown', function(){
+			blur.call(active);
+		});
+		
+		//Initialize History
+		$$('#snippet-snips div.contents').each(function(element){
+			element.setHTML(element.getHTML().trim());
+			element.history = [element.getHTML()];
+			element.addEvent('keydown', function(event){
+				if (event.meta && event.key == 'z'){
+					event.preventDefault();
+					var start = this.selectionStart;
+					var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
+					this.setHTML(previous);
+				} else {
+					if (this.getHTML() != this.history.getLast()) this.history.push(this.getHTML());
+				}
+			});
+		});
+		
+		new Sortables('snippet-snips', { handle: 'div.info' });
+	}
+
 };
 
 window.addEvent('load', Snippely.initialize.bind(Snippely));

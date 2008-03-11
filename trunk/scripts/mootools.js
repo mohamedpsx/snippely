@@ -3693,3 +3693,408 @@ Element.implement({
 	}
 
 });
+
+var Drag = new Class({
+
+	Implements: [Events, Options],
+
+	options: {/*
+		onBeforeStart: $empty,
+		onStart: $empty,
+		onDrag: $empty,
+		onCancel: $empty,
+		onComplete: $empty,*/
+		snap: 6,
+		unit: 'px',
+		grid: false,
+		style: true,
+		limit: false,
+		handle: false,
+		invert: false,
+		modifiers: {x: 'left', y: 'top'}
+	},
+
+	initialize: function(){
+		var params = Array.link(arguments, {'options': Object.type, 'element': $defined});
+		this.element = $(params.element);
+		this.document = this.element.getDocument();
+		this.setOptions(params.options || {});
+		var htype = $type(this.options.handle);
+		this.handles = (htype == 'array' || htype == 'collection') ? $$(this.options.handle) : $(this.options.handle) || this.element;
+		this.mouse = {'now': {}, 'pos': {}};
+		this.value = {'start': {}, 'now': {}};
+		
+		this.selection = (Browser.Engine.trident) ? 'selectstart' : 'mousedown';
+		
+		this.bound = {
+			start: this.start.bind(this),
+			check: this.check.bind(this),
+			drag: this.drag.bind(this),
+			stop: this.stop.bind(this),
+			cancel: this.cancel.bind(this),
+			eventStop: $lambda(false)
+		};
+		this.attach();
+	},
+
+	attach: function(){
+		this.handles.addEvent('mousedown', this.bound.start);
+		return this;
+	},
+
+	detach: function(){
+		this.handles.removeEvent('mousedown', this.bound.start);
+		return this;
+	},
+
+	start: function(event){
+		this.fireEvent('onBeforeStart', this.element);
+		this.mouse.start = event.page;
+		var limit = this.options.limit;
+		this.limit = {'x': [], 'y': []};
+		for (var z in this.options.modifiers){
+			if (!this.options.modifiers[z]) continue;
+			if (this.options.style) this.value.now[z] = this.element.getStyle(this.options.modifiers[z]).toInt();
+			else this.value.now[z] = this.element[this.options.modifiers[z]];
+			if (this.options.invert) this.value.now[z] *= -1;
+			this.mouse.pos[z] = event.page[z] - this.value.now[z];
+			if (limit && limit[z]){
+				for (var i = 2; i--; i){
+					if ($chk(limit[z][i])) this.limit[z][i] = $lambda(limit[z][i])();
+				}
+			}
+		}
+		if ($type(this.options.grid) == 'number') this.options.grid = {'x': this.options.grid, 'y': this.options.grid};
+		this.document.addEvents({mousemove: this.bound.check, mouseup: this.bound.cancel});
+		this.document.addEvent(this.selection, this.bound.eventStop);
+	},
+
+	check: function(event){
+		var distance = Math.round(Math.sqrt(Math.pow(event.page.x - this.mouse.start.x, 2) + Math.pow(event.page.y - this.mouse.start.y, 2)));
+		if (distance > this.options.snap){
+			this.cancel();
+			this.document.addEvents({
+				mousemove: this.bound.drag,
+				mouseup: this.bound.stop
+			});
+			this.fireEvent('onStart', this.element).fireEvent('onSnap', this.element);
+		}
+	},
+
+	drag: function(event){
+		this.mouse.now = event.page;
+		for (var z in this.options.modifiers){
+			if (!this.options.modifiers[z]) continue;
+			this.value.now[z] = this.mouse.now[z] - this.mouse.pos[z];
+			if (this.options.invert) this.value.now[z] *= -1;
+			if (this.options.limit && this.limit[z]){
+				if ($chk(this.limit[z][1]) && (this.value.now[z] > this.limit[z][1])){
+					this.value.now[z] = this.limit[z][1];
+				} else if ($chk(this.limit[z][0]) && (this.value.now[z] < this.limit[z][0])){
+					this.value.now[z] = this.limit[z][0];
+				}
+			}
+			if (this.options.grid[z]) this.value.now[z] -= (this.value.now[z] % this.options.grid[z]);
+			if (this.options.style) this.element.setStyle(this.options.modifiers[z], this.value.now[z] + this.options.unit);
+			else this.element[this.options.modifiers[z]] = this.value.now[z];
+		}
+		this.fireEvent('onDrag', this.element);
+	},
+
+	cancel: function(event){
+		this.document.removeEvent('mousemove', this.bound.check);
+		this.document.removeEvent('mouseup', this.bound.cancel);
+		if (event){
+			this.document.removeEvent(this.selection, this.bound.eventStop);
+			this.fireEvent('onCancel', this.element);
+		}
+	},
+
+	stop: function(event){
+		this.document.removeEvent(this.selection, this.bound.eventStop);
+		this.document.removeEvent('mousemove', this.bound.drag);
+		this.document.removeEvent('mouseup', this.bound.stop);
+		if (event) this.fireEvent('onComplete', this.element);
+	}
+
+});
+
+Element.implement({
+	
+	makeResizable: function(options){
+		return new Drag(this, $merge({modifiers: {'x': 'width', 'y': 'height'}}, options));
+	}
+
+});
+
+/*
+Script: Drag.Move.js
+	A Drag extension that provides support for the constraining of draggables to containers and droppables.
+
+License:
+	MIT-style license.
+
+Note:
+	Drag.Move requires an XHTML doctype.
+*/
+
+Drag.Move = new Class({
+
+	Extends: Drag,
+
+	options: {
+		droppables: [],
+		container: false
+	},
+
+	initialize: function(element, options){
+		arguments.callee.parent(element, options);
+		this.droppables = $$(this.options.droppables);
+		this.container = $(this.options.container);
+		var position = (this.element.positioned()) ? this.element.getStyle('position') : 'absolute';
+		
+		
+		var styleposition = this.element.getStyles('left', 'top');
+		if (styleposition.left == 'auto' || styleposition.top == 'auto') this.element.position(this.element.getRelativePosition());
+		
+		this.element.setStyle('position', position);
+	},
+
+	start: function(event){
+		if (this.overed){
+			this.overed.fireEvent('leave', [this.element, this]);
+			this.overed = null;
+		}
+		if (this.container){
+			var el = this.element, cont = this.container, ccoo = cont.getCoordinates(el.getOffsetParent()), cps = {}, ems = {};
+
+			['top', 'right', 'bottom', 'left'].each(function(pad){
+				cps[pad] = cont.getStyle('padding-' + pad).toInt();
+				ems[pad] = el.getStyle('margin-' + pad).toInt();
+			}, this);
+
+			var width = el.offsetWidth + ems.left + ems.right, height = el.offsetHeight + ems.top + ems.bottom;
+			var x = [ccoo.left + cps.left, ccoo.right - cps.right - width];
+			var y = [ccoo.top + cps.top, ccoo.bottom - cps.bottom - height];
+
+			this.options.limit = {x: x, y: y};
+		}
+		arguments.callee.parent(event);
+	},
+
+	checkAgainst: function(el){
+		el = el.getCoordinates();
+		var now = this.mouse.now;
+		return (now.x > el.left && now.x < el.right && now.y < el.bottom && now.y > el.top);
+	},
+
+	checkDroppables: function(){
+		var overed = this.droppables.filter(this.checkAgainst, this).getLast();
+		if (this.overed != overed){
+			if (this.overed) this.overed.fireEvent('leave', [this.element, this]);
+			this.overed = overed ? overed.fireEvent('over', [this.element, this]) : null;
+		}
+	},
+
+	drag: function(event){
+		arguments.callee.parent(event);
+		if (this.droppables.length) this.checkDroppables();
+	},
+
+	stop: function(event){
+		this.checkDroppables();
+		if (this.overed) this.overed.fireEvent('drop', [this.element, this]);
+		else this.element.fireEvent('emptydrop', this);
+		return arguments.callee.parent(event);
+	}
+
+});
+
+Element.implement({
+
+	makeDraggable: function(options){
+		return new Drag.Move(this, options);
+	}
+
+});
+
+
+/*
+Script: Sortables.js
+	Class for creating a drag and drop sorting interface for lists of items.
+
+License:
+	MIT-style license.
+
+Note:
+	Sortables requires an XHTML doctype.
+*/
+
+var Sortables = new Class({
+
+	Implements: [Events, Options],
+
+	options: {/*
+		onSort: $empty,
+		onStart: $empty,
+		onComplete: $empty,*/
+		snap: 4,
+		handle: false,
+		revert: false,
+		constrain: false,
+		cloneOpacity: 0.7,
+		elementOpacity: 0.3
+	},
+
+	initialize: function(lists, options){
+		this.setOptions(options);
+		this.elements = [];
+		this.lists = [];
+		this.idle = true;
+
+		this.addLists($$($(lists) || lists));
+		if (this.options.revert) this.effect = new Fx.Morph(null, $merge({duration: 250, link: 'cancel'}, this.options.revert));
+	},
+
+	attach: function(){
+		this.addLists(this.lists);
+		return this;
+	},
+
+	detach: function(){
+		this.lists = this.removeLists(this.lists);
+		return this;
+	},
+
+	addItems: function(){
+		Array.flatten(arguments).each(function(element){
+			this.elements.push(element);
+			var start = element.retrieve('sortables:start', this.start.bindWithEvent(this, element));
+			var insert = element.retrieve('sortables:insert', this.insert.bind(this, element));
+			(this.options.handle ? element.getElement(this.options.handle) || element : element).addEvent('mousedown', start);
+			element.addEvent('over', insert);
+		}, this);
+		return this;
+	},
+
+	addLists: function(){
+		Array.flatten(arguments).each(function(list){
+			this.lists.push(list);
+			this.addItems(list.getChildren());
+			list.addEvent('over', list.retrieve('sortables:insert', this.insert.bind(this, [list, 'inside'])));
+		}, this);
+		return this;
+	},
+
+	removeItems: function(){
+		var elements = [];
+		Array.flatten(arguments).each(function(element){
+			elements.push(element);
+			this.elements.erase(element);
+			var start = element.retrieve('sortables:start');
+			var insert = element.retrieve('sortables:insert');
+			(this.options.handle ? element.getElement(this.options.handle) || element : element).removeEvent('mousedown', start);
+			element.removeEvent('over', insert);
+		}, this);
+		return elements;
+	},
+
+	removeLists: function(){
+		var lists = [];
+		Array.flatten(arguments).each(function(list){
+			lists.push(list);
+			this.lists.erase(list);
+			this.removeItems(list.getChildren());
+			list.removeEvent('over', list.retrieve('sortables:insert'));
+		}, this);
+		return lists;
+	},
+
+	getClone: function(element){
+		return element.clone(true).setStyles({
+			'margin': '0px',
+			'position': 'absolute',
+			'visibility': 'hidden',
+			'width': element.getStyle('width')
+		}).inject(this.list).position(element.getRelativePosition());
+	},
+
+	getDroppables: function(){
+		var droppables = this.list.getChildren();
+		if (!this.options.constrain) droppables = this.lists.concat(droppables).erase(this.list);
+		return droppables.erase(this.clone).erase(this.element);
+	},
+
+	insert: function(element, where){
+		if (where) {
+			this.list = element;
+			this.drag.droppables = this.getDroppables();
+		}
+		where = where || (this.element.getAllPrevious().contains(element) ? 'before' : 'after');
+		this.element.inject(element, where);
+		this.fireEvent('onSort', [this.element, this.clone]);
+	},
+
+	start: function(event, element){
+		if (!this.idle) return;
+		this.idle = false;
+
+		this.element = element;
+		this.opacity = element.get('opacity');
+		this.list = element.getParent();
+		this.clone = this.getClone(element);
+
+		this.drag = this.clone.makeDraggable({
+			snap: this.options.snap,
+			container: this.options.constrain && this.clone.getParent(),
+			droppables: this.getDroppables(),
+			onStart: function(){
+				event.stop();
+				this.clone.set('opacity', this.options.cloneOpacity);
+				this.element.set('opacity', this.options.elementOpacity);
+				this.fireEvent('onStart', [this.element, this.clone]);
+			}.bind(this),
+			onCancel: this.reset.bind(this),
+			onComplete: this.end.bind(this)
+		});
+
+		this.drag.start(event);
+	},
+
+	end: function(){
+		this.element.set('opacity', this.opacity);
+		this.drag.detach();
+		if (this.effect){
+			var dim = this.element.getStyles('width', 'height');
+			var pos = this.clone.computePosition(this.element.getPosition(this.clone.offsetParent), this.clone.getParent().positioned());
+			this.effect.element = this.clone;
+			this.effect.start({
+				'top': pos.top,
+				'left': pos.left,
+				'width': dim.width,
+				'height': dim.height,
+				'opacity': 0.25
+			}).chain(this.reset.bind(this));
+		} else {
+			this.reset();
+		}
+	},
+
+	reset: function(){
+		this.idle = true;
+		this.clone.destroy();
+		this.fireEvent('onComplete', this.element);
+	},
+
+	serialize: function(index, modifier){
+		var serial = this.lists.map(function(list){
+			return list.getChildren().map(modifier || function(element, index){
+				return element.get('id');
+			}, this);
+		}, this);
+
+		if (this.lists.length == 1) index = 0;
+		return $chk(index) && index >= 0 && index < this.lists.length ? serial[index] : serial;
+	}
+
+});
