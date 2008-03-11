@@ -90,9 +90,7 @@ var Snippely = {
 		this.initializeLayout();
 		this.initializeMetas();
 		
-		//TEMP - TAGS should be retrieved from the database
-		this.Tags.load(TAGS);
-		
+		this.Tags.initialize();
 		this.Snippet.initialize();
 		
 		this.activate();
@@ -212,20 +210,34 @@ var Snippely = {
 
 Snippely.Tags = {
 
+	initialize: function(){
+		this.list = $('tags-list');
+		this.editing = false;
+		
+		document.addEvent('mousedown', this.save.bind(this));
+		
+		//TODO - load tags from database initially
+		this.load(TAGS);
+	},
+
 	load: function(tags){
-		var list = $('tags-list').empty();
+		this.list.empty();
 		var elements = tags.map(function(tag){
 			var element = new Element('li', { text: tag.name });
-			element.addEvent('click', this.select.bind(this, element));
-			element.store('tag:id', tag.id);
-			return element;
+			return element.addEvents({
+				click: this.select.bind(this, element),
+				dblclick: this.edit.bind(this, element),
+				mousedown: function(event){ event.stopPropagation(); }
+			}).store('tag:id', tag.id);
 		}, this);
 		
-		list.adopt(elements);
+		this.list.adopt(elements);
 		this.elements = $$(elements);
 	},
 	
 	select: function(element){
+		if (this.editing) this.save();
+		
 		this.elements.removeClass('selected');
 		element.addClass('selected');
 
@@ -233,6 +245,22 @@ Snippely.Tags = {
 		var snippets = SNIPPETS[id]; //TEMP - retrieve from database
 		
 		Snippely.Snippets.load(snippets);
+	},
+	
+	edit: function(element){
+		this.editing = element;
+		element.contentEditable = true;
+		element.addClass('editing').focus();
+	},
+	
+	save: function(){
+		if (!this.editing) return;
+		var id = this.editing.retrieve('tag:id');
+		var text = this.editing.get('text');
+		//save this tag's new name to the database
+		
+		this.editing.removeClass('editing');
+		this.editing = this.editing.contentEditable = false;
 	}
 
 };
