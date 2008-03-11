@@ -6,6 +6,33 @@ var console = AIR.Introspector.Console;
 
 Application.autoExit = true;
 
+// Temporary Data
+
+var TAGS = [
+	{ id: 1, name: 'Some Tag 1' },
+	{ id: 2, name: 'Some Tag 2' },
+	{ id: 3, name: 'Some Tag 3' }
+];
+
+var SNIPPETS = {
+	"1": [
+		{ id: 1, name: 'Some Snippet 1' },
+		{ id: 2, name: 'Some Snippet 2' },
+		{ id: 3, name: 'Some Snippet 3' }
+	],
+	"2": [
+		{ id: 4, name: 'Some Snippet 4' },
+		{ id: 5, name: 'Some Snippet 5' },
+		{ id: 6, name: 'Some Snippet 6' },
+		{ id: 7, name: 'Some Snippet 7' }
+	],
+	"3": [
+		{ id: 1, name: 'Some Snippet 1' },
+		{ id: 3, name: 'Some Snippet 3' },
+		{ id: 5, name: 'Some Snippet 5' }
+	]
+};
+
 // Snippely Object
 
 var Snippely = {
@@ -22,12 +49,14 @@ var Snippely = {
 		this.initializeMenus();
 		this.initializeLayout();
 		this.initializeHistory();
-		
-		this.initializeTags();
 		this.initializeMetas();
-		this.initializeSnippets();
 		
+		//TEMP - this should be called upon loading of a snippet,
+		//and will likely be called Snippely.Snippet.load for consistency
 		this.initializeSnippet();
+		
+		//TEMP - TAGS should be retrieved from the database
+		this.Tags.load(TAGS);
 		
 		this.activate();
 	},
@@ -118,14 +147,6 @@ var Snippely = {
 		});
 	},
 	
-	initializeTags: function(){
-		var tags = $$('#tags li');
-		tags.addEvent('click', function(){
-			tags.removeClass('selected');
-			this.addClass('selected');
-		});
-	},
-	
 	initializeMetas: function(){
 		var metaButtons = $$('#meta .button');
 		metaButtons.addEvent('mousedown', function(){
@@ -134,16 +155,6 @@ var Snippely = {
 		document.addEvent('mouseup', function(){
 			metaButtons.removeClass('active');
 		});
-	},
-	
-	initializeSnippets: function(){
-		var snippets = $$('#snippets li');
-		snippets.addEvent('click', function(){
-			snippets.removeClass('selected');
-			this.addClass('selected');
-		});
-		
-		$$('#snippets li:odd').addClass('odd');
 	},
 	
 	initializeSnippet: function(){
@@ -197,7 +208,62 @@ var Snippely = {
 	
 	blur: function(){
 		document.body.id = 'blur';
-	}	
+	} 
+	
+};
+
+Snippely.Tags = {
+
+	load: function(tags){
+		var list = $('tags-list').empty();
+		var elements = tags.map(function(tag){
+			var element = new Element('li', { text: tag.name });
+			element.addEvent('click', this.select.bind(this, element));
+			element.store('tag:id', tag.id);
+			return element;
+		}, this);
+		
+		list.adopt(elements);
+		this.elements = $$(elements);
+	},
+	
+	select: function(element){
+		this.elements.removeClass('selected');
+		element.addClass('selected');
+
+		var id = element.retrieve('tag:id');
+		var snippets = SNIPPETS[id]; //TEMP
+		
+		//retrieve this tag's snippets from the database and load them
+		
+		Snippely.Snippets.load(snippets);
+	}
+
+};
+
+Snippely.Snippets = {
+
+	load: function(snippets){
+		var list = $('snippets-list').empty();
+		var elements = snippets.map(function(snippet){
+			var element = new Element('li', { text: snippet.name });
+			element.addEvent('click', this.select.bind(this, element));
+			element.store('snippet:id', snippet.id);
+			return element;
+		}, this);
+		
+		list.adopt(elements).getElements(':odd').addClass('odd');
+		this.elements = $$(elements);
+	},
+	
+	select: function(element){
+		this.elements.removeClass('selected');
+		element.addClass('selected');
+		
+		var id = element.retrieve('snippet:id');
+		
+		//retrieve this snippet from the database and load its content
+	}
 	
 };
 
