@@ -111,15 +111,17 @@ var Snippely = {
 		this.addTagItem = new ART.Menu.Item('Add Tag...', {
 			onSelect: this.Tags.add.bind(this.Tags)
 		});
-		this.addSnippetItem = new ART.Menu.Item('Add Snippet...', {
-			onSelect: this.Snippets.add.bind(this.Snippets)
-		});
+		this.addSnippetItem = new ART.Menu.Item('Add Snippet...');
 		this.addMenu.addItem(this.addTagItem).addItem(this.addSnippetItem);
 		
 		//action menu
 		this.actionMenu = new ART.Menu('ActionMenu');
-		this.removeTagItem = new ART.Menu.Item('Remove Tag...');
-		this.renameTagItem = new ART.Menu.Item('Rename Tag...');
+		this.removeTagItem = new ART.Menu.Item('Remove Tag...', {
+			onSelect: this.Tags.remove.bind(this.Tags)
+		});
+		this.renameTagItem = new ART.Menu.Item('Rename Tag...', {
+			onSelect: this.Tags.rename.bind(this.Tags)
+		});
 		this.removeSnippetItem = new ART.Menu.Item('Remove Snippet...');
 		this.renameSnippetItem = new ART.Menu.Item('Rename Snippet...');
 		this.actionMenu.addItem(this.renameTagItem).addItem(this.removeTagItem).addItem(this.renameSnippetItem).addItem(this.removeSnippetItem);
@@ -243,6 +245,18 @@ Snippely.Tags = {
 		element.fireEvent('dblclick');
 	},
 	
+	remove: function(){
+		if (!this.selected) return;
+		var id = this.selected.retrieve('tag:id');
+		//TODO - remove this tag from the database, only if no snippets have it as a tag
+		this.selected.erase('editable').destroy();
+	},
+	
+	rename: function(){
+		if (!this.selected) return;
+		this.selected.fireEvent('dblclick');
+	},
+	
 	save: function(element){
 		var id = element.retrieve('tag:id');
 		var text = element.get('text');
@@ -251,8 +265,8 @@ Snippely.Tags = {
 	
 	select: function(element){
 		this.elements.removeClass('selected');
-		element.addClass('selected');
-
+		this.selected = element.addClass('selected');
+		
 		var id = element.retrieve('tag:id');
 		var snippets = SNIPPETS[id] || []; //TODO - retrieve snippets list from database
 		Snippely.Snippets.load(snippets);
@@ -284,10 +298,6 @@ Snippely.Snippets = {
 		var id = element.retrieve('snippet:id');
 		var snippet = SNIPPET[id]; //TODO - retrieve snippet from database
 		Snippely.Snippet.load(snippet);
-	},
-	
-	add: function(){
-		
 	}
 	
 };
@@ -377,6 +387,7 @@ var Editable = new Class({
 		if (!this.options.enter) this.element.addEvent('keydown', function(event){
 			if (event.key == 'enter') this.blur();
 		});
+		this.element.store('editable', this);
 	},
 	
 	edit: function(){
