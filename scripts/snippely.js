@@ -308,39 +308,39 @@ Snippely.Snippet = {
 		this.description.set('text', snippet.description);
 		
 		new Editable(this.title);
-		new Editable(this.description);
+		new Editable(this.description, {enter: true});
 		
 		snippet.snips.each(function(snip){
 			var type = snip.type + (snip.code ? ' code' : '');
 			var info = new Element('div', {'class': 'info', 'text': type});
-			var content = new Element('div', {'class': 'content', 'text': snip.content}).store('snip:id', snip.id);
-			var wrapper = new Element('div', {'class': snippet.type + ' snip'}).adopt(info, content);
-			new Editable(content, {
-				wrapper: wrapper,
-				activation: 'mousedown',
-				onBlur: this.save.bind(this)
-			});
-			this.container.adopt(wrapper);
-		}, this);
-		
-		//initialize history
-		$$('#snippet-snips div.content').each(function(element){
-			element.set('html', element.get('html').trim());
-			element.history = [element.get('html')];
-			element.addEvent('keydown', function(event){
+			var content = new Element('div', {'class': 'content', 'text': snip.content.trim()}).store('snip:id', snip.id);
+			content.history = [content.get('html')];
+			content.addEvent('keydown', function(event){
 				if (event.meta && event.key == 'z'){
 					event.preventDefault();
 					var start = this.selectionStart;
 					var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
 					this.setHTML(previous);
 				} else {
-					if (this.getHTML() != this.history.getLast()) this.history.push(this.getHTML());
+					if (this.get('html') != this.history.getLast()) this.history.push(this.get('html'));
 				}
 			});
-		});
+			
+			var wrapper = new Element('div', {'class': snippet.type + ' snip'}).adopt(info, content);
+			new Editable(content, {
+				enter: true,
+				wrapper: wrapper,
+				activation: 'mousedown',
+				onBlur: this.save.bind(this)
+			});
+			
+			this.container.adopt(wrapper);
+		}, this);
 		
 		//initialize sortables
 		new Sortables('snippet-snips', { handle: 'div.info' });
+		
+		Snippely.redraw();
 	},
 	
 	save: function(element){
@@ -362,6 +362,7 @@ var Editable = new Class({
 	options: {/*
 		onEdit: $empty,
 		onBlur: $empty,*/
+		enter: false,
 		wrapper: false,
 		className: 'editing',
 		activation: 'dblclick'
@@ -373,6 +374,9 @@ var Editable = new Class({
 		this.wrapper = this.options.wrapper || this.element;
 		this.element.addEvent(this.options.activation, this.edit.bind(this));
 		this.element.addEvent('blur', this.blur.bind(this));
+		if (!this.options.enter) this.element.addEvent('keydown', function(event){
+			if (event.key == 'enter') this.blur();
+		});
 	},
 	
 	edit: function(){
