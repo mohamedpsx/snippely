@@ -2,14 +2,13 @@ Snippely.Database = new Class({
 	
 	initialize: function(){
 		this.connection = new air.SQLConnection();
-		this.connection.addEventListener(air.SQLEvent.OPEN, this.onOpen);
+		this.connection.addEventListener(air.SQLEvent.OPEN, this.onOpen.bind(this));
 		this.connection.addEventListener(air.SQLErrorEvent.ERROR, this.onError);
 
 		this.dbFile = air.File.applicationStorageDirectory.resolvePath("application.db");
 		this.connection.openAsync(this.dbFile);
-		this.create();
 		
-		console.log('-- Snippely.database.nuke() --');
+		console.log('Snippely.database.nuke()');
 	},
 	
 	create: function(){
@@ -17,7 +16,21 @@ Snippely.Database = new Class({
 			"CREATE TABLE IF NOT EXISTS tags (" +
 			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"  name TEXT" +
-			")";
+			");" +
+			"CREATE TABLE IF NOT EXISTS snippets (" +
+			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+			"  tag_id INTEGER, " +
+			"  title TEXT, " +
+			"  description TEXT" +
+			");" +
+			"CREATE TABLE IF NOT EXISTS snips (" +
+			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+			"  snippet_id INTEGER, " +
+			"  order INTEGER, " +
+			"  type TEXT, " +
+			"  code INTEGER(1), " +
+			"  content TEXT" +
+			");";
 		
 		this.execute(sql);
 	},
@@ -38,6 +51,7 @@ Snippely.Database = new Class({
 	
 	onOpen: function(event){
 		air.trace("the database was created successfully");
+		this.create();
 	},
 	
 	onError: function(event){
@@ -48,7 +62,7 @@ Snippely.Database = new Class({
 	// Nuke the database
 	
 	nuke: function(){
-		var sql = 'DROP TABLE tags';
+		var sql = "DROP TABLE tags; DROP TABLE snippets; DROP TABLE snips;";
 		this.execute(sql);
 	}
 	
