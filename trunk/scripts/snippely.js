@@ -90,8 +90,8 @@ var Snippely = {
 		this.initializeLayout();
 		this.initializeMetas();
 		
-		this.Tags.initialize();
-		this.Snippet.initialize();
+		this.Tags.initialize(TAGS); //TODO - Load TAGS JSON from the database
+		this.Snippet.initialize(); //TODO - Load active snippet / tag from last session
 		
 		this.activate();
 	},
@@ -199,7 +199,7 @@ var Snippely = {
 		(function(){
 			nativeWindow.visible = true;
 			nativeWindow.activate();
-		}).delay(100); //give some time to render, or else garbage will be displayed
+		}).delay(100);
 	},
 
 	focus: function(){
@@ -216,68 +216,46 @@ var Snippely = {
 
 Snippely.Tags = {
 
-	initialize: function(){
-		this.list = $('tags-list');
-		this.editing = false;
-		
-		document.addEvent('mousedown', this.save.bind(this));
-		
-		//TODO - load tags from database initially
-		this.load(TAGS);
+	initialize: function(tags){
+		this.list = $('tags-list').empty();
+		var elements = tags.map(this.create, this);
+		this.elements = $$(elements);
 	},
 
 	create: function(tag){
 		var element = new Element('li', { text: tag.name });
-		return element.addEvents({
-			click: this.select.bind(this, element),
-			dblclick: this.edit.bind(this, element),
-			mousedown: function(event){ event.stopPropagation(); }
-		}).store('tag:id', tag.id);
-	},
-	
-	load: function(tags){
-		this.list.empty();
-		var elements = tags.map(this.create, this);
+		var editable = new Editable(element, {
+			onBlur: this.save.bind(this)
+		});
 		
-		this.list.adopt(elements);
-		this.elements = $$(elements);
+		this.list.adopt(element.addEvents({
+			click: this.select.bind(this, element),
+			mousedown: function(event){ event.stopPropagation(); }
+		}).store('tag:id', tag.id));
+		
+		return element;
 	},
 	
 	add: function(){
 		var element = this.create({name: 'New Tag', id: 0});
-		
-		this.list.adopt(element);
 		this.elements.push(element);
 		this.select(element);
-		this.edit(element);
+		element.fireEvent('dblclick');
+	},
+	
+	save: function(element){
+		var id = element.retrieve('tag:id');
+		var text = element.get('text');
+		//TODO - save this tag's new name to the database
 	},
 	
 	select: function(element){
-		if (this.editing) this.save();
-		
 		this.elements.removeClass('selected');
 		element.addClass('selected');
 
 		var id = element.retrieve('tag:id');
-		var snippets = SNIPPETS[id] || []; //TEMP - retrieve from database
-		
+		var snippets = SNIPPETS[id] || []; //TODO - retrieve snippets list from database
 		Snippely.Snippets.load(snippets);
-	},
-	
-	edit: function(element){
-		this.editing = element;
-		element.contentEditable = true;
-		element.addClass('editing').focus();
-	},
-	
-	save: function(){
-		if (!this.editing) return;
-		var id = this.editing.retrieve('tag:id');
-		var text = this.editing.get('text');
-		//save this tag's new name to the database
-		
-		this.editing.removeClass('editing');
-		this.editing = this.editing.contentEditable = false;
 	}
 
 };
@@ -304,8 +282,7 @@ Snippely.Snippets = {
 		element.addClass('selected');
 		
 		var id = element.retrieve('snippet:id');
-		var snippet = SNIPPET[id]; //TEMP - retrieve from database
-		
+		var snippet = SNIPPET[id]; //TODO - retrieve snippet from database
 		Snippely.Snippet.load(snippet);
 	},
 	
@@ -320,15 +297,9 @@ Snippely.Snippets = {
 Snippely.Snippet = {
 
 	initialize: function(){
-		this.active = false;
-		
 		this.title = $('snippet-title');
 		this.description = $('snippet-description');
 		this.container = $('snippet-snips');
-		
-		document.addEvent('mousedown', function(){
-			this.blur(this.active);
-		}.bind(this));
 	},
 
 	load: function(snippet){
@@ -336,19 +307,20 @@ Snippely.Snippet = {
 		this.title.set('text', snippet.title);
 		this.description.set('text', snippet.description);
 		
+		new Editable(this.title);
+		new Editable(this.description);
+		
 		snippet.snips.each(function(snip){
 			var type = snip.type + (snip.code ? ' code' : '');
 			var info = new Element('div', {'class': 'info', 'text': type});
-			var content = new Element('div', {
-				'class': 'content',
-				'text': snip.content
-			}).store('snip:id', snip.id);
-
-			content.addEvent('mousedown', this.focus.bindWithEvent(this, content));
-
-			this.container.adopt(new Element('div', {
-				'class': snippet.type + ' snip'
-			}).adopt(info, content));
+			var content = new Element('div', {'class': 'content', 'text': snip.content}).store('snip:id', snip.id);
+			var wrapper = new Element('div', {'class': snippet.type + ' snip'}).adopt(info, content);
+			new Editable(content, {
+				wrapper: wrapper,
+				activation: 'mousedown',
+				onBlur: this.save.bind(this)
+			});
+			this.container.adopt(wrapper);
 		}, this);
 		
 		//initialize history
@@ -371,25 +343,48 @@ Snippely.Snippet = {
 		new Sortables('snippet-snips', { handle: 'div.info' });
 	},
 	
-	focus: function(event, element){
-		event.stopPropagation();
-		if (element.contentEditable == true) return;
-		if (this.active) this.blur(this.active);
-		element.getParent().addClass('editing');
-		element.contentEditable = true;
-		this.active = element;
-	},
-	
-	blur: function(element){
-		if (!element.contentEditable) return;
-		element.getParent().removeClass('editing');
-		this.active = element.contentEditable = false;
-	},
-	
-	save: function(){
-		
+	save: function(element){
+		var id = element.retrieve('snip:id');
+		var text = element.get('text');
+		//TODO - save this snip to the database
 	}
 
 };
 
 window.addEvent('load', Snippely.initialize.bind(Snippely));
+
+// Class: Editable
+
+var Editable = new Class({
+	
+	Implements: [Events, Options],
+	
+	options: {/*
+		onEdit: $empty,
+		onBlur: $empty,*/
+		wrapper: false,
+		className: 'editing',
+		activation: 'dblclick'
+	},
+	
+	initialize: function(element, options){
+		this.setOptions(options);
+		this.element = $(element);
+		this.wrapper = this.options.wrapper || this.element;
+		this.element.addEvent(this.options.activation, this.edit.bind(this));
+		this.element.addEvent('blur', this.blur.bind(this));
+	},
+	
+	edit: function(){
+		this.element.contentEditable = true;
+		this.wrapper.addClass(this.options.className).focus();
+		this.fireEvent('onEdit', this.element);
+	},
+	
+	blur: function(){
+		this.element.contentEditable = false;
+		this.wrapper.removeClass(this.options.className);
+		this.fireEvent('onBlur', this.element);
+	}
+	
+});

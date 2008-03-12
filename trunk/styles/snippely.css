@@ -202,16 +202,15 @@ body {
 	color: #222;
 	font-size: 20px;
 	font-family: Helvetica;
-	padding-bottom: 10px;
-	border-bottom: 1px dotted #bbb;
+	margin-bottom: 10px;
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
 
 #snippet-description {
 	font-size: 12px;
-	margin: 10px 0;
+	padding: 10px 0px;
 	line-height: 1.6;
-	padding-bottom: 10px;
+	border-top: 1px dotted #bbb;
 	border-bottom: 1px dotted #bbb;
 }
 
