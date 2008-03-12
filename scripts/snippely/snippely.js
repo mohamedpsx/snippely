@@ -83,32 +83,16 @@ var Snippely = {
 		this.topResizer = $('top-resizer');
 		this.leftResizer = $('left-resizer');
 		
+		this.database = new Snippely.Database();
+		
 		this.initializeMenus();
 		this.initializeLayout();
 		this.initializeMetas();
+		this.initializeTags();
 		
-		this.database = new Snippely.Database();
-		this.initializeData();
+		this.Snippet.initialize(); //TODO - Load active tag / snippet from last session
 		
 		this.activate();
-	},
-	
-	initializeData: function(){
-		var sql, callback;
-		
-		//get tags
-		sql = 'SELECT * FROM tags';
-		callback = function(result){
-			var tags = [];
-			if (result.data) $each(result.data, function(tag){
-				tags.push({id: tag.id, name: tag.name});
-			});
-			this.Tags.initialize(tags);
-		}.bind(this);
-		
-		this.database.execute(sql, callback);
-		
-		this.Snippet.initialize(); //TODO - Load active snippet / tag from last session
 	},
 	
 	initializeMenus: function(){
@@ -198,6 +182,21 @@ var Snippely = {
 		});
 	},
 	
+	initializeTags: function(){
+		var sql, callback;
+		
+		sql = 'SELECT * FROM tags';
+		callback = function(result){
+			var tags = [];
+			if (result.data) $each(result.data, function(tag){
+				tags.push({id: tag.id, name: tag.name});
+			});
+			this.Tags.initialize(tags);
+		}.bind(this);
+		
+		this.database.execute(sql, callback);
+	},
+	
 	redraw: function(){
 		var left = this.tags.offsetWidth;
 		$$(this.snippets, this.topResizer, this.meta, this.snippet).setStyle('left', left);
@@ -229,212 +228,4 @@ var Snippely = {
 	
 };
 
-//The Tags List
-
-Snippely.Tags = {
-
-	initialize: function(tags){
-		this.list = $('tags-list').empty();
-		var elements = tags.map(this.create, this);
-		this.elements = $$(elements);
-	},
-
-	create: function(tag){
-		var element = new Element('li', { text: tag.name });
-		var editable = new Editable(element, {
-			onBlur: this.save.bind(this)
-		});
-		
-		this.list.adopt(element.addEvents({
-			click: this.select.bind(this, element),
-			mousedown: function(event){ event.stopPropagation(); }
-		}).store('tag:id', tag.id));
-		
-		return element;
-	},
-	
-	add: function(){
-		//QUERY - insert the tag
-		var sql = "INSERT INTO tags (name) VALUES ('" + 'New Tag' + "')";
-		var callback = function(result){
-			var element = this.create({name: 'New Tag', id: result.lastInsertRowID});
-			this.elements.push(element);
-			this.select(element);
-			element.fireEvent('dblclick');
-		}.bind(this);
-		Snippely.database.execute(sql, callback);
-	},
-	
-	remove: function(){
-		if (!this.selected) return;
-		if (!confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
-		var id = this.selected.retrieve('tag:id');
-		
-		//QUERY - remove the tag
-		var sql = "DELETE FROM tags WHERE id = " + id;
-		Snippely.database.execute(sql);
-		
-		//TODO - remove this tag and all it's snippets from the database
-		this.selected.erase('editable').destroy();
-	},
-	
-	rename: function(){
-		if (!this.selected) return;
-		this.selected.fireEvent('dblclick');
-	},
-	
-	save: function(element){
-		var id = element.retrieve('tag:id');
-		var name = element.get('text');
-		
-		//QUERY - update the tag
-		var sql = "UPDATE tags SET name = '" + name + "' WHERE id = " + id;
-		Snippely.database.execute(sql);
-		
-		//TODO - save this tag's new name to the database
-	},
-	
-	select: function(element){
-		this.elements.removeClass('selected');
-		this.selected = element.addClass('selected');
-		
-		var id = element.retrieve('tag:id');
-		var snippets = SNIPPETS[id] || []; //TODO - retrieve snippets list from database
-		Snippely.Snippets.load(snippets);
-	}
-
-};
-
-//The Snippets List
-
-Snippely.Snippets = {
-
-	load: function(snippets){
-		var list = $('snippets-list').empty();
-		var elements = snippets.map(function(snippet){
-			var element = new Element('li', { text: snippet.title });
-			element.addEvent('click', this.select.bind(this, element));
-			element.store('snippet:id', snippet.id);
-			return element;
-		}, this);
-		
-		list.adopt(elements).getElements(':odd').addClass('odd');
-		this.elements = $$(elements);
-	},
-	
-	select: function(element){
-		this.elements.removeClass('selected');
-		element.addClass('selected');
-		
-		var id = element.retrieve('snippet:id');
-		var snippet = SNIPPET[id]; //TODO - retrieve snippet from database
-		Snippely.Snippet.load(snippet);
-	}
-	
-};
-
-//The Snippet and all his Snips
-
-Snippely.Snippet = {
-
-	initialize: function(){
-		this.title = $('snippet-title');
-		this.description = $('snippet-description');
-		this.container = $('snippet-snips');
-	},
-
-	load: function(snippet){
-		this.container.empty();
-		this.title.set('text', snippet.title);
-		this.description.set('text', snippet.description);
-		
-		new Editable(this.title);
-		new Editable(this.description, {enter: true});
-		
-		snippet.snips.each(function(snip){
-			var type = snip.type + (snip.code ? ' code' : '');
-			var info = new Element('div', {'class': 'info', 'text': type});
-			var content = new Element('div', {'class': 'content', 'text': snip.content.trim()}).store('snip:id', snip.id);
-			content.history = [content.get('html')];
-			content.addEvent('keydown', function(event){
-				if (event.meta && event.key == 'z'){
-					event.preventDefault();
-					var start = this.selectionStart;
-					var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
-					this.set('html', previous);
-				} else {
-					if (this.get('html') != this.history.getLast()) this.history.push(this.get('html'));
-				}
-			});
-			
-			var wrapper = new Element('div', {'class': snippet.type + ' snip'}).adopt(info, content);
-			new Editable(content, {
-				enter: true,
-				wrapper: wrapper,
-				activation: 'mousedown',
-				onBlur: this.save.bind(this)
-			});
-			
-			this.container.adopt(wrapper);
-		}, this);
-		
-		//initialize sortables
-		new Sortables('snippet-snips', {
-			clone: true,
-			opacity: 0.3,
-			handle: 'div.info'
-		});
-		
-		Snippely.redraw();
-	},
-	
-	save: function(element){
-		var id = element.retrieve('snip:id');
-		var text = element.get('text');
-		//TODO - save this snip to the database
-	}
-
-};
-
 window.addEvent('load', Snippely.initialize.bind(Snippely));
-
-// Class: Editable
-
-var Editable = new Class({
-	
-	Implements: [Events, Options],
-	
-	options: {/*
-		onEdit: $empty,
-		onBlur: $empty,*/
-		enter: false,
-		wrapper: false,
-		className: 'editing',
-		activation: 'dblclick'
-	},
-	
-	initialize: function(element, options){
-		this.setOptions(options);
-		this.element = $(element);
-		this.wrapper = this.options.wrapper || this.element;
-		this.element.addEvent(this.options.activation, this.edit.bind(this));
-		this.element.addEvent('blur', this.blur.bind(this));
-		if (!this.options.enter) this.element.addEvent('keydown', function(event){
-			if (event.key == 'enter') this.blur();
-		});
-		this.element.store('editable', this);
-	},
-	
-	edit: function(){
-		this.element.contentEditable = true;
-		this.wrapper.addClass(this.options.className).focus();
-		this.fireEvent('onEdit', this.element);
-	},
-	
-	blur: function(){
-		this.element.contentEditable = false;
-		this.wrapper.removeClass(this.options.className);
-		this.fireEvent('onBlur', this.element);
-	}
-	
-});
