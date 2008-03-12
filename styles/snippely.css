@@ -17,8 +17,13 @@ body {
 	background-color: #eee;
 }
 
-#snippets, #meta, #footer {
-	-webkit-user-select:none;
+#snippets, #meta, #tags, #footer {
+	-webkit-user-select: none;
+}
+
+*.editing {
+	cursor: text;
+	-webkit-user-select: text !important;
 }
 
 /* @end */
@@ -56,7 +61,7 @@ body {
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-#blur  #tags h3 {
+#blur #tags h3 {
 	color: #606060;
 }
 
@@ -66,10 +71,14 @@ body {
 
 #tags li {
 	color: #222;
-	cursor: pointer;
 	font-size: 11px;
 	line-height: 11px;
 	padding: 4px 6px 5px 25px;
+}
+
+#tags li.editing::selection {
+	color: #fff;
+	background-color: #ccc;
 }
 
 #tags li.selected {
@@ -78,7 +87,7 @@ body {
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 }
 
-#blur  #tags li.selected {
+#blur #tags li.selected {
 	background-image: url(../images/selected-blur.png);
 }
 
@@ -116,7 +125,7 @@ body {
 	background-position: center bottom;
 }
 
-#button-add    {
+#button-add {
 	background-image: url(../images/button-add.png);
 }
 
@@ -148,7 +157,6 @@ body {
 }
 
 #snippets li {
-  cursor: pointer;
 	padding: 4px 20px;
 	background-color: #fff;
 }
@@ -231,7 +239,7 @@ div.snip.editing {
 
 div.info {
 	color: #888;
-  cursor: move;
+	cursor: move;
 	font-size: 9px;
 	margin-bottom: 6px;
 	padding-bottom: 5px;

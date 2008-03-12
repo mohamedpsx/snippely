@@ -320,7 +320,7 @@ Snippely.Snippet = {
 					event.preventDefault();
 					var start = this.selectionStart;
 					var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
-					this.setHTML(previous);
+					this.set('html', previous);
 				} else {
 					if (this.get('html') != this.history.getLast()) this.history.push(this.get('html'));
 				}
