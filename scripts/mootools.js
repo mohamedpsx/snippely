@@ -18,7 +18,7 @@ Inspiration:
 
 var MooTools = {
 	'version': '1.2dev',
-	'build': '1494'
+	'build': '1496'
 };
 
 var Native = function(options){
@@ -721,7 +721,7 @@ String.implement({
 	},
 
 	substitute: function(object, regexp){
-		return this.replace(regexp || /\\?\{([^}]+)\}/g, function(match, name){
+		return this.replace(regexp || (/\\?\{([^}]+)\}/g), function(match, name){
 			if (match.charAt(0) == '\\') return match.slice(1);
 			return (object[name] != undefined) ? object[name] : '';
 		});
@@ -3690,13 +3690,13 @@ Drag.Move = new Class({
 		if (element.getStyle('left') == 'auto' || element.getStyle('top') == 'auto') element.position(element.getPosition(element.offsetParent));
 		
 		element.setStyle('position', position);
+		
+		this.addEvent('onStart', function(){
+			this.checkDroppables();
+		}, true);
 	},
 
 	start: function(event){
-		if (this.overed){
-			this.overed.fireEvent('leave', [this.element, this]);
-			this.overed = null;
-		}
 		if (this.container){
 			var el = this.element, cont = this.container, ccoo = cont.getCoordinates(el.offsetParent), cps = {}, ems = {};
 
@@ -3723,8 +3723,13 @@ Drag.Move = new Class({
 	checkDroppables: function(){
 		var overed = this.droppables.filter(this.checkAgainst, this).getLast();
 		if (this.overed != overed){
-			if (this.overed) this.overed.fireEvent('leave', [this.element, this]);
-			this.overed = overed ? overed.fireEvent('over', [this.element, this]) : null;
+			if (this.overed) this.fireEvent('onLeave', [this.element, this.overed]);
+			if (overed){
+				this.overed = overed;
+				this.fireEvent('onEnter', [this.element, overed]);
+			} else {
+				this.overed = null;
+			}
 		}
 	},
 
@@ -3735,8 +3740,8 @@ Drag.Move = new Class({
 
 	stop: function(event){
 		this.checkDroppables();
-		if (this.overed) this.overed.fireEvent('drop', [this.element, this]);
-		else this.element.fireEvent('emptydrop', this);
+		this.fireEvent('onDrop', [this.element, this.overed]);
+		this.overed = null;
 		return arguments.callee.parent(event);
 	}
 
@@ -3843,8 +3848,7 @@ var Sortables = new Class({
 		return element.clone(true).setStyles({
 			'margin': '0px',
 			'position': 'absolute',
-			'visibility': 'hidden',
-			'width': element.getStyle('width')
+			'visibility': 'hidden'
 		}).inject(this.list).position(element.getPosition(element.offsetParent));
 	},
 
@@ -3855,7 +3859,7 @@ var Sortables = new Class({
 	},
 
 	insert: function(element, where){
-		if (where){
+		if (where) {
 			this.list = element;
 			this.drag.droppables = this.getDroppables();
 		}
