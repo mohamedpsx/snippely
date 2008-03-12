@@ -1,24 +1,8 @@
-/*
-Script: Core.js
-	MooTools - My Object Oriented JavaScript Tools.
-
-License:
-	MIT-style license.
-
-Copyright:
-	Copyright (c) 2006-2007 [Valerio Proietti](http://mad4milk.net/).
-
-Code & Documentation:
-	[The MooTools production team](http://mootools.net/developers/).
-
-Inspiration:
-	- Class implementation inspired by [Base.js](http://dean.edwards.name/weblog/2006/03/base/) Copyright (c) 2006 Dean Edwards, [GNU Lesser General Public License](http://opensource.org/licenses/lgpl-license.php)
-	- Some functionality inspired by [Prototype.js](http://prototypejs.org) Copyright (c) 2005-2007 Sam Stephenson, [MIT License](http://opensource.org/licenses/mit-license.php)
-*/
+//MooTools, My Object Oriented Javascript Tools. Copyright (c) 2006-2007 Valerio Proietti, <http://mad4milk.net>, MIT Style License.
 
 var MooTools = {
 	'version': '1.2dev',
-	'build': '1496'
+	'build': '1497'
 };
 
 var Native = function(options){
@@ -134,7 +118,7 @@ function $extend(original, extended){
 
 function $unlink(object){
 	var unlinked = null;
-	
+
 	switch ($type(object)){
 		case 'object':
 			unlinked = {};
@@ -146,7 +130,7 @@ function $unlink(object){
 		break;
 		default: return object;
 	}
-	
+
 	return unlinked;
 };
 
@@ -220,7 +204,7 @@ var Hash = new Native({
 });
 
 Hash.implement({
-	
+
 	getLength: function(){
 		var length = 0;
 		for (var key in this){
@@ -234,7 +218,7 @@ Hash.implement({
 			if (this.hasOwnProperty(key)) fn.call(bind, this[key], key, this);
 		}
 	},
-	
+
 	getClean: function(){
 		var clean = {};
 		for (var key in this){
@@ -274,15 +258,6 @@ function $each(iterable, fn, bind){
 	var type = $type(iterable);
 	((type == 'arguments' || type == 'collection' || type == 'array') ? Array : Hash).each(iterable, fn, bind);
 };
-
-
-/*
-Script: Browser.js
-	The Browser Core. Contains Browser initialization, Window and Document, and the Browser Hash.
-
-License:
-	MIT-style license.
-*/
 
 var Browser = new Hash({
 	Engine: {name: 'unknown', version: ''},
@@ -352,7 +327,7 @@ var Window = new Native({
 		$uid(win);
 		if (!win.Element){
 			win.Element = $empty;
-			if (Browser.Engine.webkit) win.document.createElement("iframe"); //fixes safari 2
+			if (Browser.Engine.webkit) win.document.createElement("iframe");
 			win.Element.prototype = (Browser.Engine.webkit) ? window["[[DOMElement.prototype]]"] : {};
 		}
 		return $extend(win, Window.Prototype);
@@ -395,14 +370,6 @@ Document.Prototype = {$family: {name: 'document'}};
 
 new Document(document);
 
-/*
-Script: Array.js
-	Contains Array Prototypes like copy, each, contains, and remove.
-
-License:
-	MIT-style license.
-*/
-
 Array.implement({
 
 	every: function(fn, bind){
@@ -419,7 +386,7 @@ Array.implement({
 		}
 		return results;
 	},
-	
+
 	clean: function() {
 		return this.filter($defined);
 	},
@@ -536,14 +503,6 @@ Array.implement({
 
 });
 
-/*
-Script: Function.js
-	Contains Function Prototypes like create, bind, pass, and delay.
-
-License:
-	MIT-style license.
-*/
-
 Function.implement({
 
 	extend: function(properties){
@@ -598,14 +557,6 @@ Function.implement({
 
 });
 
-/*
-Script: Number.js
-	Contains Number Prototypes like limit, round, times, and ceil.
-
-License:
-	MIT-style license.
-*/
-
 Number.implement({
 
 	limit: function(min, max){
@@ -642,14 +593,6 @@ Number.alias('times', 'each');
 	});
 	Number.implement(methods);
 })(['abs', 'acos', 'asin', 'atan', 'atan2', 'ceil', 'cos', 'exp', 'floor', 'log', 'max', 'min', 'pow', 'sin', 'sqrt', 'tan']);
-
-/*
-Script: String.js
-	Contains String Prototypes like camelCase, capitalize, test, and toInt.
-
-License:
-	MIT-style license.
-*/
 
 String.implement({
 
@@ -728,14 +671,6 @@ String.implement({
 	}
 
 });
-
-/*
-Script: Hash.js
-	Contains Hash Prototypes. Provides a means for overcoming the JavaScript practical impossibility of extending native Objects.
-
-License:
-	MIT-style license.
-*/
 
 Hash.implement({
 
@@ -838,7 +773,7 @@ Hash.implement({
 		});
 		return values;
 	},
-	
+
 	toQueryString: function(base){
 		var queryString = [];
 		Hash.each(this, function(value, key){
@@ -857,21 +792,13 @@ Hash.implement({
 			}
 			if (value != undefined) queryString.push(result);
 		});
-		
+
 		return queryString.join('&');
 	}
 
 });
 
 Hash.alias('keyOf', 'indexOf').alias('hasValue', 'contains');
-
-/*
-Script: Event.js
-	Contains the Event Native, to make the event object completely crossbrowser.
-
-License:
-	MIT-style license.
-*/
 
 var Event = new Native({
 
@@ -886,7 +813,7 @@ var Event = new Native({
 		var type = event.type;
 		var target = event.target || event.srcElement;
 		while (target && target.nodeType == 3) target = target.parentNode;
-		
+
 		if (type.test(/key/)){
 			var code = event.which || event.keyCode;
 			var key = Event.Keys.keyOf(code);
@@ -925,19 +852,19 @@ var Event = new Native({
 		return $extend(this, {
 			event: event,
 			type: type,
-			
+
 			page: page,
 			client: client,
 			rightClick: rightClick,
-			
+
 			wheel: wheel,
-			
+
 			relatedTarget: related,
 			target: target,
-			
+
 			code: code,
 			key: key,
-			
+
 			shift: event.shiftKey,
 			control: event.ctrlKey,
 			alt: event.altKey,
@@ -980,14 +907,6 @@ Event.implement({
 
 });
 
-/*
-Script: Class.js
-	Contains the Class Function for easily creating, extending, and implementing reusable Classes.
-
-License:
-	MIT-style license.
-*/
-
 var Class = new Native({
 
 	name: 'Class',
@@ -998,9 +917,9 @@ var Class = new Native({
 
 		var klass = function(){
 			for (var property in this) this[property] = $unlink(this[property]);
-			
+
 			this.parent = null;
-			
+
 			for (var Property in Class.Mutators){
 				if (!this[Property]) continue;
 				Class.Mutators[Property](this, this[Property]);
@@ -1064,14 +983,6 @@ Class.Mutators.Extends = function(self, klass){
 		})(kp, sp);
 	}
 };
-
-/*
-Script: Class.Extras.js
-	Contains Utility Classes that can be implemented into your own Classes to ease the execution of many common tasks.
-
-License:
-	MIT-style license.
-*/
 
 var Chain = new Class({
 
@@ -1147,16 +1058,6 @@ var Options = new Class({
 	}
 
 });
-
-
-/*
-Script: Element.js
-	One of the most important items in MooTools. Contains the dollar function, the dollars function, and an handful of cross-browser,
-	time-saver methods to let you easily work with HTML Elements.
-
-License:
-	MIT-style license.
-*/
 
 Document.implement({
 
@@ -1779,14 +1680,6 @@ window.addListener('unload', function(){
 	if (Browser.Engine.trident) CollectGarbage();
 });
 
-/*
-Script: Element.Event.js
-	Contains Element methods for dealing with events, and custom Events.
-
-License:
-	MIT-style license.
-*/
-
 Element.Properties.events = {set: function(events){
 	this.addEvents(events);
 }};
@@ -1885,13 +1778,13 @@ Native.implement([Element, Window, Document], {
 });
 
 Element.NativeEvents = {
-	click: 2, dblclick: 2, mouseup: 2, mousedown: 2, contextmenu: 2, //mouse buttons
-	mousewheel: 2, DOMMouseScroll: 2, //mouse wheel
-	mouseover: 2, mouseout: 2, mousemove: 2, selectstart: 2, selectend: 2, //mouse movement
-	keydown: 2, keypress: 2, keyup: 2, //keyboard
-	focus: 2, blur: 2, change: 2, reset: 2, select: 2, submit: 2, //form elements
-	load: 1, unload: 1, beforeunload: 1, resize: 1, move: 1, DOMContentLoaded: 1, readystatechange: 1, //window
-	error: 1, abort: 1, scroll: 1 //misc
+	click: 2, dblclick: 2, mouseup: 2, mousedown: 2, contextmenu: 2,
+	mousewheel: 2, DOMMouseScroll: 2,
+	mouseover: 2, mouseout: 2, mousemove: 2, selectstart: 2, selectend: 2,
+	keydown: 2, keypress: 2, keyup: 2,
+	focus: 2, blur: 2, change: 2, reset: 2, select: 2, submit: 2,
+	load: 1, unload: 1, beforeunload: 1, resize: 1, move: 1, DOMContentLoaded: 1, readystatechange: 1,
+	error: 1, abort: 1, scroll: 1
 };
 
 (function(){
@@ -1923,14 +1816,6 @@ Element.Events = new Hash({
 
 })();
 
-/*
-Script: Element.Style.js
-	Contains methods for interacting with the styles of Elements in a fashionable way.
-
-License:
-	MIT-style license.
-*/
-
 Element.Properties.styles = {set: function(styles){
 	this.setStyles(styles);
 }};
@@ -1958,11 +1843,11 @@ Element.Properties.opacity = {
 };
 
 Element.implement({
-	
+
 	setOpacity: function(value){
 		return this.set('opacity', value, true);
 	},
-	
+
 	getOpacity: function(){
 		return this.get('opacity');
 	},
@@ -2064,23 +1949,10 @@ Element.ShortStyles = {margin: {}, padding: {}, border: {}, borderWidth: {}, bor
 	Short.borderColor[bdc] = Short[bd][bdc] = All[bdc] = 'rgb(@, @, @)';
 });
 
-
-/*
-Script: Element.Dimensions.js
-	Contains methods to work with size, scroll, or positioning of Elements and the window object.
-
-License:
-	MIT-style license.
-	
-Credits:
-	- Element positioning based on the [qooxdoo](http://qooxdoo.org/) code and smart browser fixes, [LGPL License](http://www.gnu.org/licenses/lgpl.html).
-	- Viewport dimensions based on [YUI](http://developer.yahoo.com/yui/) code, [BSD License](http://developer.yahoo.com/yui/license.html).
-*/
-
 (function(){
 
 Element.implement({
-	
+
 	scrollTo: function(x, y){
 		if (isBody(this)){
 			this.getWindow().scrollTo(x, y);
@@ -2090,99 +1962,103 @@ Element.implement({
 		}
 		return this;
 	},
-	
+
 	getSize: function(){
 		if (isBody(this)) return this.getWindow().getSize();
-		
+
 		return {x: this.offsetHeight, y: this.offsetWidth};
 	},
-	
+
 	getScrollSize: function(){
 		if (isBody(this)) return this.getWindow().getScrollSize();
-		
-		return {x: this.scrollHeight, y: this.scrollWidth};
+
+		return {x: this.scrollWidth, y: this.scrollHeight};
 	},
-	
+
 	getScroll: function(){
-		if (isBody(this)) return this.getWindow().getScroll();
-		
+		if (isBody(this)) return this.getWindow().getScrollSize();
+
+		return {x: this.scrollLeft, y: this.scrollTop};
+	},
+
+	getScrolls: function(){
 		var element = this, position = {x: 0, y: 0};
-		
+
 		while (element && !isBody(element)){
 			position.x += element.scrollLeft;
 			position.y += element.scrollTop;
 			element = element.parentNode;
 		}
-		
+
 		return position;
 	},
-	
-	getOffset: function(){
+
+	getOffsets: function(){
 		if (isBody(this)) return {x: 0, y: 0};
-		
+
 		var element = this, position = {x: 0, y: 0};
 
 		var standards = isStandards(Element.getDocument(this));
-		
+
 		while (element && !isBody(element)){
 			position.x += element.offsetLeft;
 			position.y += element.offsetTop;
-			
+
 			if (Browser.Engine.gecko){
 
 				if (!borderBox(element)){
 					position.x += leftBorder(element);
 		            position.y += topBorder(element);
 				}
-				
+
 				var parent = element.parentNode;
-				
+
 				if (parent && !visibleOverflow(parent)){
 					position.x += leftBorder(parent);
 					position.y += topBorder(parent);
 				}
-				
+
 			} else if (element != this && ((Browser.Engine.trident && standards) || Browser.Engine.webkit)){
-				
+
 				position.x += leftBorder(element);
 				position.y += topBorder(element);
 
 			}
-			
+
 			element = element.offsetParent;
 		}
-		
+
 		if (Browser.Engine.gecko && !borderBox(this)){
 			position.x -= leftBorder(this);
             position.y -= topBorder(this);
 		}
-		
+
 		return position;
 	},
-	
+
 	getPosition: function(relative){
 		if (isBody(this)) return {x: 0, y: 0};
-		
-		var offset = this.getOffset(), scroll = this.getScroll();
+
+		var offset = this.getOffsets(), scroll = this.getScrolls();
 		var position = {x: offset.x - scroll.x, y: offset.y - scroll.y};
-		
+
 		var relativePosition = (relative && (relative = $(relative, true))) ? Element.getPosition(relative) : {x: 0, y: 0};
-		
+
 		return {x: position.x - relativePosition.x, y: position.y - relativePosition.y};
 	},
-	
+
 	getCoordinates: function(element){
 		if (isBody(this)) return this.getWindow().getCoordinates();
-		
+
 		var position = this.getPosition(element), size = this.getSize();
-		
+
 		var obj = {left: position.x, top: position.y, width: size.x, height: size.y};
 		obj.right = obj.left + obj.width;
 		obj.bottom = obj.top + obj.height;
-		
+
 		return obj;
 	},
-	
+
 	computePosition: function(obj){
 		return {left: obj.x - styleNumber(this, 'margin-left'), top: obj.y - styleNumber(this, 'margin-top')};
 	},
@@ -2190,43 +2066,41 @@ Element.implement({
 	position: function(obj){
 		return this.setStyles(this.computePosition(obj));
 	}
-	
+
 });
 
 Native.implement([Document, Window], {
-	
+
 	getSize: function(){
 		var win = this.getWindow();
 		if (Browser.Engine.presto || Browser.Engine.webkit) return {x: win.innerWidth, y: win.innerHeight};
 		var doc = getCompatElement(this);
 		return {x: doc.clientWidth, y: doc.clientHeight};
-		
+
 	},
-	
+
 	getScroll: function(){
 		var win = this.getWindow();
 		var doc = getCompatElement(this);
 		return {x: win.pageXOffset || doc.scrollLeft, y: win.pageYOffset || doc.scrollTop};
 	},
-	
+
 	getScrollSize: function(){
 		var doc = getCompatElement(this);
 		var min = this.getSize();
 		return {x: Math.max(doc.scrollWidth, min.x), y: Math.max(doc.scrollHeight, min.y)};
 	},
-	
+
 	getPosition: function(){
 		return {x: 0, y: 0};
 	},
-	
+
 	getCoordinates: function(){
 		var size = this.getSize();
 		return {top: 0, left: 0, bottom: size.y, right: size.x, height: size.y, width: size.x};
 	}
-	
-});
 
-// private methods
+});
 
 function isBody(elemenet){
 	var tag = elemenet.tagName.toLowerCase();
@@ -2268,8 +2142,6 @@ function getCompatElement(element){
 
 })();
 
-//aliases
-
 Native.implement([Window, Document, Element], {
 
 	getHeight: function(){
@@ -2306,16 +2178,8 @@ Native.implement([Window, Document, Element], {
 
 });
 
-/*
-Script: Selectors.js
-	Adds advanced CSS Querying capabilities for targeting elements. Also includes pseudoselectors support.
-
-License:
-	MIT-style license.
-*/
-
 Native.implement([Document, Element], {
-	
+
 	getElements: function(expression, nocash){
 		expression = expression.split(',');
 		var items, local = {};
@@ -2326,11 +2190,11 @@ Native.implement([Document, Element], {
 		}
 		return new Elements(items, {ddup: (expression.length > 1), cash: !nocash});
 	}
-	
+
 });
 
 Element.implement({
-	
+
 	match: function(selector){
 		if (!selector) return true;
 		var tagid = Selectors.Utils.parseTagAndID(selector);
@@ -2339,7 +2203,7 @@ Element.implement({
 		var parsed = Selectors.Utils.parseSelector(selector);
 		return (parsed) ? Selectors.Utils.filter(this, parsed, {}) : true;
 	}
-	
+
 });
 
 var Selectors = {Cache: {nth: {}, parsed: {}}};
@@ -2353,14 +2217,14 @@ Selectors.RegExps = {
 };
 
 Selectors.Utils = {
-	
+
 	chk: function(item, uniques){
 		if (!uniques) return true;
 		var uid = $uid(item);
 		if (!uniques[uid]) return uniques[uid] = true;
 		return false;
 	},
-	
+
 	parseNthArgument: function(argument){
 		if (Selectors.Cache.nth[argument]) return Selectors.Cache.nth[argument];
 		var parsed = argument.match(/^([+-]?\d*)?([a-z]+)?([+-]?\d*)?$/);
@@ -2386,10 +2250,10 @@ Selectors.Utils = {
 			case 'only': parsed = {special: 'only-child'}; break;
 			default: parsed = {a: (a - 1), special: 'index'};
 		}
-		
+
 		return Selectors.Cache.nth[argument] = parsed;
 	},
-	
+
 	parseSelector: function(selector){
 		if (Selectors.Cache.parsed[selector]) return Selectors.Cache.parsed[selector];
 		var m, parsed = {classes: [], pseudos: [], attributes: []};
@@ -2411,13 +2275,13 @@ Selectors.Utils = {
 		if (!parsed.classes && !parsed.attributes && !parsed.pseudos) parsed = null;
 		return Selectors.Cache.parsed[selector] = parsed;
 	},
-	
+
 	parseTagAndID: function(selector){
 		var tag = selector.match(Selectors.RegExps.tag);
 		var id = selector.match(Selectors.RegExps.id);
 		return [(tag) ? tag[1] : '*', (id) ? id[1] : false];
 	},
-	
+
 	filter: function(item, parsed, local){
 		var i;
 		if (parsed.classes){
@@ -2440,7 +2304,7 @@ Selectors.Utils = {
 		}
 		return true;
 	},
-	
+
 	getByTagAndID: function(ctx, tag, id){
 		if (id){
 			var item = ctx.getElementById(id, true);
@@ -2449,28 +2313,28 @@ Selectors.Utils = {
 			return ctx.getElementsByTagName(tag);
 		}
 	},
-	
+
 	search: function(self, expression, local){
 		var splitters = [];
-		
+
 		var selectors = expression.trim().replace(Selectors.RegExps.splitter, function(m0, m1, m2){
 			splitters.push(m1);
 			return ':)' + m2;
 		}).split(':)');
-		
+
 		var items, match, filtered, item;
-		
+
 		for (var i = 0, l = selectors.length; i < l; i++){
-			
+
 			var selector = selectors[i];
-			
+
 			if (i == 0 && Selectors.RegExps.quick.test(selector)){
 				items = self.getElementsByTagName(selector);
 				continue;
 			}
-			
+
 			var splitter = splitters[i - 1];
-			
+
 			var tagid = Selectors.Utils.parseTagAndID(selector);
 			var tag = tagid[0], id = tagid[1];
 
@@ -2481,9 +2345,9 @@ Selectors.Utils = {
 				for (var j = 0, k = items.length; j < k; j++) found = Selectors.Getters[splitter](found, items[j], tag, id, uniques);
 				items = found;
 			}
-			
+
 			var parsed = Selectors.Utils.parseSelector(selector);
-			
+
 			if (parsed){
 				filtered = [];
 				for (var m = 0, n = items.length; m < n; m++){
@@ -2492,17 +2356,17 @@ Selectors.Utils = {
 				}
 				items = filtered;
 			}
-			
+
 		}
-		
+
 		return items;
-		
+
 	}
-	
+
 };
 
 Selectors.Getters = {
-	
+
 	' ': function(found, self, tag, id, uniques){
 		var items = Selectors.Utils.getByTagAndID(self, tag, id);
 		for (var i = 0, l = items.length; i < l; i++){
@@ -2511,7 +2375,7 @@ Selectors.Getters = {
 		}
 		return found;
 	},
-	
+
 	'>': function(found, self, tag, id, uniques){
 		var children = Selectors.Utils.getByTagAndID(self, tag, id);
 		for (var i = 0, l = children.length; i < l; i++){
@@ -2520,7 +2384,7 @@ Selectors.Getters = {
 		}
 		return found;
 	},
-	
+
 	'+': function(found, self, tag, id, uniques){
 		while ((self = self.nextSibling)){
 			if (self.nodeType == 1){
@@ -2530,9 +2394,9 @@ Selectors.Getters = {
 		}
 		return found;
 	},
-	
+
 	'~': function(found, self, tag, id, uniques){
-		
+
 		while ((self = self.nextSibling)){
 			if (self.nodeType == 1){
 				if (!Selectors.Utils.chk(self, uniques)) break;
@@ -2541,27 +2405,27 @@ Selectors.Getters = {
 		}
 		return found;
 	}
-	
+
 };
 
 Selectors.Filters = {
-	
+
 	byTag: function(self, tag){
 		return (tag == '*' || (self.tagName && self.tagName.toLowerCase() == tag));
 	},
-	
+
 	byID: function(self, id){
 		return (!id || (self.id && self.id == id));
 	},
-	
+
 	byClass: function(self, klass){
 		return (self.className && self.className.contains(klass, ' '));
 	},
-	
+
 	byPseudo: function(self, parser, argument, local){
 		return parser.call(self, argument, local);
 	},
-	
+
 	byAttribute: function(self, name, operator, value){
 		var result = Element.prototype.getProperty.call(self, name);
 		if (!result) return false;
@@ -2577,29 +2441,27 @@ Selectors.Filters = {
 		}
 		return false;
 	}
-	
+
 };
 
 Selectors.Pseudo = new Hash({
-	
-	// w3c pseudo selectors
-	
+
 	empty: function(){
 		return !(this.innerText || this.textContent || '').length;
 	},
-	
+
 	not: function(selector){
 		return !Element.match(this, selector);
 	},
-	
+
 	contains: function(text){
 		return (this.innerText || this.textContent || '').contains(text);
 	},
-	
+
 	'first-child': function(){
 		return Selectors.Pseudo.index.call(this, 0);
 	},
-	
+
 	'last-child': function(){
 		var element = this;
 		while ((element = element.nextSibling)){
@@ -2607,7 +2469,7 @@ Selectors.Pseudo = new Hash({
 		}
 		return true;
 	},
-	
+
 	'only-child': function(){
 		var prev = this;
 		while ((prev = prev.previousSibling)){
@@ -2619,7 +2481,7 @@ Selectors.Pseudo = new Hash({
 		}
 		return true;
 	},
-	
+
 	'nth-child': function(argument, local){
 		argument = (argument == undefined) ? 'n' : argument;
 		var parsed = Selectors.Utils.parseNthArgument(argument);
@@ -2642,9 +2504,7 @@ Selectors.Pseudo = new Hash({
 		}
 		return (local.positions[uid] % parsed.a == parsed.b);
 	},
-	
-	// custom pseudo selectors
-	
+
 	index: function(index){
 		var element = this, count = 0;
 		while ((element = element.previousSibling)){
@@ -2652,7 +2512,7 @@ Selectors.Pseudo = new Hash({
 		}
 		return (count == index);
 	},
-	
+
 	even: function(argument, local){
 		return Selectors.Pseudo['nth-child'].call(this, '2n+1', local);
 	},
@@ -2660,16 +2520,8 @@ Selectors.Pseudo = new Hash({
 	odd: function(argument, local){
 		return Selectors.Pseudo['nth-child'].call(this, '2n', local);
 	}
-	
+
 });
-
-/*
-Script: Domready.js
-	Contains the domready custom event.
-
-License:
-	MIT-style license.
-*/
 
 Element.Events.domready = {
 
@@ -2680,14 +2532,14 @@ Element.Events.domready = {
 };
 
 (function(){
-	
+
 	var domready = function(){
 		if (Browser.loaded) return;
 		Browser.loaded = true;
 		window.fireEvent('domready');
 		document.fireEvent('domready');
 	};
-	
+
 	switch (Browser.Engine.name){
 
 		case 'webkit': (function(){
@@ -2703,25 +2555,14 @@ Element.Events.domready = {
 				})) ? domready() : arguments.callee.delay(50);
 			})();
 		break;
-		
+
 		default:
 			window.addEvent('load', domready);
 			document.addEvent('DOMContentLoaded', domready);
 
 	}
-	
+
 })();
-
-/*
-Script: JSON.js
-	JSON encoder and decoder.
-
-License:
-	MIT-style license.
-
-See Also:
-	<http://www.json.org/>
-*/
 
 var JSON = new Hash({
 
@@ -2766,25 +2607,11 @@ Native.implement([Hash, Array, String, Number], {
 
 });
 
-
-/*
-Script: Fx.js
-	Contains the basic animation logic to be extended by all other Fx Classes.
-
-License:
-	MIT-style license.
-*/
-
 var Fx = new Class({
 
 	Implements: [Chain, Events, Options],
 
 	options: {
-		/*
-		onStart: $empty,
-		onCancel: $empty,
-		onComplete: $empty,
-		*/
 		fps: 50,
 		unit: false,
 		duration: 500,
@@ -2895,20 +2722,9 @@ Fx.compute = function(from, to, delta){
 
 Fx.Durations = {'short': 250, 'normal': 500, 'long': 1000};
 
-
-/*
-Script: Fx.CSS.js
-	Contains the CSS animation logic. Used by Fx.Tween, Fx.Morph, Fx.Elements.
-
-License:
-	MIT-style license.
-*/
-
 Fx.CSS = new Class({
 
 	Extends: Fx,
-
-	//prepares the base from/to object
 
 	prepare: function(element, property, values){
 		values = $splat(values);
@@ -2920,8 +2736,6 @@ Fx.CSS = new Class({
 		var parsed = values.map(this.parse);
 		return {from: parsed[0], to: parsed[1]};
 	},
-
-	//parses a value into an array
 
 	parse: function(value){
 		value = $lambda(value)();
@@ -2939,8 +2753,6 @@ Fx.CSS = new Class({
 		});
 	},
 
-	//computes by a from and to prepared objects, using their parsers.
-
 	compute: function(from, to, delta){
 		var computed = [];
 		(Math.min(from.length, to.length)).times(function(i){
@@ -2949,8 +2761,6 @@ Fx.CSS = new Class({
 		computed.$family = {name: 'fx:css:value'};
 		return computed;
 	},
-
-	//serves the value as settable
 
 	serve: function(value, unit){
 		if ($type(value) != 'fx:css:value') value = this.parse(value);
@@ -2961,13 +2771,9 @@ Fx.CSS = new Class({
 		return returned;
 	},
 
-	//renders the change to an element
-
 	render: function(element, property, value, unit){
 		element.setStyle(property, this.serve(value, unit));
 	},
-
-	//searches inside the page css to find the values for a selector
 
 	search: function(selector){
 		var to = {}, domain = document.domain;
@@ -3025,15 +2831,6 @@ Fx.CSS.Parsers = new Hash({
 	}
 
 });
-
-
-/*
-Script: Fx.Tween.js
-	Formerly Fx.Style, effect to transition any CSS property for an element.
-
-License:
-	MIT-style license.
-*/
 
 Fx.Tween = new Class({
 
@@ -3123,15 +2920,6 @@ Element.implement({
 
 });
 
-
-/*
-Script: Fx.Morph.js
-	Formerly Fx.Styles, effect to transition any number of CSS properties for an element using an object of rules, or CSS based selector rules.
-
-License:
-	MIT-style license.
-*/
-
 Fx.Morph = new Class({
 
 	Extends: Fx.CSS,
@@ -3193,17 +2981,6 @@ Element.implement({
 	}
 
 });
-
-/*
-Script: Fx.Transitions.js
-	Contains a set of advanced transitions to be used with any of the Fx Classes.
-
-License:
-	MIT-style license.
-
-Credits:
-	Easing Equations by Robert Penner, <http://www.robertpenner.com/easing/>, modified and optimized to be used with MooTools.
-*/
 
 (function(){
 
@@ -3292,15 +3069,6 @@ Fx.Transitions.extend({
 		return Math.pow(p, [i + 2]);
 	});
 });
-
-
-/*
-Script: Fx.Slide.js
-	Effect to slide an element in and out of view.
-
-License:
-	MIT-style license.
-*/
 
 Fx.Slide = new Class({
 
@@ -3434,15 +3202,6 @@ Element.implement({
 
 });
 
-
-/*
-Script: Fx.Scroll.js
-	Effect to smoothly scroll any element, including the window.
-
-License:
-	MIT-style license.
-*/
-
 Fx.Scroll = new Class({
 
 	Extends: Fx,
@@ -3519,15 +3278,6 @@ Fx.Scroll = new Class({
 
 });
 
-
-/*
-Script: Drag.js
-	The base Drag Class. Can be used to drag and resize Elements using mouse events.
-
-License:
-	MIT-style license.
-*/
-
 var Drag = new Class({
 
 	Implements: [Events, Options],
@@ -3557,9 +3307,9 @@ var Drag = new Class({
 		this.handles = (htype == 'array' || htype == 'collection') ? $$(this.options.handle) : $(this.options.handle) || this.element;
 		this.mouse = {'now': {}, 'pos': {}};
 		this.value = {'start': {}, 'now': {}};
-		
+
 		this.selection = (Browser.Engine.trident) ? 'selectstart' : 'mousedown';
-		
+
 		this.bound = {
 			start: this.start.bind(this),
 			check: this.check.bind(this),
@@ -3654,20 +3404,12 @@ var Drag = new Class({
 });
 
 Element.implement({
-	
+
 	makeResizable: function(options){
 		return new Drag(this, $merge({modifiers: {'x': 'width', 'y': 'height'}}, options));
 	}
 
 });
-
-/*
-Script: Drag.Move.js
-	A Drag extension that provides support for the constraining of draggables to containers and droppables.
-
-License:
-	MIT-style license.
-*/
 
 Drag.Move = new Class({
 
@@ -3684,13 +3426,13 @@ Drag.Move = new Class({
 		this.container = $(this.options.container);
 		if (this.container && $type(this.container) != 'element') this.container = $(this.container.getDocument().body);
 		element = this.element;
-		
+
 		var current = element.getStyle('position');
 		var position = (current != 'static') ? current : 'absolute';
 		if (element.getStyle('left') == 'auto' || element.getStyle('top') == 'auto') element.position(element.getPosition(element.offsetParent));
-		
+
 		element.setStyle('position', position);
-		
+
 		this.addEvent('onStart', function(){
 			this.checkDroppables();
 		}, true);
@@ -3754,15 +3496,6 @@ Element.implement({
 	}
 
 });
-
-
-/*
-Script: Sortables.js
-	Class for creating a drag and drop sorting interface for lists of items.
-
-License:
-	MIT-style license.
-*/
 
 var Sortables = new Class({
 
