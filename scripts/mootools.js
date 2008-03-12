@@ -6,19 +6,19 @@ License:
 	MIT-style license.
 
 Copyright:
-	Copyright (c) 2006-2007 Valerio Proietti, <http://mad4milk.net/>
+	Copyright (c) 2006-2007 [Valerio Proietti](http://mad4milk.net/).
 
 Code & Documentation:
-	The MooTools production team <http://mootools.net/developers/>.
+	[The MooTools production team](http://mootools.net/developers/).
 
 Inspiration:
-	- Class implementation inspired by Base.js <http://dean.edwards.name/weblog/2006/03/base/> Copyright (c) 2006 Dean Edwards, GNU Lesser General Public License <http://opensource.org/licenses/lgpl-license.php>
-	- Some functionality inspired by Prototype.js <http://prototypejs.org> Copyright (c) 2005-2007 Sam Stephenson, MIT License <http://opensource.org/licenses/mit-license.php>
+	- Class implementation inspired by [Base.js](http://dean.edwards.name/weblog/2006/03/base/) Copyright (c) 2006 Dean Edwards, [GNU Lesser General Public License](http://opensource.org/licenses/lgpl-license.php)
+	- Some functionality inspired by [Prototype.js](http://prototypejs.org) Copyright (c) 2005-2007 Sam Stephenson, [MIT License](http://opensource.org/licenses/mit-license.php)
 */
 
 var MooTools = {
 	'version': '1.2dev',
-	'build': '1441'
+	'build': '1494'
 };
 
 var Native = function(options){
@@ -287,12 +287,12 @@ License:
 var Browser = new Hash({
 	Engine: {name: 'unknown', version: ''},
 	Platform: {name: (navigator.platform.match(/mac|win|linux/i) || ['other'])[0].toLowerCase()},
-	Features: {xhr: !!(window.XMLHttpRequest), xpath: !!(document.evaluate), air: !!(window.runtime)},
+	Features: {xpath: !!(document.evaluate), air: !!(window.runtime)},
 	Plugins: {}
 });
 
 if (window.opera) Browser.Engine = {name: 'presto', version: (document.getElementsByClassName) ? 950 : 925};
-else if (window.ActiveXObject) Browser.Engine = {name: 'trident', version: (Browser.Features.xhr) ? 5 : 4};
+else if (window.ActiveXObject) Browser.Engine = {name: 'trident', version: (window.XMLHttpRequest) ? 5 : 4};
 else if (!navigator.taintEnabled) Browser.Engine = {name: 'webkit', version: (Browser.Features.xpath) ? 420 : 419};
 else if (document.getBoxObjectFor != null) Browser.Engine = {name: 'gecko', version: (document.getElementsByClassName) ? 19 : 18};
 Browser.Engine[Browser.Engine.name] = Browser.Engine[Browser.Engine.name + Browser.Engine.version] = true;
@@ -301,11 +301,21 @@ if (window.orientation != undefined) Browser.Platform.name = 'ipod';
 
 Browser.Platform[Browser.Platform.name] = true;
 
+Browser.Request = function(){
+	return $try(function(){
+		return new XMLHttpRequest();
+	}, function(){
+		return new ActiveXObject('MSXML2.XMLHTTP');
+	});
+};
+
+Browser.Features.xhr = !!(Browser.Request());
+
 Browser.Plugins.Flash = (function(){
 	var version = ($try(function(){
-		return new ActiveXObject("ShockwaveFlash.ShockwaveFlash").GetVariable("$version");
+		return navigator.plugins['Shockwave Flash'].description;
 	}, function(){
-		return navigator.plugins["Shockwave Flash"].description;
+		return new ActiveXObject('ShockwaveFlash.ShockwaveFlash').GetVariable('$version');
 	}) || '0 r0').match(/\d+/g);
 	return {version: parseInt(version[0] || 0 + '.' + version[1] || 0), build: parseInt(version[2] || 0)};
 })();
@@ -336,7 +346,7 @@ var Window = new Native({
 
 	name: 'Window',
 
-	legacy: window.Window,
+	legacy: (Browser.Engine.trident) ? null: window.Window,
 
 	initialize: function(win){
 		$uid(win);
@@ -362,7 +372,7 @@ var Document = new Native({
 
 	name: 'Document',
 
-	legacy: window.Document,
+	legacy: (Browser.Engine.trident) ? null: window.Document,
 
 	initialize: function(doc){
 		$uid(doc);
@@ -384,7 +394,6 @@ var Document = new Native({
 Document.Prototype = {$family: {name: 'document'}};
 
 new Document(document);
-
 
 /*
 Script: Array.js
@@ -412,7 +421,7 @@ Array.implement({
 	},
 	
 	clean: function() {
-		return this.filter($arguments(0));
+		return this.filter($defined);
 	},
 
 	indexOf: function(item, from){
@@ -710,12 +719,11 @@ String.implement({
 		else if ($type(option) == 'function') option(scripts, text);
 		return text;
 	},
-	
-	substitute: function(object, limiters){
-		limiters = limiters || ['{', '}'];
-		var regexp = new RegExp(limiters[0].escapeRegExp() + '([\\w-]+)' + limiters[1].escapeRegExp(), 'g');
-		return this.replace(regexp, function(full, found){
-			return (object[found] != undefined) ? object[found] : '';
+
+	substitute: function(object, regexp){
+		return this.replace(regexp || /\\?\{([^}]+)\}/g, function(match, name){
+			if (match.charAt(0) == '\\') return match.slice(1);
+			return (object[name] != undefined) ? object[name] : '';
 		});
 	}
 
@@ -830,14 +838,26 @@ Hash.implement({
 		});
 		return values;
 	},
-
-	toQueryString: function(){
+	
+	toQueryString: function(base){
 		var queryString = [];
 		Hash.each(this, function(value, key){
-			$splat(value).each(function(val){
-				queryString.push(key + '=' + encodeURIComponent(val));
-			});
+			if (base) key = base + '[' + key + ']';
+			var result;
+			switch ($type(value)){
+				case 'object': result = Hash.toQueryString(value, key); break;
+				case 'array':
+					var qs = {};
+					value.each(function(val, i){
+						qs[i] = val;
+					});
+					result = Hash.toQueryString(qs, key);
+				break;
+				default: result = key + '=' + encodeURIComponent(value);
+			}
+			if (value != undefined) queryString.push(result);
 		});
+		
 		return queryString.join('&');
 	}
 
@@ -859,6 +879,7 @@ var Event = new Native({
 
 	initialize: function(event, win){
 		win = win || window;
+		var doc = win.document;
 		event = event || win.event;
 		if (event.$extended) return event;
 		this.$extended = true;
@@ -875,13 +896,14 @@ var Event = new Native({
 			}
 			key = key || String.fromCharCode(code).toLowerCase();
 		} else if (type.match(/(click|mouse|menu)/i)){
+			doc = (!doc.compatMode || doc.compatMode == 'CSS1Compat') ? doc.html : doc.body;
 			var page = {
-				x: event.pageX || event.clientX + win.document.documentElement.scrollLeft,
-				y: event.pageY || event.clientY + win.document.documentElement.scrollTop
+				x: event.pageX || event.clientX + doc.scrollLeft,
+				y: event.pageY || event.clientY + doc.scrollTop
 			};
 			var client = {
-				x: event.pageX ? event.pageX - win.pageXOffset : event.clientX,
-				y: event.pageY ? event.pageY - win.pageYOffset : event.clientY
+				x: (event.pageX) ? event.pageX - win.pageXOffset : event.clientX,
+				y: (event.pageY) ? event.pageY - win.pageYOffset : event.clientY
 			};
 			if (type.match(/DOMMouseScroll|mousewheel/)){
 				var wheel = (event.wheelDelta) ? event.wheelDelta / 120 : -(event.detail || 0) / 3;
@@ -1059,8 +1081,7 @@ var Chain = new Class({
 	},
 
 	callChain: function(){
-		if (this.$chain && this.$chain.length) this.$chain.shift().apply(this, arguments);
-		return this;
+		return (this.$chain && this.$chain.length) ? this.$chain.shift().apply(this, arguments) : false;
 	},
 
 	clearChain: function(){
@@ -1138,7 +1159,7 @@ License:
 */
 
 Document.implement({
-	
+
 	newElement: function(tag, props){
 		if (Browser.Engine.trident && props){
 			['name', 'type', 'checked'].each(function(attribute){
@@ -1150,19 +1171,19 @@ Document.implement({
 		}
 		return $.element(this.createElement(tag)).set(props);
 	},
-	
+
 	newTextNode: function(text){
 		return this.createTextNode(text);
 	},
-	
+
 	getDocument: function(){
 		return this;
 	},
-	
+
 	getWindow: function(){
 		return this.defaultView || this.parentWindow;
 	},
-	
+
 	purge: function(){
 		var elements = this.getElementsByTagName('*');
 		for (var i = 0, l = elements.length; i < l; i++) memfree(elements[i]);
@@ -1218,7 +1239,7 @@ var IFrame = new Native({
 				var doc = new Document(iframe.window.document);
 				$extend(win.Element.prototype, Element.Prototype);
 			}
-			onload.call(iframe.contentWindow);
+			onload.call(iframe.contentWindow, iframe.contentWindow.document);
 		};
 		(!window.frames[props.id]) ? iframe.addListener('load', onFrameLoad) : onFrameLoad();
 		return iframe;
@@ -1275,7 +1296,7 @@ Elements.multi = function(property){
 Window.implement({
 
 	$: function(el, notrash){
-		if (el && el.$attributes) return el;
+		if (el && el.$family && el.uid) return el;
 		var type = $type(el);
 		return ($[type]) ? $[type](el, notrash, this.document) : null;
 	},
@@ -1295,11 +1316,11 @@ Window.implement({
 		}
 		return new Elements(elements);
 	},
-	
+
 	getDocument: function(){
 		return this.document;
 	},
-	
+
 	getWindow: function(){
 		return this;
 	}
@@ -1320,7 +1341,12 @@ $.element = function(el, notrash){
 	return el;
 };
 
-$.textnode = $.window = $.document = $arguments(0);
+$.object = function(obj, notrash, doc){
+	if (obj.toElement) return $.element(obj.toElement(doc), notrash);
+	return null;
+};
+
+$.textnode = $.whitespace = $.window = $.document = $arguments(0);
 
 Native.implement([Element, Document], {
 
@@ -1375,27 +1401,27 @@ Element.Inserters = new Hash({
 Element.Inserters.inside = Element.Inserters.bottom;
 
 Element.Inserters.each(function(value, key){
-	
+
 	var Key = key.capitalize();
-	
+
 	Element.implement('inject' + Key, function(el){
-		Element.Inserters[key](this, $(el, true));
+		value(this, $(el, true));
 		return this;
 	});
-	
+
 	Element.implement('grab' + Key, function(el){
-		Element.Inserters[key]($(el, true), this);
+		value($(el, true), this);
 		return this;
 	});
-	
+
 });
 
 Element.implement({
-	
+
 	getDocument: function(){
 		return this.ownerDocument;
 	},
-	
+
 	getWindow: function(){
 		return this.ownerDocument.getWindow();
 	},
@@ -1515,14 +1541,9 @@ Element.implement({
 	},
 
 	getComputedStyle: function(property){
-		var result = null;
-		if (this.currentStyle){
-			result = this.currentStyle[property.camelCase()];
-		} else {
-			var computed = this.getWindow().getComputedStyle(this, null);
-			if (computed) result = computed.getPropertyValue([property.hyphenate()]);
-		}
-		return result;
+		if (this.currentStyle) return this.currentStyle[property.camelCase()];
+		var computed = this.getWindow().getComputedStyle(this, null);
+		return (computed) ? computed.getPropertyValue([property.hyphenate()]) : null;
 	},
 
 	empty: function(){
@@ -1539,13 +1560,21 @@ Element.implement({
 		return null;
 	},
 
+	getSelected: function(){
+		return $A(this.options).filter(function(option){
+			return options.selected;
+		});
+	},
+
 	toQueryString: function(){
 		var queryString = [];
-		this.getElements('input, select, textarea', true).each(function(el){
-			var name = el.name, type = el.type, value = Element.get(el, 'value');
-			if (value === false || !name || el.disabled) return;
+		this.getElements('input, select, textarea').each(function(el){
+			if (!el.name || el.disabled) return;
+			var value = (el.tagName.toLowerCase() == 'select') ? Element.getSelected(el).map(function(opt){
+				return opt.value;
+			}) : ((el.type == 'radio' || el.type == 'checkbox') && !el.checked) ? null : el.value;
 			$splat(value).each(function(val){
-				queryString.push(name + '=' + encodeURIComponent(val));
+				if (val) queryString.push(el.name + '=' + encodeURIComponent(val));
 			});
 		});
 		return queryString.join('&');
@@ -1553,7 +1582,7 @@ Element.implement({
 
 	getProperty: function(attribute){
 		var EA = Element.Attributes, key = EA.Props[attribute];
-		var value = (key) ? this[key] : this.getAttribute(attribute);
+		var value = (key) ? this[key] : this.getAttribute(attribute, 2);
 		return (EA.Bools[attribute]) ? !!value : value;
 	},
 
@@ -1670,50 +1699,17 @@ Element.Properties.style = {
 
 };
 
-Element.Properties.value = {get: function(){
-	switch (Element.get(this, 'tag')){
-		case 'select':
-			var values = [];
-			Array.each(this.options, function(option){
-				if (option.selected) values.push(option.value);
-			});
-			return (this.multiple) ? values : values[0];
-		case 'input': if (['checkbox', 'radio'].contains(this.type) && !this.checked) return false;
-		default: return $pick(this.value, false);
-	}
-}};
-
 Element.Properties.tag = {get: function(){
 	return this.tagName.toLowerCase();
+}};
+
+Element.Properties.href = {get: function(){
+	return (!this.href) ? null : this.href.replace(new RegExp('^' + document.location.protocol + '\/\/' + document.location.host), '');
 }};
 
 Element.Properties.html = {set: function(){
 	return this.innerHTML = Array.flatten(arguments).join('');
 }};
-
-Element.implement({
-
-	getText: function(){
-		return this.get('text');
-	},
-
-	setText: function(text){
-		return this.set('text', text);
-	},
-
-	setHTML: function(){
-		return this.set('html', arguments);
-	},
-	
-	getHTML: function(){
-		return this.get('html');
-	},
-
-	getTag: function(){
-		return this.get('tag');
-	}
-
-});
 
 Native.implement([Element, Window, Document], {
 
@@ -1771,8 +1767,7 @@ function memfree(item){
 	if (!item || !item.tagName) return;
 	if (Browser.Engine.trident && (/object/i).test(item.tagName)){
 		for (var p in item){
-			var property = item[p];
-			if (typeof property == 'function') property = $empty;
+			if (typeof item[p] == 'function') item[p] = $empty;
 		}
 		Element.dispose(item);
 	}
@@ -1901,7 +1896,7 @@ Element.NativeEvents = {
 
 (function(){
 
-var checkRelatedTarget = function(event){
+var $check = function(event){
 	var related = event.relatedTarget;
 	if (related == undefined) return true;
 	if (related === false) return false;
@@ -1912,12 +1907,12 @@ Element.Events = new Hash({
 
 	mouseenter: {
 		base: 'mouseover',
-		condition: checkRelatedTarget
+		condition: $check
 	},
 
 	mouseleave: {
 		base: 'mouseout',
-		condition: checkRelatedTarget
+		condition: $check
 	},
 
 	mousewheel: {
@@ -2042,13 +2037,13 @@ Element.implement({
 });
 
 Element.Styles = new Hash({
-	width: '@px', height: '@px', left: '@px', top: '@px', bottom: '@px', right: '@px', maxWidth: '@px', maxHeight: '@px',
+	left: '@px', top: '@px', bottom: '@px', right: '@px',
+	width: '@px', height: '@px', maxWidth: '@px', maxHeight: '@px', minWidth: '@px', minHeight: '@px',
 	backgroundColor: 'rgb(@, @, @)', backgroundPosition: '@px @px', color: 'rgb(@, @, @)',
 	fontSize: '@px', letterSpacing: '@px', lineHeight: '@px', clip: 'rect(@px @px @px @px)',
 	margin: '@px @px @px @px', padding: '@px @px @px @px', border: '@px @ rgb(@, @, @) @px @ rgb(@, @, @) @px @ rgb(@, @, @)',
 	borderWidth: '@px @px @px @px', borderStyle: '@ @ @ @', borderColor: 'rgb(@, @, @) rgb(@, @, @) rgb(@, @, @) rgb(@, @, @)',
-	zIndex: '@', 'zoom': '@', fontWeight: '@',
-	textIndent: '@px', opacity: '@'
+	zIndex: '@', 'zoom': '@', fontWeight: '@', textIndent: '@px', opacity: '@'
 });
 
 Element.ShortStyles = {margin: {}, padding: {}, border: {}, borderWidth: {}, borderStyle: {}, borderColor: {}};
@@ -2076,86 +2071,120 @@ Script: Element.Dimensions.js
 
 License:
 	MIT-style license.
-
-Note:
-	Dimensions requires an XHTML doctype.
+	
+Credits:
+	- Element positioning based on the [qooxdoo](http://qooxdoo.org/) code and smart browser fixes, [LGPL License](http://www.gnu.org/licenses/lgpl.html).
+	- Viewport dimensions based on [YUI](http://developer.yahoo.com/yui/) code, [BSD License](http://developer.yahoo.com/yui/license.html).
 */
 
 (function(){
 
-function $body(el){
-	return el.tagName.toLowerCase() == 'body';
-};
-
 Element.implement({
 	
-	positioned: function(){
-		if ($body(this)) return true;
-		return (Element.getComputedStyle(this, 'position') != 'static');
-	},
-	
-	getOffsetParent: function(){
-		if ($body(this)) return null;
-		if (!Browser.Engine.trident) return $(this.offsetParent);
-		var el = this;
-		while ((el = el.parentNode)){
-			if (Element.positioned(el)) return $(el);
-		}
-		return null;
-	},
-	
-	getSize: function(){
-		if ($body(this)) return this.getWindow().getSize();
-		return {x: this.offsetWidth, y: this.offsetHeight};
-	},
-	
-	getScrollSize: function(){
-		if ($body(this)) return this.getWindow().getScrollSize();
-		return {x: this.scrollWidth, y: this.scrollHeight};
-	},
-	
-	getScroll: function(){
-		if ($body(this)) return this.getWindow().getScroll();
-		return {x: this.scrollLeft, y: this.scrollTop};
-	},
-	
 	scrollTo: function(x, y){
-		if ($body(this)) return this.getWindow().scrollTo(x, y);
-		this.scrollLeft = x;
-		this.scrollTop = y;
+		if (isBody(this)){
+			this.getWindow().scrollTo(x, y);
+		} else {
+			this.scrollLeft = x;
+			this.scrollTop = y;
+		}
 		return this;
 	},
 	
-	getPosition: function(relative){
-		if ($body(this)) return {x: 0, y: 0};
-		var el = this, position = {x: 0, y: 0};
-		while (el){
-			position.x += el.offsetLeft;
-			position.y += el.offsetTop;
-			el = el.offsetParent;
+	getSize: function(){
+		if (isBody(this)) return this.getWindow().getSize();
+		
+		return {x: this.offsetHeight, y: this.offsetWidth};
+	},
+	
+	getScrollSize: function(){
+		if (isBody(this)) return this.getWindow().getScrollSize();
+		
+		return {x: this.scrollHeight, y: this.scrollWidth};
+	},
+	
+	getScroll: function(){
+		if (isBody(this)) return this.getWindow().getScroll();
+		
+		var element = this, position = {x: 0, y: 0};
+		
+		while (element && !isBody(element)){
+			position.x += element.scrollLeft;
+			position.y += element.scrollTop;
+			element = element.parentNode;
 		}
-		var rpos = (relative) ? $(relative).getPosition() : {x: 0, y: 0};
-		return {x: position.x - rpos.x, y: position.y - rpos.y};
+		
+		return position;
+	},
+	
+	getOffset: function(){
+		if (isBody(this)) return {x: 0, y: 0};
+		
+		var element = this, position = {x: 0, y: 0};
+
+		var standards = isStandards(Element.getDocument(this));
+		
+		while (element && !isBody(element)){
+			position.x += element.offsetLeft;
+			position.y += element.offsetTop;
+			
+			if (Browser.Engine.gecko){
+
+				if (!borderBox(element)){
+					position.x += leftBorder(element);
+		            position.y += topBorder(element);
+				}
+				
+				var parent = element.parentNode;
+				
+				if (parent && !visibleOverflow(parent)){
+					position.x += leftBorder(parent);
+					position.y += topBorder(parent);
+				}
+				
+			} else if (element != this && ((Browser.Engine.trident && standards) || Browser.Engine.webkit)){
+				
+				position.x += leftBorder(element);
+				position.y += topBorder(element);
+
+			}
+			
+			element = element.offsetParent;
+		}
+		
+		if (Browser.Engine.gecko && !borderBox(this)){
+			position.x -= leftBorder(this);
+            position.y -= topBorder(this);
+		}
+		
+		return position;
+	},
+	
+	getPosition: function(relative){
+		if (isBody(this)) return {x: 0, y: 0};
+		
+		var offset = this.getOffset(), scroll = this.getScroll();
+		var position = {x: offset.x - scroll.x, y: offset.y - scroll.y};
+		
+		var relativePosition = (relative && (relative = $(relative, true))) ? Element.getPosition(relative) : {x: 0, y: 0};
+		
+		return {x: position.x - relativePosition.x, y: position.y - relativePosition.y};
 	},
 	
 	getCoordinates: function(element){
-		if ($body(this)) return this.getWindow().getCoordinates();
+		if (isBody(this)) return this.getWindow().getCoordinates();
+		
 		var position = this.getPosition(element), size = this.getSize();
-		var obj = {'top': position.y, 'left': position.x, 'width': size.x, 'height': size.y};
+		
+		var obj = {left: position.x, top: position.y, width: size.x, height: size.y};
 		obj.right = obj.left + obj.width;
 		obj.bottom = obj.top + obj.height;
+		
 		return obj;
 	},
 	
-	getRelativePosition: function(){
-		return this.getPosition(this.getOffsetParent());
-	},
-	
 	computePosition: function(obj){
-		return {
-			left: obj.x - (this.getComputedStyle('margin-left').toInt() || 0),
-			top: obj.y - (this.getComputedStyle('margin-top').toInt() || 0)
-		};
+		return {left: obj.x - styleNumber(this, 'margin-left'), top: obj.y - styleNumber(this, 'margin-top')};
 	},
 
 	position: function(obj){
@@ -2164,27 +2193,26 @@ Element.implement({
 	
 });
 
-})();
-
-Native.implement([Window, Document], {
-
+Native.implement([Document, Window], {
+	
 	getSize: function(){
-		var doc = this.getDocument(), win = this.getWindow(), html = doc.documentElement;
-		if (Browser.Engine.webkit419) return {x: win.innerWidth, y: win.innerHeight};
-		if (Browser.Engine.presto925) return {x: doc.body.clientWidth, y: doc.body.clientHeight};
-		return {x: html.clientWidth, y: html.clientHeight};
+		var win = this.getWindow();
+		if (Browser.Engine.presto || Browser.Engine.webkit) return {x: win.innerWidth, y: win.innerHeight};
+		var doc = getCompatElement(this);
+		return {x: doc.clientWidth, y: doc.clientHeight};
+		
 	},
-
+	
 	getScroll: function(){
-		var win = this.getWindow(), html = this.getDocument().documentElement;
-		return {x: $pick(win.pageXOffset, html.scrollLeft), y: $pick(win.pageYOffset, html.scrollTop)};
+		var win = this.getWindow();
+		var doc = getCompatElement(this);
+		return {x: win.pageXOffset || doc.scrollLeft, y: win.pageYOffset || doc.scrollTop};
 	},
-
+	
 	getScrollSize: function(){
-		var doc = this.getDocument(), html = doc.documentElement, body = doc.body;
-		if (Browser.Engine.trident) return {x: Math.max(html.clientWidth, html.scrollWidth), y: Math.max(html.clientHeight, html.scrollHeight)};
-		if (Browser.Engine.webkit) return {x: body.scrollWidth, y: body.scrollHeight};
-		return {x: html.scrollWidth, y: html.scrollHeight};
+		var doc = getCompatElement(this);
+		var min = this.getSize();
+		return {x: Math.max(doc.scrollWidth, min.x), y: Math.max(doc.scrollHeight, min.y)};
 	},
 	
 	getPosition: function(){
@@ -2193,45 +2221,89 @@ Native.implement([Window, Document], {
 	
 	getCoordinates: function(){
 		var size = this.getSize();
-		return {top: 0, left: 0, height: size.y, width: size.x, bottom: size.y, right: size.x};
+		return {top: 0, left: 0, bottom: size.y, right: size.x, height: size.y, width: size.x};
 	}
-
+	
 });
 
+// private methods
+
+function isBody(elemenet){
+	var tag = elemenet.tagName.toLowerCase();
+	return (tag == 'body' || tag == 'html');
+};
+
+function styleString(element, style){
+	return Element.getComputedStyle(element, style);
+};
+
+function styleNumber(element, style){
+	return Element.getComputedStyle(element, style).toInt() || 0;
+};
+
+function leftBorder(element){
+	return styleNumber(element, 'border-left-width');
+};
+
+function topBorder(element){
+	return styleNumber(element, 'border-top-width');
+};
+
+function borderBox(element){
+	return styleString(element, '-moz-box-sizing') == 'border-box';
+};
+
+function visibleOverflow(element){
+	return styleString(element, 'overflow') == 'visible';
+};
+
+function isStandards(doc){
+	return (!doc.compatMode || doc.compatMode == 'CSS1Compat');
+};
+
+function getCompatElement(element){
+	var doc = element.getDocument();
+	return (isStandards(doc)) ? doc.html : doc.body;
+};
+
+})();
+
+//aliases
+
 Native.implement([Window, Document, Element], {
-	
+
 	getHeight: function(){
 		return this.getSize().y;
 	},
-	
+
 	getWidth: function(){
 		return this.getSize().x;
 	},
-	
+
 	getScrollTop: function(){
 		return this.getScroll().y;
 	},
-	
+
 	getScrollLeft: function(){
 		return this.getScroll().x;
 	},
-	
+
 	getScrollHeight: function(){
 		return this.getScrollSize().y;
 	},
-	
+
 	getScrollWidth: function(){
 		return this.getScrollSize().x;
 	},
-	
+
 	getTop: function(){
 		return this.getPosition().y;
 	},
-	
+
 	getLeft: function(){
 		return this.getPosition().x;
 	}
-	
+
 });
 
 /*
@@ -2294,12 +2366,17 @@ Selectors.Utils = {
 		var parsed = argument.match(/^([+-]?\d*)?([a-z]+)?([+-]?\d*)?$/);
 		if (!parsed) return false;
 		var inta = parseInt(parsed[1]);
-		var a = ($chk(inta)) ? inta : 1;
+		var a = (inta || inta === 0) ? inta : 1;
 		var special = parsed[2] || false;
 		var b = parseInt(parsed[3]) || 0;
-		b--;
-		while (b < 1) b += a;
-		while (b >= a) b -= a;
+		if (a != 0){
+			b--;
+			while (b < 1) b += a;
+			while (b >= a) b -= a;
+		} else {
+			a = b;
+			special = 'index';
+		}
 		switch (special){
 			case 'n': parsed = {a: a, b: b, special: 'n'}; break;
 			case 'odd': parsed = {a: 2, b: 0, special: 'n'}; break;
@@ -2573,7 +2650,7 @@ Selectors.Pseudo = new Hash({
 		while ((element = element.previousSibling)){
 			if (element.nodeType == 1 && ++count > index) return false;
 		}
-		return true;
+		return (count == index);
 	},
 	
 	even: function(argument, local){
@@ -2585,6 +2662,55 @@ Selectors.Pseudo = new Hash({
 	}
 	
 });
+
+/*
+Script: Domready.js
+	Contains the domready custom event.
+
+License:
+	MIT-style license.
+*/
+
+Element.Events.domready = {
+
+	onAdd: function(fn){
+		if (Browser.loaded) fn.call(this);
+	}
+
+};
+
+(function(){
+	
+	var domready = function(){
+		if (Browser.loaded) return;
+		Browser.loaded = true;
+		window.fireEvent('domready');
+		document.fireEvent('domready');
+	};
+	
+	switch (Browser.Engine.name){
+
+		case 'webkit': (function(){
+			(['loaded', 'complete'].contains(document.readyState)) ? domready() : arguments.callee.delay(50);
+		})(); break;
+
+		case 'trident':
+			var temp = document.createElement('div');
+			(function(){
+				($try(function(){
+					temp.doScroll('left');
+					return $(temp).inject(document.body).set('html', 'temp').dispose();
+				})) ? domready() : arguments.callee.delay(50);
+			})();
+		break;
+		
+		default:
+			window.addEvent('load', domready);
+			document.addEvent('DOMContentLoaded', domready);
+
+	}
+	
+})();
 
 /*
 Script: JSON.js
@@ -2611,7 +2737,7 @@ var JSON = new Hash({
 					var json = JSON.encode(value);
 					if (json) string.push(JSON.encode(key) + ':' + json);
 				});
-				return '{' + String(string) + '}';
+				return '{' + string + '}';
 			case 'number': case 'boolean': return String(obj);
 			case false: return 'null';
 		}
@@ -2640,68 +2766,6 @@ Native.implement([Hash, Array, String, Number], {
 
 });
 
-
-/*
-Script: Swiff.js
-	Wrapper for embedding SWF movies. Supports (and fixes) External Interface Communication.
-
-License:
-	MIT-style license.
-
-Credits:
-	Flash detection & Internet Explorer + Flash Player 9 fix inspired by SWFObject.
-*/
-
-var Swiff = function(path, options){
-	var instance = 'Swiff_' + $time();
-	options = $merge({
-		id: instance,
-		height: 1,
-		width: 1,
-		container: null,
-		properties: {},
-		params: {
-			quality: 'high',
-			allowScriptAccess: 'always',
-			wMode: 'transparent',
-			swLiveConnect: true
-		},
-		events: {},
-		vars: {}
-	}, options);
-	var params = options.params, vars = options.vars, id = options.id;
-	var properties = $extend({height: options.height, width: options.width}, options.properties);
-	Swiff.Events[instance] = {};
-	for (var event in options.events){
-		Swiff.Events[instance][event] = (function(option){
-			return function(){
-				option.apply($(options.id), arguments);
-			};
-		})(options.events[event]);
-		vars[event] = 'Swiff.Events.' + instance + '.' + event;
-	}
-	params.flashVars = Hash.toQueryString(vars);
-	if (Browser.Engine.trident){
-		properties.classid = 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000';
-		params.movie = path;
-	} else {
-		properties.type = 'application/x-shockwave-flash';
-		properties.data = path;
-	}
-	var build = '<object id="' + options.id + '"';
-	for (var property in properties) build += ' ' + property + '="' + properties[property] + '"';
-	build += '>';
-	for (var param in params) build += '<param name="' + param + '" value="' + params[param] + '" />';
-	build += '</object>';
-	return ($(options.container) || new Element('div')).set('html', build).firstChild;
-};
-
-Swiff.Events = {};
-
-Swiff.remote = function(obj, fn){
-	var rs = obj.CallFunction('<invoke name="' + fn + '" returntype="javascript">' + __flash__argumentsToXML(arguments, 2) + '</invoke>');
-	return eval(rs);
-};
 
 /*
 Script: Fx.js
@@ -2777,23 +2841,26 @@ var Fx = new Class({
 	},
 
 	complete: function(){
-		return (!this.stopTimer()) ? this : this.onComplete();
+		if (this.stopTimer()) this.onComplete();
+		return this;
 	},
 
 	cancel: function(){
-		return (!this.stopTimer()) ? this : this.onCancel();
+		if (this.stopTimer()) this.onCancel();
+		return this;
 	},
 
 	onStart: function(){
-		return this.fireEvent('onStart', this.subject);
+		this.fireEvent('onStart', this.subject);
 	},
 
 	onComplete: function(){
-		return this.fireEvent('onComplete', this.subject).callChain();
+		this.fireEvent('onComplete', this.subject);
+		if (!this.callChain()) this.fireEvent('onChainComplete', this.subject);
 	},
 
 	onCancel: function(){
-		return this.fireEvent('onCancel', this.subject).clearChain();
+		this.fireEvent('onCancel', this.subject).clearChain();
 	},
 
 	pause: function(){
@@ -3128,14 +3195,111 @@ Element.implement({
 });
 
 /*
+Script: Fx.Transitions.js
+	Contains a set of advanced transitions to be used with any of the Fx Classes.
+
+License:
+	MIT-style license.
+
+Credits:
+	Easing Equations by Robert Penner, <http://www.robertpenner.com/easing/>, modified and optimized to be used with MooTools.
+*/
+
+(function(){
+
+	var old = Fx.prototype.initialize;
+
+	Fx.prototype.initialize = function(options){
+		old.call(this, options);
+		var trans = this.options.transition;
+		if (typeof trans == 'string' && (trans = trans.split(':'))){
+			var base = Fx.Transitions;
+			base = base[trans[0]] || base[trans[0].capitalize()];
+			if (trans[1]) base = base['ease' + trans[1].capitalize() + (trans[2] ? trans[2].capitalize() : '')];
+			this.options.transition = base;
+		}
+	};
+
+})();
+
+Fx.Transition = function(transition, params){
+	params = $splat(params);
+	return $extend(transition, {
+		easeIn: function(pos){
+			return transition(pos, params);
+		},
+		easeOut: function(pos){
+			return 1 - transition(1 - pos, params);
+		},
+		easeInOut: function(pos){
+			return (pos <= 0.5) ? transition(2 * pos, params) / 2 : (2 - transition(2 * (1 - pos), params)) / 2;
+		}
+	});
+};
+
+Fx.Transitions = new Hash({
+
+	linear: $arguments(0)
+
+});
+
+Fx.Transitions.extend = function(transitions){
+	for (var transition in transitions) Fx.Transitions[transition] = new Fx.Transition(transitions[transition]);
+};
+
+Fx.Transitions.extend({
+
+	Pow: function(p, x){
+		return Math.pow(p, x[0] || 6);
+	},
+
+	Expo: function(p){
+		return Math.pow(2, 8 * (p - 1));
+	},
+
+	Circ: function(p){
+		return 1 - Math.sin(Math.acos(p));
+	},
+
+	Sine: function(p){
+		return 1 - Math.sin((1 - p) * Math.PI / 2);
+	},
+
+	Back: function(p, x){
+		x = x[0] || 1.618;
+		return Math.pow(p, 2) * ((x + 1) * p - x);
+	},
+
+	Bounce: function(p){
+		var value;
+		for (var a = 0, b = 1; 1; a += b, b /= 2){
+			if (p >= (7 - 4 * a) / 11){
+				value = - Math.pow((11 - 6 * a - 11 * p) / 4, 2) + b * b;
+				break;
+			}
+		}
+		return value;
+	},
+
+	Elastic: function(p, x){
+		return Math.pow(2, 10 * --p) * Math.cos(20 * p * Math.PI * (x[0] || 1) / 3);
+	}
+
+});
+
+['Quad', 'Cubic', 'Quart', 'Quint'].each(function(transition, i){
+	Fx.Transitions[transition] = new Fx.Transition(function(p){
+		return Math.pow(p, [i + 2]);
+	});
+});
+
+
+/*
 Script: Fx.Slide.js
 	Effect to slide an element in and out of view.
 
 License:
 	MIT-style license.
-
-Note:
-	Fx.Slide requires an XHTML doctype.
 */
 
 Fx.Slide = new Class({
@@ -3277,9 +3441,6 @@ Script: Fx.Scroll.js
 
 License:
 	MIT-style license.
-
-Note:
-	Fx.Scroll requires an XHTML doctype.
 */
 
 Fx.Scroll = new Class({
@@ -3360,114 +3521,11 @@ Fx.Scroll = new Class({
 
 
 /*
-Script: Fx.Transitions.js
-	Contains a set of advanced transitions to be used with any of the Fx Classes.
-
-License:
-	MIT-style license.
-
-Credits:
-	Easing Equations by Robert Penner, <http://www.robertpenner.com/easing/>, modified and optimized to be used with MooTools.
-*/
-
-(function(){
-
-	var old = Fx.prototype.initialize;
-
-	Fx.prototype.initialize = function(options){
-		old.call(this, options);
-		var trans = this.options.transition;
-		if (typeof trans == 'string' && (trans = trans.split(':'))){
-			var base = Fx.Transitions;
-			base = base[trans[0]] || base[trans[0].capitalize()];
-			if (trans[1]) base = base['ease' + trans[1].capitalize() + (trans[2] ? trans[2].capitalize() : '')];
-			this.options.transition = base;
-		}
-	};
-
-})();
-
-Fx.Transition = function(transition, params){
-	params = $splat(params);
-	return $extend(transition, {
-		easeIn: function(pos){
-			return transition(pos, params);
-		},
-		easeOut: function(pos){
-			return 1 - transition(1 - pos, params);
-		},
-		easeInOut: function(pos){
-			return (pos <= 0.5) ? transition(2 * pos, params) / 2 : (2 - transition(2 * (1 - pos), params)) / 2;
-		}
-	});
-};
-
-Fx.Transitions = new Hash({
-
-	linear: $arguments(0)
-
-});
-
-Fx.Transitions.extend = function(transitions){
-	for (var transition in transitions) Fx.Transitions[transition] = new Fx.Transition(transitions[transition]);
-};
-
-Fx.Transitions.extend({
-
-	Pow: function(p, x){
-		return Math.pow(p, x[0] || 6);
-	},
-
-	Expo: function(p){
-		return Math.pow(2, 8 * (p - 1));
-	},
-
-	Circ: function(p){
-		return 1 - Math.sin(Math.acos(p));
-	},
-
-	Sine: function(p){
-		return 1 - Math.sin((1 - p) * Math.PI / 2);
-	},
-
-	Back: function(p, x){
-		x = x[0] || 1.618;
-		return Math.pow(p, 2) * ((x + 1) * p - x);
-	},
-
-	Bounce: function(p){
-		var value;
-		for (var a = 0, b = 1; 1; a += b, b /= 2){
-			if (p >= (7 - 4 * a) / 11){
-				value = - Math.pow((11 - 6 * a - 11 * p) / 4, 2) + b * b;
-				break;
-			}
-		}
-		return value;
-	},
-
-	Elastic: function(p, x){
-		return Math.pow(2, 10 * --p) * Math.cos(20 * p * Math.PI * (x[0] || 1) / 3);
-	}
-
-});
-
-['Quad', 'Cubic', 'Quart', 'Quint'].each(function(transition, i){
-	Fx.Transitions[transition] = new Fx.Transition(function(p){
-		return Math.pow(p, [i + 2]);
-	});
-});
-
-
-/*
 Script: Drag.js
 	The base Drag Class. Can be used to drag and resize Elements using mouse events.
 
 License:
 	MIT-style license.
-
-Note:
-	This Script requires an XHTML doctype.
 */
 
 var Drag = new Class({
@@ -3609,9 +3667,6 @@ Script: Drag.Move.js
 
 License:
 	MIT-style license.
-
-Note:
-	Drag.Move requires an XHTML doctype.
 */
 
 Drag.Move = new Class({
@@ -3627,13 +3682,14 @@ Drag.Move = new Class({
 		arguments.callee.parent(element, options);
 		this.droppables = $$(this.options.droppables);
 		this.container = $(this.options.container);
-		var position = (this.element.positioned()) ? this.element.getStyle('position') : 'absolute';
+		if (this.container && $type(this.container) != 'element') this.container = $(this.container.getDocument().body);
+		element = this.element;
 		
+		var current = element.getStyle('position');
+		var position = (current != 'static') ? current : 'absolute';
+		if (element.getStyle('left') == 'auto' || element.getStyle('top') == 'auto') element.position(element.getPosition(element.offsetParent));
 		
-		var styleposition = this.element.getStyles('left', 'top');
-		if (styleposition.left == 'auto' || styleposition.top == 'auto') this.element.position(this.element.getRelativePosition());
-		
-		this.element.setStyle('position', position);
+		element.setStyle('position', position);
 	},
 
 	start: function(event){
@@ -3642,231 +3698,7 @@ Drag.Move = new Class({
 			this.overed = null;
 		}
 		if (this.container){
-			var el = this.element, cont = this.container, ccoo = cont.getCoordinates(el.getOffsetParent()), cps = {}, ems = {};
-
-			['top', 'right', 'bottom', 'left'].each(function(pad){
-				cps[pad] = cont.getStyle('padding-' + pad).toInt();
-				ems[pad] = el.getStyle('margin-' + pad).toInt();
-			}, this);
-
-			var width = el.offsetWidth + ems.left + ems.right, height = el.offsetHeight + ems.top + ems.bottom;
-			var x = [ccoo.left + cps.left, ccoo.right - cps.right - width];
-			var y = [ccoo.top + cps.top, ccoo.bottom - cps.bottom - height];
-
-			this.options.limit = {x: x, y: y};
-		}
-		arguments.callee.parent(event);
-	},
-
-	checkAgainst: function(el){
-		el = el.getCoordinates();
-		var now = this.mouse.now;
-		return (now.x > el.left && now.x < el.right && now.y < el.bottom && now.y > el.top);
-	},
-
-	checkDroppables: function(){
-		var overed = this.droppables.filter(this.checkAgainst, this).getLast();
-		if (this.overed != overed){
-			if (this.overed) this.overed.fireEvent('leave', [this.element, this]);
-			this.overed = overed ? overed.fireEvent('over', [this.element, this]) : null;
-		}
-	},
-
-	drag: function(event){
-		arguments.callee.parent(event);
-		if (this.droppables.length) this.checkDroppables();
-	},
-
-	stop: function(event){
-		this.checkDroppables();
-		if (this.overed) this.overed.fireEvent('drop', [this.element, this]);
-		else this.element.fireEvent('emptydrop', this);
-		return arguments.callee.parent(event);
-	}
-
-});
-
-Element.implement({
-
-	makeDraggable: function(options){
-		return new Drag.Move(this, options);
-	}
-
-});
-
-var Drag = new Class({
-
-	Implements: [Events, Options],
-
-	options: {/*
-		onBeforeStart: $empty,
-		onStart: $empty,
-		onDrag: $empty,
-		onCancel: $empty,
-		onComplete: $empty,*/
-		snap: 6,
-		unit: 'px',
-		grid: false,
-		style: true,
-		limit: false,
-		handle: false,
-		invert: false,
-		modifiers: {x: 'left', y: 'top'}
-	},
-
-	initialize: function(){
-		var params = Array.link(arguments, {'options': Object.type, 'element': $defined});
-		this.element = $(params.element);
-		this.document = this.element.getDocument();
-		this.setOptions(params.options || {});
-		var htype = $type(this.options.handle);
-		this.handles = (htype == 'array' || htype == 'collection') ? $$(this.options.handle) : $(this.options.handle) || this.element;
-		this.mouse = {'now': {}, 'pos': {}};
-		this.value = {'start': {}, 'now': {}};
-		
-		this.selection = (Browser.Engine.trident) ? 'selectstart' : 'mousedown';
-		
-		this.bound = {
-			start: this.start.bind(this),
-			check: this.check.bind(this),
-			drag: this.drag.bind(this),
-			stop: this.stop.bind(this),
-			cancel: this.cancel.bind(this),
-			eventStop: $lambda(false)
-		};
-		this.attach();
-	},
-
-	attach: function(){
-		this.handles.addEvent('mousedown', this.bound.start);
-		return this;
-	},
-
-	detach: function(){
-		this.handles.removeEvent('mousedown', this.bound.start);
-		return this;
-	},
-
-	start: function(event){
-		this.fireEvent('onBeforeStart', this.element);
-		this.mouse.start = event.page;
-		var limit = this.options.limit;
-		this.limit = {'x': [], 'y': []};
-		for (var z in this.options.modifiers){
-			if (!this.options.modifiers[z]) continue;
-			if (this.options.style) this.value.now[z] = this.element.getStyle(this.options.modifiers[z]).toInt();
-			else this.value.now[z] = this.element[this.options.modifiers[z]];
-			if (this.options.invert) this.value.now[z] *= -1;
-			this.mouse.pos[z] = event.page[z] - this.value.now[z];
-			if (limit && limit[z]){
-				for (var i = 2; i--; i){
-					if ($chk(limit[z][i])) this.limit[z][i] = $lambda(limit[z][i])();
-				}
-			}
-		}
-		if ($type(this.options.grid) == 'number') this.options.grid = {'x': this.options.grid, 'y': this.options.grid};
-		this.document.addEvents({mousemove: this.bound.check, mouseup: this.bound.cancel});
-		this.document.addEvent(this.selection, this.bound.eventStop);
-	},
-
-	check: function(event){
-		var distance = Math.round(Math.sqrt(Math.pow(event.page.x - this.mouse.start.x, 2) + Math.pow(event.page.y - this.mouse.start.y, 2)));
-		if (distance > this.options.snap){
-			this.cancel();
-			this.document.addEvents({
-				mousemove: this.bound.drag,
-				mouseup: this.bound.stop
-			});
-			this.fireEvent('onStart', this.element).fireEvent('onSnap', this.element);
-		}
-	},
-
-	drag: function(event){
-		this.mouse.now = event.page;
-		for (var z in this.options.modifiers){
-			if (!this.options.modifiers[z]) continue;
-			this.value.now[z] = this.mouse.now[z] - this.mouse.pos[z];
-			if (this.options.invert) this.value.now[z] *= -1;
-			if (this.options.limit && this.limit[z]){
-				if ($chk(this.limit[z][1]) && (this.value.now[z] > this.limit[z][1])){
-					this.value.now[z] = this.limit[z][1];
-				} else if ($chk(this.limit[z][0]) && (this.value.now[z] < this.limit[z][0])){
-					this.value.now[z] = this.limit[z][0];
-				}
-			}
-			if (this.options.grid[z]) this.value.now[z] -= (this.value.now[z] % this.options.grid[z]);
-			if (this.options.style) this.element.setStyle(this.options.modifiers[z], this.value.now[z] + this.options.unit);
-			else this.element[this.options.modifiers[z]] = this.value.now[z];
-		}
-		this.fireEvent('onDrag', this.element);
-	},
-
-	cancel: function(event){
-		this.document.removeEvent('mousemove', this.bound.check);
-		this.document.removeEvent('mouseup', this.bound.cancel);
-		if (event){
-			this.document.removeEvent(this.selection, this.bound.eventStop);
-			this.fireEvent('onCancel', this.element);
-		}
-	},
-
-	stop: function(event){
-		this.document.removeEvent(this.selection, this.bound.eventStop);
-		this.document.removeEvent('mousemove', this.bound.drag);
-		this.document.removeEvent('mouseup', this.bound.stop);
-		if (event) this.fireEvent('onComplete', this.element);
-	}
-
-});
-
-Element.implement({
-	
-	makeResizable: function(options){
-		return new Drag(this, $merge({modifiers: {'x': 'width', 'y': 'height'}}, options));
-	}
-
-});
-
-/*
-Script: Drag.Move.js
-	A Drag extension that provides support for the constraining of draggables to containers and droppables.
-
-License:
-	MIT-style license.
-
-Note:
-	Drag.Move requires an XHTML doctype.
-*/
-
-Drag.Move = new Class({
-
-	Extends: Drag,
-
-	options: {
-		droppables: [],
-		container: false
-	},
-
-	initialize: function(element, options){
-		arguments.callee.parent(element, options);
-		this.droppables = $$(this.options.droppables);
-		this.container = $(this.options.container);
-		var position = (this.element.positioned()) ? this.element.getStyle('position') : 'absolute';
-		
-		
-		var styleposition = this.element.getStyles('left', 'top');
-		if (styleposition.left == 'auto' || styleposition.top == 'auto') this.element.position(this.element.getRelativePosition());
-		
-		this.element.setStyle('position', position);
-	},
-
-	start: function(event){
-		if (this.overed){
-			this.overed.fireEvent('leave', [this.element, this]);
-			this.overed = null;
-		}
-		if (this.container){
-			var el = this.element, cont = this.container, ccoo = cont.getCoordinates(el.getOffsetParent()), cps = {}, ems = {};
+			var el = this.element, cont = this.container, ccoo = cont.getCoordinates(el.offsetParent), cps = {}, ems = {};
 
 			['top', 'right', 'bottom', 'left'].each(function(pad){
 				cps[pad] = cont.getStyle('padding-' + pad).toInt();
@@ -3925,9 +3757,6 @@ Script: Sortables.js
 
 License:
 	MIT-style license.
-
-Note:
-	Sortables requires an XHTML doctype.
 */
 
 var Sortables = new Class({
@@ -4016,7 +3845,7 @@ var Sortables = new Class({
 			'position': 'absolute',
 			'visibility': 'hidden',
 			'width': element.getStyle('width')
-		}).inject(this.list).position(element.getRelativePosition());
+		}).inject(this.list).position(element.getPosition(element.offsetParent));
 	},
 
 	getDroppables: function(){
@@ -4026,7 +3855,7 @@ var Sortables = new Class({
 	},
 
 	insert: function(element, where){
-		if (where) {
+		if (where){
 			this.list = element;
 			this.drag.droppables = this.getDroppables();
 		}
@@ -4066,7 +3895,7 @@ var Sortables = new Class({
 		this.drag.detach();
 		if (this.effect){
 			var dim = this.element.getStyles('width', 'height');
-			var pos = this.clone.computePosition(this.element.getPosition(this.clone.offsetParent), this.clone.getParent().positioned());
+			var pos = this.clone.computePosition(this.element.getPosition(this.clone.offsetParent));
 			this.effect.element = this.clone;
 			this.effect.start({
 				'top': pos.top,
