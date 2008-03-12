@@ -2,7 +2,7 @@
 
 var MooTools = {
 	'version': '1.2dev',
-	'build': '1498'
+	'build': '1500'
 };
 
 var Native = function(options){
@@ -1965,97 +1965,80 @@ Element.implement({
 
 	getSize: function(){
 		if (isBody(this)) return this.getWindow().getSize();
-
 		return {x: this.offsetWidth, y: this.offsetHeight};
 	},
 
 	getScrollSize: function(){
 		if (isBody(this)) return this.getWindow().getScrollSize();
-
 		return {x: this.scrollWidth, y: this.scrollHeight};
 	},
 
 	getScroll: function(){
-		if (isBody(this)) return this.getWindow().getScrollSize();
-
+		if (isBody(this)) return this.getWindow().getScroll();
 		return {x: this.scrollLeft, y: this.scrollTop};
 	},
 
 	getScrolls: function(){
 		var element = this, position = {x: 0, y: 0};
-
 		while (element && !isBody(element)){
 			position.x += element.scrollLeft;
 			position.y += element.scrollTop;
 			element = element.parentNode;
 		}
-
 		return position;
 	},
 
 	getOffsets: function(){
-		if (isBody(this)) return {x: 0, y: 0};
-
 		var element = this, position = {x: 0, y: 0};
-
-		var standards = isStandards(Element.getDocument(this));
+		if (isBody(this)) return position;
 
 		while (element && !isBody(element)){
 			position.x += element.offsetLeft;
 			position.y += element.offsetTop;
 
 			if (Browser.Engine.gecko){
-
 				if (!borderBox(element)){
 					position.x += leftBorder(element);
-		            position.y += topBorder(element);
+					position.y += topBorder(element);
 				}
-
 				var parent = element.parentNode;
-
 				if (parent && !visibleOverflow(parent)){
 					position.x += leftBorder(parent);
 					position.y += topBorder(parent);
 				}
-
-			} else if (element != this && ((Browser.Engine.trident && standards) || Browser.Engine.webkit)){
-
+			} else if (element != this && (Browser.Engine.trident || Browser.Engine.webkit)){
 				position.x += leftBorder(element);
 				position.y += topBorder(element);
-
 			}
 
-			element = element.offsetParent;
-		}
+			var offsetParent = element.offsetParent;
+			if (Browser.Engine.trident){
+				while (offsetParent && !offsetParent.currentStyle.hasLayout) offsetParent = offsetParent.offsetParent;
+			}
 
+			element = offsetParent;
+		}
 		if (Browser.Engine.gecko && !borderBox(this)){
 			position.x -= leftBorder(this);
-            position.y -= topBorder(this);
+			position.y -= topBorder(this);
 		}
-
 		return position;
 	},
 
 	getPosition: function(relative){
 		if (isBody(this)) return {x: 0, y: 0};
-
 		var offset = this.getOffsets(), scroll = this.getScrolls();
 		var position = {x: offset.x - scroll.x, y: offset.y - scroll.y};
-
 		var relativePosition = (relative && (relative = $(relative, true))) ? Element.getPosition(relative) : {x: 0, y: 0};
-
 		return {x: position.x - relativePosition.x, y: position.y - relativePosition.y};
 	},
 
 	getCoordinates: function(element){
 		if (isBody(this)) return this.getWindow().getCoordinates();
-
 		var position = this.getPosition(element), size = this.getSize();
-
 		var obj = {left: position.x, top: position.y, width: size.x, height: size.y};
 		obj.right = obj.left + obj.width;
 		obj.bottom = obj.top + obj.height;
-
 		return obj;
 	},
 
@@ -2076,7 +2059,6 @@ Native.implement([Document, Window], {
 		if (Browser.Engine.presto || Browser.Engine.webkit) return {x: win.innerWidth, y: win.innerHeight};
 		var doc = getCompatElement(this);
 		return {x: doc.clientWidth, y: doc.clientHeight};
-
 	},
 
 	getScroll: function(){
@@ -3506,11 +3488,11 @@ var Sortables = new Class({
 		onStart: $empty,
 		onComplete: $empty,*/
 		snap: 4,
-		handle: false,
+		opacity: 1,
+		clone: false,
 		revert: false,
-		constrain: false,
-		cloneOpacity: 0.7,
-		elementOpacity: 0.3
+		handle: false,
+		constrain: false
 	},
 
 	initialize: function(lists, options){
@@ -3520,6 +3502,7 @@ var Sortables = new Class({
 		this.idle = true;
 
 		this.addLists($$($(lists) || lists));
+		if (!this.options.clone) this.options.revert = false;
 		if (this.options.revert) this.effect = new Fx.Morph(null, $merge({duration: 250, link: 'cancel'}, this.options.revert));
 	},
 
@@ -3537,9 +3520,7 @@ var Sortables = new Class({
 		Array.flatten(arguments).each(function(element){
 			this.elements.push(element);
 			var start = element.retrieve('sortables:start', this.start.bindWithEvent(this, element));
-			var insert = element.retrieve('sortables:insert', this.insert.bind(this, element));
 			(this.options.handle ? element.getElement(this.options.handle) || element : element).addEvent('mousedown', start);
-			element.addEvent('over', insert);
 		}, this);
 		return this;
 	},
@@ -3548,7 +3529,6 @@ var Sortables = new Class({
 		Array.flatten(arguments).each(function(list){
 			this.lists.push(list);
 			this.addItems(list.getChildren());
-			list.addEvent('over', list.retrieve('sortables:insert', this.insert.bind(this, [list, 'inside'])));
 		}, this);
 		return this;
 	},
@@ -3559,11 +3539,9 @@ var Sortables = new Class({
 			elements.push(element);
 			this.elements.erase(element);
 			var start = element.retrieve('sortables:start');
-			var insert = element.retrieve('sortables:insert');
 			(this.options.handle ? element.getElement(this.options.handle) || element : element).removeEvent('mousedown', start);
-			element.removeEvent('over', insert);
 		}, this);
-		return elements;
+		return $$(elements);
 	},
 
 	removeLists: function(){
@@ -3572,16 +3550,18 @@ var Sortables = new Class({
 			lists.push(list);
 			this.lists.erase(list);
 			this.removeItems(list.getChildren());
-			list.removeEvent('over', list.retrieve('sortables:insert'));
 		}, this);
-		return lists;
+		return $$(lists);
 	},
 
-	getClone: function(element){
+	getClone: function(event, element){
+		if (!this.options.clone) return new Element('div').inject(document.body);
+		if ($type(this.options.clone) == 'function') return this.options.clone.call(this, event, element, this.list);
 		return element.clone(true).setStyles({
 			'margin': '0px',
 			'position': 'absolute',
-			'visibility': 'hidden'
+			'visibility': 'hidden',
+			'width': element.getStyle('width')
 		}).inject(this.list).position(element.getPosition(element.offsetParent));
 	},
 
@@ -3591,12 +3571,14 @@ var Sortables = new Class({
 		return droppables.erase(this.clone).erase(this.element);
 	},
 
-	insert: function(element, where){
-		if (where) {
+	insert: function(dragging, element){
+		var where = 'inside';
+		if (this.lists.contains(element)){
 			this.list = element;
 			this.drag.droppables = this.getDroppables();
+		} else {
+			where = this.element.getAllPrevious().contains(element) ? 'before' : 'after';
 		}
-		where = where || (this.element.getAllPrevious().contains(element) ? 'before' : 'after');
 		this.element.inject(element, where);
 		this.fireEvent('onSort', [this.element, this.clone]);
 	},
@@ -3604,42 +3586,43 @@ var Sortables = new Class({
 	start: function(event, element){
 		if (!this.idle) return;
 		this.idle = false;
-
 		this.element = element;
 		this.opacity = element.get('opacity');
 		this.list = element.getParent();
-		this.clone = this.getClone(element);
+		this.clone = this.getClone(event, element);
 
-		this.drag = this.clone.makeDraggable({
+		this.drag = new Drag.Move(this.clone, {
 			snap: this.options.snap,
-			container: this.options.constrain && this.clone.getParent(),
+			container: this.options.constrain && this.element.getParent(),
 			droppables: this.getDroppables(),
-			onStart: function(){
+			onSnap: function(){
 				event.stop();
-				this.clone.set('opacity', this.options.cloneOpacity);
-				this.element.set('opacity', this.options.elementOpacity);
+				this.clone.setStyle('visibility', 'visible');
+				this.element.set('opacity', this.options.opacity || 0);
 				this.fireEvent('onStart', [this.element, this.clone]);
 			}.bind(this),
+			onEnter: this.insert.bind(this),
 			onCancel: this.reset.bind(this),
 			onComplete: this.end.bind(this)
 		});
 
+		this.clone.inject(this.element, 'before');
 		this.drag.start(event);
 	},
 
 	end: function(){
-		this.element.set('opacity', this.opacity);
 		this.drag.detach();
+		this.element.set('opacity', this.opacity);
 		if (this.effect){
 			var dim = this.element.getStyles('width', 'height');
 			var pos = this.clone.computePosition(this.element.getPosition(this.clone.offsetParent));
 			this.effect.element = this.clone;
 			this.effect.start({
-				'top': pos.top,
-				'left': pos.left,
-				'width': dim.width,
-				'height': dim.height,
-				'opacity': 0.25
+				top: pos.top,
+				left: pos.left,
+				width: dim.width,
+				height: dim.height,
+				opacity: 0.25
 			}).chain(this.reset.bind(this));
 		} else {
 			this.reset();
