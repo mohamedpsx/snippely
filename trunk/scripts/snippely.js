@@ -8,12 +8,6 @@ Application.autoExit = true;
 
 // Temporary Data
 
-var TAGS = [
-	{ id: 1, name: 'Some Tag 1' },
-	{ id: 2, name: 'Some Tag 2' },
-	{ id: 3, name: 'Some Tag 3' }
-];
-
 var SNIPPETS = {
 	"1": [
 		{ id: 1, title: 'My First Snippet' },
@@ -32,6 +26,9 @@ var SNIPPETS = {
 		{ id: 2, title: 'My Second Snippet' }
 	]
 };
+
+//TEMP
+SNIPPETS = {};
 
 var SNIPPET = {
 	"1": {
@@ -90,10 +87,28 @@ var Snippely = {
 		this.initializeLayout();
 		this.initializeMetas();
 		
-		this.Tags.initialize(TAGS); //TODO - Load TAGS JSON from the database
-		this.Snippet.initialize(); //TODO - Load active snippet / tag from last session
+		this.database = new Snippely.Database();
+		this.initializeData();
 		
 		this.activate();
+	},
+	
+	initializeData: function(){
+		var sql, callback;
+		
+		//get tags
+		sql = 'SELECT * FROM tags';
+		callback = function(result){
+			var tags = [];
+			if (result.data) $each(result.data, function(tag){
+				tags.push({id: tag.id, name: tag.name});
+			});
+			this.Tags.initialize(tags);
+		}.bind(this);
+		
+		this.database.execute(sql, callback);
+		
+		this.Snippet.initialize(); //TODO - Load active snippet / tag from last session
 	},
 	
 	initializeMenus: function(){
@@ -239,16 +254,27 @@ Snippely.Tags = {
 	},
 	
 	add: function(){
-		var element = this.create({name: 'New Tag', id: 0});
-		this.elements.push(element);
-		this.select(element);
-		element.fireEvent('dblclick');
+		//QUERY - insert the tag
+		var sql = "INSERT INTO tags (name) VALUES ('" + 'New Tag' + "')";
+		var callback = function(result){
+			var element = this.create({name: 'New Tag', id: result.lastInsertRowID});
+			this.elements.push(element);
+			this.select(element);
+			element.fireEvent('dblclick');
+		}.bind(this);
+		Snippely.database.execute(sql, callback);
 	},
 	
 	remove: function(){
 		if (!this.selected) return;
+		if (!confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
 		var id = this.selected.retrieve('tag:id');
-		//TODO - remove this tag from the database, only if no snippets have it as a tag
+		
+		//QUERY - remove the tag
+		var sql = "DELETE FROM tags WHERE id = " + id;
+		Snippely.database.execute(sql);
+		
+		//TODO - remove this tag and all it's snippets from the database
 		this.selected.erase('editable').destroy();
 	},
 	
@@ -259,7 +285,12 @@ Snippely.Tags = {
 	
 	save: function(element){
 		var id = element.retrieve('tag:id');
-		var text = element.get('text');
+		var name = element.get('text');
+		
+		//QUERY - update the tag
+		var sql = "UPDATE tags SET name = '" + name + "' WHERE id = " + id;
+		Snippely.database.execute(sql);
+		
 		//TODO - save this tag's new name to the database
 	},
 	
@@ -348,7 +379,11 @@ Snippely.Snippet = {
 		}, this);
 		
 		//initialize sortables
-		new Sortables('snippet-snips', { handle: 'div.info' });
+		new Sortables('snippet-snips', {
+			clone: true,
+			opacity: 0.3,
+			handle: 'div.info'
+		});
 		
 		Snippely.redraw();
 	},
