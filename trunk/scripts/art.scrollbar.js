@@ -38,6 +38,10 @@ ART.ScrollBar = new Class({
 		this.paintCenter = new Element('div', {'class': 'art-scrollbar-paint-center'}).inject(this.thumb);
 		this.paintBottom = new Element('div', {'class': 'art-scrollbar-paint-bottom'}).inject(this.thumb);
 		
+		this.scroller = new Fx.Scroll(this.content, this.options.morph);
+
+		this.morphThumb = new Fx.Morph(this.thumb, this.options.morph);
+		
 		this.selection = (Browser.Engine.trident) ? 'selectstart' : 'mousedown';
 		
 		this.bound = {
@@ -121,7 +125,8 @@ ART.ScrollBar = new Class({
 	updateThumbFromContentScroll: function(scroll){
 		var scrollValue = $pick(scroll, this.content.scrollTop);
 		this.position.now = (scrollValue / this.scrollRatio).limit(0, (this.trackSize - this.thumbSize));
-		this.thumb.setStyles({top: this.position.now});
+		if ($defined(scroll)) this.morphThumb.start({top: this.position.now});
+		else this.thumb.setStyles({top: this.position.now});
 	},
 
 	updateContentFromThumbPosition: function(){
@@ -136,9 +141,9 @@ ART.ScrollBar = new Class({
 	page: function(event){
 		if (this.track.hasChild(event.target)) return;
 		var height = this.content.offsetHeight;
-		var page = (event.page.y > this.thumb.getPosition().y) ? height : -height;
+		var page = (event.page.y > this.thumb.getTop()) ? height : -height;
 		var scroll = this.content.scrollTop + page;
-		this.content.scrollTop = scroll;
+		this.scroller.start(0, scroll);
 		this.updateThumbFromContentScroll(scroll);
 	},
 
