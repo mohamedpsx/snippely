@@ -353,8 +353,8 @@ Snippely.Snippet = {
 		
 		//initialize history
 		$$('#snippet-snips div.content').each(function(element){
-			element.setHTML(element.getHTML().trim());
-			element.history = [element.getHTML()];
+			element.set('html', element.get('html').trim());
+			element.history = [element.get('html')];
 			element.addEvent('keydown', function(event){
 				if (event.meta && event.key == 'z'){
 					event.preventDefault();
