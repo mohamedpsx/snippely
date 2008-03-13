@@ -1,13 +1,9 @@
 Snippely.Tags = {
 
-	//set up properties and perform actions for initial load
-	
 	initialize: function(){
 		this.list = $('tags-list');
 		this.load();
 	},
-	
-	//load all existing tags from the database
 	
 	load: function(){
 		var callback = function(result){
@@ -24,16 +20,12 @@ Snippely.Tags = {
 		Snippely.database.execute(this.Queries.select, callback);
 	},
 	
-	//initialize the tags list from the data passed in
-	
 	build: function(tags){
 		this.list.empty();
 		var elements = tags.map(this.create, this);
 		this.elements = $$(elements);
 		Snippely.redraw();
 	},
-
-	//create a tag element and insert it into the tags list
 
 	create: function(tag){
 		var element = new Element('li', {
@@ -51,8 +43,6 @@ Snippely.Tags = {
 		return element;
 	},
 	
-	//add a new tag to the database and create an editable list item for it
-	
 	add: function(){
 		var callback = function(result){
 			var element = this.create({name: 'New Tag', id: result.lastInsertRowID});
@@ -63,8 +53,6 @@ Snippely.Tags = {
 		}.bind(this);
 		Snippely.database.execute(this.Queries.insert, callback);
 	},
-	
-	//remove the currently selected tag from the database and the tags list
 	
 	remove: function(){
 		if (!this.selected || !confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
@@ -77,14 +65,10 @@ Snippely.Tags = {
 		this.selected.destroy();
 	},
 	
-	//invoke the inline editor for the currently selected tag
-	
 	rename: function(){
 		if (!this.selected) return;
 		this.selected.fireEvent('dblclick');
 	},
-	
-	//save the name of a tag to the database
 	
 	save: function(element){
 		Snippely.database.execute(this.Queries.update, {
@@ -92,8 +76,6 @@ Snippely.Tags = {
 			name: element.get('text')
 		});
 	},
-	
-	//select a tag from the list and load all it's snippets into the snippets list
 	
 	select: function(element){
 		if (element == this.selected) return;
