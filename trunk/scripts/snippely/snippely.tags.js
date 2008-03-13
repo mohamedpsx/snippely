@@ -1,5 +1,12 @@
 Snippely.Tags = {
 
+	//set up properties and perform actions for initial load
+	
+	initialize: function(){
+		this.list = $('tags-list');
+		this.load();
+	},
+	
 	//load all existing tags from the database
 	
 	load: function(){
@@ -7,9 +14,9 @@ Snippely.Tags = {
 		var callback = function(result){
 			var tags = [];
 			if (result.data) $each(result.data, function(tag){
-				tags.push({id: tag.id, name: tag.name});
+				tags.push({id: tag.id, name: tag.name.unescape()});
 			});
-			this.initialize(tags);
+			this.build(tags);
 		}.bind(this);
 		
 		Snippely.database.execute(sql, callback);
@@ -17,8 +24,8 @@ Snippely.Tags = {
 	
 	//initialize the tags list from the data passed in
 	
-	initialize: function(tags){
-		this.list = $('tags-list').empty();
+	build: function(tags){
+		this.list.empty();
 		var elements = tags.map(this.create, this);
 		this.elements = $$(elements);
 		Snippely.redraw();
@@ -27,7 +34,11 @@ Snippely.Tags = {
 	//create a tag element and insert it into the tags list
 
 	create: function(tag){
-		var element = new Element('li', { text: tag.name });
+		var element = new Element('li', {
+			id: 'tag_' + tag.id,
+			text: tag.name
+		});
+		
 		new Editable(element, { onBlur: this.save.bind(this) });
 		
 		this.list.adopt(element.addEvents({
@@ -77,7 +88,7 @@ Snippely.Tags = {
 	save: function(element){
 		var id = element.retrieve('tag:id');
 		var name = element.get('text');
-		var sql = "UPDATE tags SET name = '" + name + "' WHERE id = " + id;
+		var sql = "UPDATE tags SET name = '" + name.escape() + "' WHERE id = " + id;
 		Snippely.database.execute(sql);
 	},
 	

@@ -1,23 +1,29 @@
 Snippely.Snippets = {
 
+	//set up properties and perform actions for initial load
+	
+	initialize: function(){
+		this.list = $('snippets-list');
+	},
+	
 	//load all snippets in a particular tag from the database
 
 	load: function(tag_id){
-		var sql = 'SELECT * FROM snippets WHERE tag_id = ' + tag_id;
+		var sql = 'SELECT id, title FROM snippets WHERE tag_id = ' + tag_id;
 		var callback = function(result){
 			var snippets = [];
 			if (result.data) $each(result.data, function(snippet){
-				snippets.push({id: snippet.id, title: snippet.title});
+				snippets.push({id: snippet.id, title: snippet.title.unescape()});
 			});
-			this.initialize(snippets);
+			this.build(snippets);
 		}.bind(this);
 		
 		Snippely.database.execute(sql, callback);
 	},
 	
-	//initialize the snippets list from the snippets passed in
+	//build the snippets list from the snippets passed in
 	
-	initialize: function(snippets){
+	build: function(snippets){
 		this.list = $('snippets-list').empty();
 		var elements = snippets.map(this.create, this);
 		this.elements = $$(elements);
@@ -27,7 +33,11 @@ Snippely.Snippets = {
 	//create a snippet element and insert it into the snippets list
 	
 	create: function(snippet){
-		var element = new Element('li', { text: snippet.title });
+		var element = new Element('li', {
+			id: 'snippet_' + snippet.id,
+			text: snippet.title
+		});
+		
 		new Editable(element, { onBlur: this.save.bind(this) });
 		
 		this.list.adopt(element.addEvents({
@@ -80,9 +90,11 @@ Snippely.Snippets = {
 	save: function(element){
 		var id = element.retrieve('snippet:id');
 		var title = element.get('text');
-		var sql = "UPDATE snippets SET title = '" + title + "' WHERE id = " + id;
-		//Snippely.Snippet.title.set('text', title);
-		Snippely.database.execute(sql);
+		var sql = "UPDATE snippets SET title = '" + title.escape() + "' WHERE id = " + id;
+		var callback = function(){
+			if (Snippely.Snippet.id && Snippely.Snippet.id == id) Snippely.Snippet.title.set('text', title);
+		};
+		Snippely.database.execute(sql, callback);
 	},
 	
 	//select a snippet from the list and load it into the snippet viewer / editor
@@ -92,8 +104,7 @@ Snippely.Snippets = {
 		this.selected = element.addClass('selected');
 		
 		var id = element.retrieve('snippet:id');
-		var snippet = SNIPPET[id]; //TODO - retrieve snippet from database
-		Snippely.Snippet.load(snippet);
+		Snippely.Snippet.load(id);
 	},
 	
 	//zebra stripe the list and re-render the scrollbars
@@ -102,6 +113,6 @@ Snippely.Snippets = {
 		this.elements.removeClass('odd');
 		this.list.getElements(':odd').addClass('odd');
 		Snippely.redraw();
-	}
+	}	
 	
 };

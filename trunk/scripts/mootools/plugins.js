@@ -38,3 +38,17 @@ var Editable = new Class({
 	}
 	
 });
+
+//String extensions
+
+String.implement({
+	
+	escape: function(){
+		return escape(this);
+	},
+	
+	unescape: function(){
+		return unescape(this);
+	}
+	
+});
