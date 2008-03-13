@@ -1,15 +1,25 @@
 Snippely.Database = new Class({
 	
-	initialize: function(){
+	Implements: [Events, Options],
+	
+	options: {/*
+		onOpen: $empty,
+		onError: $empty,*/
+		filename: 'application.db'
+	},
+	
+	initialize: function(options){
+		this.setOptions(options);
+		
 		this.connection = new air.SQLConnection();
 		this.connection.addEventListener(air.SQLEvent.OPEN, this.onOpen.bind(this));
 		this.connection.addEventListener(air.SQLErrorEvent.ERROR, this.onError);
 		
-		this.dbFile = air.File.applicationStorageDirectory.resolvePath("application.db");
+		this.dbFile = air.File.applicationStorageDirectory.resolvePath(this.options.filename);
 		this.connection.openAsync(this.dbFile);
 	},
 	
-	create: function(){
+	create: function(callback){
 		var tags =
 			"CREATE TABLE IF NOT EXISTS tags (" +
 			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -30,21 +40,32 @@ Snippely.Database = new Class({
 			"  snippet_id INTEGER, " +
 			"  rank INTEGER, " +
 			"  type TEXT, " +
-			"  code INTEGER(1), " +
+			"  code INTEGER, " +
 			"  content TEXT" +
 			")";
 		
-		this.execute(tags);
-		this.execute(snippets);
-		this.execute(snips);
+		var self = this;
+		self.execute(tags, function(){
+			self.execute(snippets, function(){
+				self.execute(snips, callback);
+			});
+		});
 	},
 	
-	execute: function(sql, callback){
-		callback = callback || $empty;
+	execute: function(){
+		var args = Array.link(arguments, {sql: String.type, callback: Function.type, params: Object.type});
+		
+		var sql = args.sql;
+		var callback = args.callback || $empty;
+		var params = args.params || {};
 		
 		var statement = new air.SQLStatement();
 		statement.sqlConnection = this.connection;
 		statement.text = sql;
+		
+		$each(params, function(value, key){
+			statement.parameters[":" + key] = value;
+		});
 		
 		statement.addEventListener(air.SQLEvent.RESULT, function(){ callback(statement.getResult(), event); });
 		statement.addEventListener(air.SQLErrorEvent.ERROR, this.onError);
@@ -56,8 +77,8 @@ Snippely.Database = new Class({
 	onOpen: function(event){
 		air.trace("database created / loaded");
 		console.log('database created / loaded');
-		//this.nuke();
-		this.create();
+		
+		this.create(this.fireEvent.bind(this, 'onOpen'));
 	},
 	
 	onError: function(event){

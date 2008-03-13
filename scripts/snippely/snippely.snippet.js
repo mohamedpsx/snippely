@@ -22,7 +22,6 @@ Snippely.Snippet = {
 	//load a snippet from the database based on id
 	
 	load: function(id){
-		var sql = "SELECT * FROM snippets WHERE id = " + id;
 		var callback = function(result){
 			var data = result.data && result.data[0];
 			if (!data) return;
@@ -34,7 +33,9 @@ Snippely.Snippet = {
 			this.buildMeta(snippet);
 		}.bind(this);
 		
-		Snippely.database.execute(sql, callback);
+		Snippely.database.execute(this.Queries.select, callback, {
+			id: id
+		});
 	},
 	
 	buildMeta: function(snippet){
@@ -97,21 +98,23 @@ Snippely.Snippet = {
 	saveTitle: function(element){
 		var id = this.id;
 		var title = element.get('text');
-		var sql = "UPDATE snippets SET title = '" + title.escape() + "' WHERE id = " + id;
+		
 		var callback = function(){
 			var snippet = $('snippet_' + id);
 			if (snippet) snippet.set('text', title);
 		};
 		
-		Snippely.database.execute(sql, callback);
+		Snippely.database.execute(this.Queries.updateTitle, callback, {
+			id: id,
+			title: title.escape()
+		});
 	},
 	
 	saveDescription: function(element){
-		var id = this.id;
-		var description = element.get('text');
-		var sql = "UPDATE snippets SET description = '" + description.escape() + "' WHERE id = " + id;
-		
-		Snippely.database.execute(sql);
+		Snippely.database.execute(this.Queries.updateDescription, {
+			id: this.id,
+			description: element.get('text').escape()
+		});
 	},
 	
 	saveSnip: function(element){
@@ -120,4 +123,16 @@ Snippely.Snippet = {
 		//TODO - save this snip to the database
 	}
 
+};
+
+//Snippet related queries
+
+Snippely.Snippet.Queries = {
+	
+	select: "SELECT * FROM snippets WHERE id = :id",
+	
+	updateTitle: "UPDATE snippets SET title = :title WHERE id = :id",
+	
+	updateDescription: "UPDATE snippets SET description = :description WHERE id = :id"
+	
 };
