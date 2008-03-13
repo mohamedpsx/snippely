@@ -8,28 +8,6 @@ Application.autoExit = true;
 
 // Temporary Data
 
-var SNIPPETS = {
-	"1": [
-		{ id: 1, title: 'My First Snippet' },
-		{ id: 2, title: 'My Second Snippet' },
-		{ id: 3, title: 'My Third Snippet' }
-	],
-	"2": [
-		{ id: 3, title: 'My Third Snippet' },
-		{ id: 4, title: 'My Fourth Snippet' },
-		{ id: 2, title: 'My Second Snippet' },
-		{ id: 1, title: 'My First Snippet' }
-	],
-	"3": [
-		{ id: 4, title: 'My Fourth Snippet' },
-		{ id: 1, title: 'My First Snippet' },
-		{ id: 2, title: 'My Second Snippet' }
-	]
-};
-
-//TEMP
-SNIPPETS = {};
-
 var SNIPPET = {
 	"1": {
 		title: 'My First Snippet',
@@ -107,22 +85,16 @@ var Snippely = {
 		
 		//add menu
 		this.addMenu = new ART.Menu('AddMenu');
-		this.addTagItem = new ART.Menu.Item('Add Tag...', {
-			onSelect: this.Tags.add.bind(this.Tags)
-		});
-		this.addSnippetItem = new ART.Menu.Item('Add Snippet...');
+		this.addTagItem = new ART.Menu.Item('Add Tag...', { onSelect: this.Tags.add.bind(this.Tags) });
+		this.addSnippetItem = new ART.Menu.Item('Add Snippet...', { onSelect: this.Snippets.add.bind(this.Snippets) });
 		this.addMenu.addItem(this.addTagItem).addItem(this.addSnippetItem);
 		
 		//action menu
 		this.actionMenu = new ART.Menu('ActionMenu');
-		this.removeTagItem = new ART.Menu.Item('Remove Tag...', {
-			onSelect: this.Tags.remove.bind(this.Tags)
-		});
-		this.renameTagItem = new ART.Menu.Item('Rename Tag...', {
-			onSelect: this.Tags.rename.bind(this.Tags)
-		});
-		this.removeSnippetItem = new ART.Menu.Item('Remove Snippet...');
-		this.renameSnippetItem = new ART.Menu.Item('Rename Snippet...');
+		this.removeTagItem = new ART.Menu.Item('Remove Tag...', { onSelect: this.Tags.remove.bind(this.Tags) });
+		this.renameTagItem = new ART.Menu.Item('Rename Tag...', { onSelect: this.Tags.rename.bind(this.Tags) });
+		this.removeSnippetItem = new ART.Menu.Item('Remove Snippet...', { onSelect: this.Snippets.remove.bind(this.Snippets) });
+		this.renameSnippetItem = new ART.Menu.Item('Rename Snippet...', { onSelect: this.Snippets.rename.bind(this.Snippets) });
 		this.actionMenu.addItem(this.renameTagItem).addItem(this.removeTagItem).addItem(this.renameSnippetItem).addItem(this.removeSnippetItem);
 		
 		$('button-add').addEvent('mousedown', function(event){
@@ -183,15 +155,26 @@ var Snippely = {
 	},
 	
 	initializeTags: function(){
-		var sql, callback;
-		
-		sql = 'SELECT * FROM tags';
-		callback = function(result){
+		var sql = 'SELECT * FROM tags';
+		var callback = function(result){
 			var tags = [];
 			if (result.data) $each(result.data, function(tag){
 				tags.push({id: tag.id, name: tag.name});
 			});
 			this.Tags.initialize(tags);
+		}.bind(this);
+		
+		this.database.execute(sql, callback);
+	},
+	
+	initializeSnippets: function(tag_id){
+		var sql = 'SELECT * FROM snippets WHERE tag_id = ' + tag_id;
+		var callback = function(result){
+			var snippets = [];
+			if (result.data) $each(result.data, function(snippet){
+				snippets.push({id: snippet.id, title: snippet.title});
+			});
+			this.Snippets.initialize(snippets);
 		}.bind(this);
 		
 		this.database.execute(sql, callback);
