@@ -10,7 +10,7 @@ Application.autoExit = true;
 
 var SNIPPET = {
 	"1": {
-		title: 'My First Snippet',
+		title: 'This is still static 1!',
 		description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur consectetuer, elit quis gravida mollis, ligula sem cursus leo, lacinia rhoncus mi urna eget felis. Nam non felis id dolor egestas iaculis.',
 		snips: [
 			{ id: 1, type: 'javascript', code: true, content: 'Cras eget eros. Ut enim purus, scelerisque in, eleifend ut, tristique id, elit. Integer sapien. Proin nunc massa, auctor at, fermentum placerat, pulvinar sit amet, enim. Phasellus consequat lobortis nisl. Curabitur sed felis. Donec ultrices, libero at rhoncus blandit, lacus risus dapibus mi, quis fermentum velit erat volutpat lectus. Sed accumsan feugiat nulla. Ut in erat eu nisi sagittis blandit. Ut mauris ligula, pretium in, bibendum ac, bibendum eget, purus. In erat libero, hendrerit ac, faucibus a, pretium nec, diam. Vestibulum nisi. Curabitur tincidunt. Cras elementum justo.' },
@@ -19,7 +19,7 @@ var SNIPPET = {
 		]
 	},
 	"2": {
-		title: 'My Second Snippet',
+		title: 'This is still static 2!',
 		description: 'Fusce gravida nulla nec erat. Fusce euismod nulla a arcu. Vivamus rutrum. Nam ultricies libero ut turpis. Vivamus viverra tempor neque. Aenean felis. Curabitur vel odio sit amet enim posuere blandit. Vivamus consequat sem luctus elit. In ante nisl, euismod sed, interdum at, eleifend id, dolor. Phasellus sit amet ipsum. Etiam augue arcu, suscipit vel, tincidunt ac, congue vel, mauris.',
 		snips: [
 			{ id: 4, type: 'ruby', code: true, content: 'Proin dictum lorem. Sed at lectus. Nullam cursus quam ac turpis. In hac habitasse platea dictumst. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam et tellus vel sem pellentesque bibendum. Maecenas mollis urna ac est. Sed volutpat. Nam molestie turpis ac ante. Cras ultrices ante eget nibh. Integer lobortis interdum eros. Aliquam sapien ante, interdum nec, malesuada et, varius ac, nulla. Aliquam et diam. Maecenas mollis nunc in nunc.' },
@@ -28,7 +28,7 @@ var SNIPPET = {
 		]
 	},
 	"3": {
-		title: 'My Third Snippet',
+		title: 'This is still static 3!',
 		description: 'Fusce gravida nulla nec erat. Fusce euismod nulla a arcu. Vivamus rutrum. Nam ultricies libero ut turpis. Vivamus viverra tempor neque. Aenean felis. Curabitur vel odio sit amet enim posuere blandit. Vivamus consequat sem luctus elit. In ante nisl, euismod sed, interdum at, eleifend id, dolor. Phasellus sit amet ipsum. Etiam augue arcu, suscipit vel, tincidunt ac, congue vel, mauris.',
 		snips: [
 			{ id: 7, type: 'php', code: true, content: 'In hac habitasse platea dictumst. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam et tellus vel sem pellentesque bibendum. Maecenas mollis urna ac est. Sed volutpat. Nam molestie turpis ac ante. Cras ultrices ante eget nibh. Integer lobortis interdum eros. Aliquam sapien ante, interdum nec, malesuada et, varius ac, nulla. Aliquam et diam. Maecenas mollis nunc in nunc.' },
@@ -36,7 +36,7 @@ var SNIPPET = {
 		]
 	},
 	"4": {
-		title: 'My Fourth Snippet',
+		title: 'This is still static 4!',
 		description: 'This snippet is all about ruby because i love ruby so much.',
 		snips: [
 			{ id: 9, type: 'ruby', code: true, content: 'Curabitur consectetuer, elit quis gravida mollis, ligula sem cursus leo, lacinia rhoncus mi urna eget felis. Nam non felis id dolor egestas iaculis. Fusce gravida nulla nec erat. Fusce euismod nulla a arcu. Vivamus rutrum. Nam ultricies libero ut turpis. Vivamus viverra tempor neque. Aenean felis. Curabitur vel odio sit amet enim posuere blandit. Vivamus consequat sem luctus elit. In ante nisl, euismod sed, interdum at, eleifend id, dolor.' },
@@ -66,7 +66,8 @@ var Snippely = {
 		this.initializeMenus();
 		this.initializeLayout();
 		this.initializeMetas();
-		this.initializeTags();
+		
+		this.Tags.load();
 		
 		this.Snippet.initialize(); //TODO - Load active tag / snippet from last session
 		
@@ -153,32 +154,6 @@ var Snippely = {
 		document.addEvent('mouseup', function(){
 			metaButtons.removeClass('active');
 		});
-	},
-	
-	initializeTags: function(){
-		var sql = 'SELECT * FROM tags';
-		var callback = function(result){
-			var tags = [];
-			if (result.data) $each(result.data, function(tag){
-				tags.push({id: tag.id, name: tag.name});
-			});
-			this.Tags.initialize(tags);
-		}.bind(this);
-		
-		this.database.execute(sql, callback);
-	},
-	
-	initializeSnippets: function(tag_id){
-		var sql = 'SELECT * FROM snippets WHERE tag_id = ' + tag_id;
-		var callback = function(result){
-			var snippets = [];
-			if (result.data) $each(result.data, function(snippet){
-				snippets.push({id: snippet.id, title: snippet.title});
-			});
-			this.Snippets.initialize(snippets);
-		}.bind(this);
-		
-		this.database.execute(sql, callback);
 	},
 	
 	redraw: function(){

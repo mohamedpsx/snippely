@@ -1,14 +1,18 @@
 Snippely.Snippet = {
 
 	initialize: function(){
+		this.container = $('snippet-container');
 		this.title = $('snippet-title');
 		this.description = $('snippet-description');
-		this.container = $('snippet-snips');
+		this.snips = $('snippet-snips');
 	},
 
 	load: function(snippet){
-		this.container.empty();
-		this.title.set('text', snippet.title).setStyle('display', '');
+		this.container.setStyle('display', (snippet ? '' : 'none'));
+		if (!snippet) return;
+		
+		this.snips.empty();
+		this.title.set('text', snippet.title);
 		this.description.set('text', snippet.description);
 		
 		new Editable(this.title);
@@ -38,7 +42,7 @@ Snippely.Snippet = {
 				onBlur: this.save.bind(this)
 			});
 			
-			this.container.adopt(wrapper);
+			this.snips.adopt(wrapper);
 		}, this);
 		
 		//initialize sortables

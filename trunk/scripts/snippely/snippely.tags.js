@@ -1,10 +1,30 @@
 Snippely.Tags = {
 
+	//load all existing tags from the database
+	
+	load: function(){
+		var sql = 'SELECT * FROM tags';
+		var callback = function(result){
+			var tags = [];
+			if (result.data) $each(result.data, function(tag){
+				tags.push({id: tag.id, name: tag.name});
+			});
+			this.initialize(tags);
+		}.bind(this);
+		
+		Snippely.database.execute(sql, callback);
+	},
+	
+	//initialize the tags list from the data passed in
+	
 	initialize: function(tags){
 		this.list = $('tags-list').empty();
 		var elements = tags.map(this.create, this);
 		this.elements = $$(elements);
+		Snippely.redraw();
 	},
+
+	//create a tag element and insert it into the tags list
 
 	create: function(tag){
 		var element = new Element('li', { text: tag.name });
@@ -18,16 +38,21 @@ Snippely.Tags = {
 		return element;
 	},
 	
+	//add a new tag to the database and create an editable list item for it
+	
 	add: function(){
 		var sql = "INSERT INTO tags (name) VALUES ('New Tag')";
 		var callback = function(result){
 			var element = this.create({name: 'New Tag', id: result.lastInsertRowID});
 			this.elements.push(element);
 			this.select(element);
+			Snippely.redraw();
 			element.fireEvent('dblclick');
 		}.bind(this);
 		Snippely.database.execute(sql, callback);
 	},
+	
+	//remove the currently selected tag from the database and the tags list
 	
 	remove: function(){
 		if (!this.selected || !confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
@@ -40,10 +65,14 @@ Snippely.Tags = {
 		this.selected.destroy();
 	},
 	
+	//invoke the inline editor for the currently selected tag
+	
 	rename: function(){
 		if (!this.selected) return;
 		this.selected.fireEvent('dblclick');
 	},
+	
+	//save the name of a tag to the database
 	
 	save: function(element){
 		var id = element.retrieve('tag:id');
@@ -52,12 +81,14 @@ Snippely.Tags = {
 		Snippely.database.execute(sql);
 	},
 	
+	//select a tag from the list and load all it's snippets into the snippets list
+	
 	select: function(element){
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
 		
 		var id = element.retrieve('tag:id');
-		Snippely.initializeSnippets(id);
+		Snippely.Snippets.load(id);
 	}
-
+	
 };
