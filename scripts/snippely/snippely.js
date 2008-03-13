@@ -75,38 +75,39 @@ var Snippely = {
 	
 	initializeMenus: function(){
 		//main menus
-		this.mainMenu = new ART.Menu('MainMenu');
-		this.saveItem = new ART.Menu.Item('Save');
-		this.loadItem = new ART.Menu.Item('Load');
-		this.saveItem.shortcut = 'command+s';
-		this.loadItem.shortcut = 'command+l';
-		this.fileMenu = new ART.Menu('File').addItem(this.saveItem).addItem(this.loadItem);
-		this.mainMenu.addMenu(this.fileMenu);
+		var mainMenu = new ART.Menu('MainMenu');
+		var fileMenu = new ART.Menu('File');
+		var saveItem = new ART.Menu.Item('Save');
+		var loadItem = new ART.Menu.Item('Load');
+		saveItem.shortcut = 'command+s';
+		loadItem.shortcut = 'command+l';
+		fileMenu.addItems([saveItem, loadItem]);
+		mainMenu.addMenu(fileMenu);
 		
 		//add menu
-		this.addMenu = new ART.Menu('AddMenu');
-		this.addTagItem = new ART.Menu.Item('Add Tag...', { onSelect: this.Tags.add.bind(this.Tags) });
-		this.addSnippetItem = new ART.Menu.Item('Add Snippet...', { onSelect: this.Snippets.add.bind(this.Snippets) });
-		this.addMenu.addItem(this.addTagItem).addItem(this.addSnippetItem);
+		var addMenu = new ART.Menu('AddMenu').addItems([
+			new ART.Menu.Item('Add Tag...', { onSelect: this.Tags.add.bind(this.Tags) }),
+			new ART.Menu.Item('Add Snippet...', { onSelect: this.Snippets.add.bind(this.Snippets) })
+		]);
 		
 		//action menu
-		this.actionMenu = new ART.Menu('ActionMenu');
-		this.removeTagItem = new ART.Menu.Item('Remove Tag...', { onSelect: this.Tags.remove.bind(this.Tags) });
-		this.renameTagItem = new ART.Menu.Item('Rename Tag...', { onSelect: this.Tags.rename.bind(this.Tags) });
-		this.removeSnippetItem = new ART.Menu.Item('Remove Snippet...', { onSelect: this.Snippets.remove.bind(this.Snippets) });
-		this.renameSnippetItem = new ART.Menu.Item('Rename Snippet...', { onSelect: this.Snippets.rename.bind(this.Snippets) });
-		this.actionMenu.addItem(this.renameTagItem).addItem(this.removeTagItem).addItem(this.renameSnippetItem).addItem(this.removeSnippetItem);
+		var actionMenu = new ART.Menu('ActionMenu').addItems([
+			new ART.Menu.Item('Remove Tag...', { onSelect: this.Tags.remove.bind(this.Tags) }),
+			new ART.Menu.Item('Rename Tag...', { onSelect: this.Tags.rename.bind(this.Tags) }),
+			new ART.Menu.Item('Remove Snippet...', { onSelect: this.Snippets.remove.bind(this.Snippets) }),
+			new ART.Menu.Item('Rename Snippet...', { onSelect: this.Snippets.rename.bind(this.Snippets) })
+		]);
 		
 		$('button-add').addEvent('mousedown', function(event){
 			this.addClass('active');
-			Snippely.addMenu.display(event.client); //he doesnt care about my passed positions.. whoa.
-			this.removeClass('active'); //apparently, the menu blocks all activity.
+			addMenu.display(event.client);
+			this.removeClass('active');
 			event.stop();
 		});
 		
 		$('button-action').addEvent('mousedown', function(event){
 			this.addClass('active');
-			Snippely.actionMenu.display(event.client);
+			actionMenu.display(event.client);
 			this.removeClass('active');
 			event.stop();
 		});

@@ -40,6 +40,11 @@ ART.Menu = new Class({
 		return this;
 	},
 	
+	addItems: function(items){
+		items.each(this.addItem, this);
+		return this;
+	},
+	
 	addMenu: function(menu){
 		this.menu.addSubmenu(menu.menu, menu.name);
 		return this;
@@ -93,7 +98,6 @@ ART.Menu.Item = new Class({
 			this.disabled = this.options.disabled;
 			this.shortcut = this.options.shortcut;
 		}
-
 	},
 	
 	attachTo: function(menu){
