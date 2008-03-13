@@ -10,7 +10,6 @@ Snippely.Tags = {
 	//load all existing tags from the database
 	
 	load: function(){
-		var sql = 'SELECT * FROM tags';
 		var callback = function(result){
 			var tags = [];
 			if (result.data) $each(result.data, function(tag){
@@ -19,7 +18,7 @@ Snippely.Tags = {
 			this.build(tags);
 		}.bind(this);
 		
-		Snippely.database.execute(sql, callback);
+		Snippely.database.execute(this.Queries.select, callback);
 	},
 	
 	//initialize the tags list from the data passed in
@@ -52,7 +51,6 @@ Snippely.Tags = {
 	//add a new tag to the database and create an editable list item for it
 	
 	add: function(){
-		var sql = "INSERT INTO tags (name) VALUES ('New Tag')";
 		var callback = function(result){
 			var element = this.create({name: 'New Tag', id: result.lastInsertRowID});
 			this.elements.push(element);
@@ -60,7 +58,7 @@ Snippely.Tags = {
 			Snippely.redraw();
 			element.fireEvent('dblclick');
 		}.bind(this);
-		Snippely.database.execute(sql, callback);
+		Snippely.database.execute(this.Queries.insert, callback);
 	},
 	
 	//remove the currently selected tag from the database and the tags list
@@ -68,9 +66,9 @@ Snippely.Tags = {
 	remove: function(){
 		if (!this.selected || !confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
 		
-		var id = this.selected.retrieve('tag:id');
-		var sql = "DELETE FROM tags WHERE id = " + id;
-		Snippely.database.execute(sql);
+		Snippely.database.execute(this.Queries.remove, {
+			id: this.selected.retrieve('tag:id')
+		});
 		
 		//TODO - remove all this tag's snippets and their snips from the database
 		this.selected.destroy();
@@ -86,20 +84,36 @@ Snippely.Tags = {
 	//save the name of a tag to the database
 	
 	save: function(element){
-		var id = element.retrieve('tag:id');
-		var name = element.get('text');
-		var sql = "UPDATE tags SET name = '" + name.escape() + "' WHERE id = " + id;
-		Snippely.database.execute(sql);
+		Snippely.database.execute(this.Queries.update, {
+			id: element.retrieve('tag:id'),
+			name: element.get('text')
+		});
 	},
 	
 	//select a tag from the list and load all it's snippets into the snippets list
 	
 	select: function(element){
+		if (element == this.selected) return;
+		
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
 		
 		var id = element.retrieve('tag:id');
 		Snippely.Snippets.load(id);
 	}
+	
+};
+
+//Tag related queries
+
+Snippely.Tags.Queries = {
+	
+	select: "SELECT * FROM tags",
+	
+	insert: "INSERT INTO tags (name) VALUES ('New Tag')",
+	
+	remove: "DELETE FROM tags WHERE id = :id",
+	
+	update: "UPDATE tags SET name = :name WHERE id = :id"
 	
 };

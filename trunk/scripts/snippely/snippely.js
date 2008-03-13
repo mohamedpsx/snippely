@@ -19,17 +19,19 @@ var Snippely = {
 		this.topResizer = $('top-resizer');
 		this.leftResizer = $('left-resizer');
 		
-		this.database = new Snippely.Database();
-		
-		this.initializeMenus();
-		this.initializeLayout();
-		this.initializeMetas();
-		
-		this.Tags.initialize();
-		this.Snippets.initialize();
-		this.Snippet.initialize(); //TODO - Load active tag / snippet from last session
-		
-		this.activate();
+		this.database = new Snippely.Database({
+			onOpen: function(database){
+				this.initializeMenus();
+				this.initializeLayout();
+				this.initializeMetas();
+
+				this.Tags.initialize();
+				this.Snippets.initialize();
+				this.Snippet.initialize(); //TODO - Load active tag / snippet from last session
+
+				this.activate();
+			}.bind(this)
+		});
 	},
 	
 	initializeMenus: function(){
