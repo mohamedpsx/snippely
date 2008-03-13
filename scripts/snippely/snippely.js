@@ -24,11 +24,11 @@ var Snippely = {
 				this.initializeMenus();
 				this.initializeLayout();
 				this.initializeMetas();
-
+				
 				this.Tags.initialize();
 				this.Snippets.initialize();
 				this.Snippet.initialize(); //TODO - Load active tag / snippet from last session
-
+				
 				this.activate();
 			}.bind(this)
 		});
