@@ -1,12 +1,31 @@
 Snippely.Snippets = {
 
+	//load all snippets in a particular tag from the database
+
+	load: function(tag_id){
+		var sql = 'SELECT * FROM snippets WHERE tag_id = ' + tag_id;
+		var callback = function(result){
+			var snippets = [];
+			if (result.data) $each(result.data, function(snippet){
+				snippets.push({id: snippet.id, title: snippet.title});
+			});
+			this.initialize(snippets);
+		}.bind(this);
+		
+		Snippely.database.execute(sql, callback);
+	},
+	
+	//initialize the snippets list from the snippets passed in
+	
 	initialize: function(snippets){
 		this.list = $('snippets-list').empty();
 		var elements = snippets.map(this.create, this);
 		this.elements = $$(elements);
-		this.list.getElements(':odd').addClass('odd');
+		this.redraw();
 	},
-
+	
+	//create a snippet element and insert it into the snippets list
+	
 	create: function(snippet){
 		var element = new Element('li', { text: snippet.title });
 		new Editable(element, { onBlur: this.save.bind(this) });
@@ -18,7 +37,9 @@ Snippely.Snippets = {
 		
 		return element;
 	},
-
+	
+	//add a new snippet to the database and create an editable list item for it
+	
 	add: function(){
 		var tag = Snippely.Tags.selected;
 		if (!tag) return;
@@ -28,10 +49,13 @@ Snippely.Snippets = {
 			var element = this.create({title: 'New Snippet', id: result.lastInsertRowID});
 			this.elements.push(element);
 			this.select(element);
+			this.redraw();
 			element.fireEvent('dblclick');
 		}.bind(this);
 		Snippely.database.execute(sql, callback);
 	},
+	
+	//remove the currently selected snippet from the database and the snippets list
 	
 	remove: function(){
 		if (!this.selected || !confirm("Are you sure you want to remove this Snippet?")) return;
@@ -44,10 +68,14 @@ Snippely.Snippets = {
 		this.selected.destroy();
 	},
 	
+	//invoke the inline editor for the currently selected snippet
+	
 	rename: function(){
 		if (!this.selected) return;
 		this.selected.fireEvent('dblclick');
 	},
+	
+	//save the title of a snippet to the database
 	
 	save: function(element){
 		var id = element.retrieve('snippet:id');
@@ -57,15 +85,23 @@ Snippely.Snippets = {
 		Snippely.database.execute(sql);
 	},
 	
+	//select a snippet from the list and load it into the snippet viewer / editor
+	
 	select: function(element){
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
 		
 		var id = element.retrieve('snippet:id');
-		/*
 		var snippet = SNIPPET[id]; //TODO - retrieve snippet from database
 		Snippely.Snippet.load(snippet);
-		*/
+	},
+	
+	//zebra stripe the list and re-render the scrollbars
+	
+	redraw: function(){
+		this.elements.removeClass('odd');
+		this.list.getElements(':odd').addClass('odd');
+		Snippely.redraw();
 	}
 	
 };

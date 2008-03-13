@@ -54,8 +54,8 @@ Snippely.Database = new Class({
 	// Callbacks
 	
 	onOpen: function(event){
+		air.trace("database created / loaded");
 		console.log('database created / loaded');
-		air.trace("the database was opened successfully");
 		//this.nuke();
 		this.create();
 	},
