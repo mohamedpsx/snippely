@@ -114,6 +114,8 @@ var Snippely = {
 		document.addEvent('mouseup', function(){
 			metaButtons.removeClass('active');
 		});
+		
+		$('add-code').addEvent('click', this.Snippet.add.bind(this.Snippet));
 	},
 	
 	redraw: function(){

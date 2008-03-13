@@ -12,7 +12,10 @@ Snippely.Snippets = {
 		var callback = function(result){
 			var snippets = [];
 			if (result.data) $each(result.data, function(snippet){
-				snippets.push({id: snippet.id, title: snippet.title.unescape()});
+				snippets.push({
+					id: snippet.id,
+					title: snippet.title.unescape()
+				});
 			});
 			this.build(snippets);
 		}.bind(this);
@@ -25,7 +28,7 @@ Snippely.Snippets = {
 	//build the snippets list from the snippets passed in
 	
 	build: function(snippets){
-		this.list = $('snippets-list').empty();
+		this.list.empty();
 		var elements = snippets.map(this.create, this);
 		this.elements = $$(elements);
 		this.redraw();
@@ -54,8 +57,12 @@ Snippely.Snippets = {
 	add: function(){
 		var tag = Snippely.Tags.selected;
 		if (!tag) return;
+		
 		var callback = function(result){
-			var element = this.create({title: 'New Snippet', id: result.lastInsertRowID});
+			var element = this.create({
+				id: result.lastInsertRowID,
+				title: 'New Snippet'
+			});
 			this.elements.push(element);
 			this.select(element);
 			this.redraw();
