@@ -92,6 +92,11 @@ Snippely.Snips = {
 		});
 	},
 	
+	remove: function(element){
+		this.removeById(element.retrieve('snip:id'));
+		element.destroy();
+	},
+	
 	save: function(element){
 		var id = element.retrieve('snip:id');
 		var text = element.get('html');
@@ -99,6 +104,20 @@ Snippely.Snips = {
 		Snippely.database.execute(this.Queries.update, {
 			id: id,
 			content: text.escape()
+		});
+	},
+	
+	//remove helpers
+	
+	removeById: function(id){
+		Snippely.database.execute(this.Queries.remove, {
+			id: id
+		});
+	},
+	
+	removeBySnippet: function(snippet_id, callback){
+		Snippely.database.execute(this.Queries.removeBySnippet, {
+			snippet_id: snippet_id
 		});
 	}
 	
@@ -110,8 +129,12 @@ Snippely.Snips.Queries = {
 	
 	select: "SELECT * FROM snips WHERE snippet_id = :snippet_id ORDER BY rank ASC",
 	
+	insert: "INSERT INTO snips (snippet_id, rank, type, content) VALUES (:snippet_id, :rank, :type, :content)",
+	
+	remove: "DELETE FROM snips WHERE id = :id",
+	
 	update: "UPDATE snips SET content = :content WHERE id = :id",
 	
-	insert: "INSERT INTO snips (snippet_id, rank, type, content) VALUES (:snippet_id, :rank, :type, :content)"
+	removeBySnippet: "DELETE FROM snips WHERE snippet_id = :snippet_id"
 	
 };

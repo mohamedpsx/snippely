@@ -66,12 +66,7 @@ Snippely.Snippets = {
 	
 	remove: function(){
 		if (!this.selected || !confirm("Are you sure you want to remove this Snippet?")) return;
-		
-		Snippely.database.execute(this.Queries.remove, {
-			id: this.selected.retrieve('snippet:id')
-		});
-		
-		//TODO - remove all this snippet's snips from the database
+		this.removeById(this.selected.retrieve('snippet:id'));
 		this.selected.destroy();
 	},
 	
@@ -108,7 +103,29 @@ Snippely.Snippets = {
 		this.elements.removeClass('odd');
 		this.list.getElements(':odd').addClass('odd');
 		Snippely.redraw();
-	}	
+	},
+	
+	//remove helpers
+	
+	removeById: function(id){
+		var callback = function(result){
+			Snippely.database.execute(this.Queries.remove, { id: id });
+		}.bind(this);
+		
+		Snippely.database.execute(this.Queries.removeSnips, callback, { snippet_id: id });
+	},
+	
+	removeByTag: function(tag_id){
+		var callback = function(result){
+			if (result.data) $each(result.data, function(snippet){
+				Snippely.Snips.removeBySnippet(snippet.id);
+			}, this);
+			
+			Snippely.database.execute(this.Queries.removeByTag, { tag_id: tag_id });
+		}.bind(this);
+		
+		Snippely.database.execute(this.Queries.select, callback, { tag_id: tag_id });
+	}
 	
 };
 
@@ -122,6 +139,8 @@ Snippely.Snippets.Queries = {
 	
 	remove: "DELETE FROM snippets WHERE id = :id",
 	
-	update: "UPDATE snippets SET title = :title WHERE id = :id"
+	update: "UPDATE snippets SET title = :title WHERE id = :id",
+	
+	removeByTag: "DELETE FROM snippets WHERE tag_id = :tag_id"
 	
 };

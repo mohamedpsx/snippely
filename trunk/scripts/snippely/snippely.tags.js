@@ -57,11 +57,10 @@ Snippely.Tags = {
 	remove: function(){
 		if (!this.selected || !confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
 		
-		Snippely.database.execute(this.Queries.remove, {
-			id: this.selected.retrieve('tag:id')
-		});
+		var id = this.selected.retrieve('tag:id');
+		Snippely.database.execute(this.Queries.remove, { id: id });
+		Snippely.Snippets.removeByTag(id);
 		
-		//TODO - remove all this tag's snippets and their snips from the database
 		this.selected.destroy();
 	},
 	
