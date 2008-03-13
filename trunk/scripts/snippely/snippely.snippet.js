@@ -79,7 +79,7 @@ Snippely.Snippet = {
 	create: function(snip){
 		var type = snip.type + (snip.code ? ' code' : '');
 		var info = new Element('div', {'class': 'info', 'text': type});
-		var content = new Element('div', {'class': 'content', 'text': snip.content.unescape()}).store('snip:id', snip.id);
+		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).store('snip:id', snip.id);
 		var wrapper = new Element('div', {'class': snip.type + ' snip'}).adopt(info, content);
 		
 		new Editable(content, {
@@ -146,7 +146,7 @@ Snippely.Snippet = {
 	
 	saveSnip: function(element){
 		var id = element.retrieve('snip:id');
-		var text = element.get('text');
+		var text = element.get('html');
 		
 		Snippely.database.execute(this.Queries.updateSnip, {
 			id: id,
