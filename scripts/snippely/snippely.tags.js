@@ -8,9 +8,7 @@ Snippely.Tags = {
 
 	create: function(tag){
 		var element = new Element('li', { text: tag.name });
-		var editable = new Editable(element, {
-			onBlur: this.save.bind(this)
-		});
+		new Editable(element, { onBlur: this.save.bind(this) });
 		
 		this.list.adopt(element.addEvents({
 			click: this.select.bind(this, element),
@@ -21,7 +19,7 @@ Snippely.Tags = {
 	},
 	
 	add: function(){
-		var sql = "INSERT INTO tags (name) VALUES ('" + 'New Tag' + "')";
+		var sql = "INSERT INTO tags (name) VALUES ('New Tag')";
 		var callback = function(result){
 			var element = this.create({name: 'New Tag', id: result.lastInsertRowID});
 			this.elements.push(element);
@@ -38,7 +36,7 @@ Snippely.Tags = {
 		var sql = "DELETE FROM tags WHERE id = " + id;
 		Snippely.database.execute(sql);
 		
-		//TODO - remove all this tag's snippets from the database
+		//TODO - remove all this tag's snippets and their snips from the database
 		this.selected.destroy();
 	},
 	
@@ -59,8 +57,7 @@ Snippely.Tags = {
 		this.selected = element.addClass('selected');
 		
 		var id = element.retrieve('tag:id');
-		var snippets = SNIPPETS[id] || []; //TODO - retrieve snippets list from database
-		Snippely.Snippets.load(snippets);
+		Snippely.initializeSnippets(id);
 	}
 
 };

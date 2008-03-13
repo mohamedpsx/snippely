@@ -4,35 +4,39 @@ Snippely.Database = new Class({
 		this.connection = new air.SQLConnection();
 		this.connection.addEventListener(air.SQLEvent.OPEN, this.onOpen.bind(this));
 		this.connection.addEventListener(air.SQLErrorEvent.ERROR, this.onError);
-
+		
 		this.dbFile = air.File.applicationStorageDirectory.resolvePath("application.db");
 		this.connection.openAsync(this.dbFile);
-		
-		console.log('Snippely.database.nuke()');
 	},
 	
 	create: function(){
-		var sql = 
+		var tags =
 			"CREATE TABLE IF NOT EXISTS tags (" +
 			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"  name TEXT" +
-			");" +
+			")";
+		
+		var snippets =
 			"CREATE TABLE IF NOT EXISTS snippets (" +
 			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"  tag_id INTEGER, " +
 			"  title TEXT, " +
 			"  description TEXT" +
-			");" +
+			")";
+		
+		var snips =
 			"CREATE TABLE IF NOT EXISTS snips (" +
 			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"  snippet_id INTEGER, " +
-			"  order INTEGER, " +
+			"  rank INTEGER, " +
 			"  type TEXT, " +
 			"  code INTEGER(1), " +
 			"  content TEXT" +
-			");";
+			")";
 		
-		this.execute(sql);
+		this.execute(tags);
+		this.execute(snippets);
+		this.execute(snips);
 	},
 	
 	execute: function(sql, callback){
@@ -50,7 +54,9 @@ Snippely.Database = new Class({
 	// Callbacks
 	
 	onOpen: function(event){
-		air.trace("the database was created successfully");
+		console.log('database created / loaded');
+		air.trace("the database was opened successfully");
+		//this.nuke();
 		this.create();
 	},
 	
@@ -62,8 +68,9 @@ Snippely.Database = new Class({
 	// Nuke the database
 	
 	nuke: function(){
-		var sql = "DROP TABLE tags; DROP TABLE snippets; DROP TABLE snips;";
-		this.execute(sql);
+		['tags', 'snippets', 'snips'].each(function(table){
+			this.execute("DROP TABLE " + table);
+		}, this);
 	}
 	
 });
