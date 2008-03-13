@@ -270,7 +270,7 @@ div.snip.code div.content {
 	line-height: 1.4;
 }
 
-div.snip div.content {
+div.snip .content {
 	cursor: text;
 	outline: none;
 }

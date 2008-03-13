@@ -10,7 +10,6 @@ Snippely.Snips = {
 			if (result.data) $each(result.data, function(snip){
 				snips.push({
 					id: snip.id,
-					code: snip.code,
 					type: snip.type.unescape(),
 					content: snip.content.unescape()
 				});
@@ -38,10 +37,21 @@ Snippely.Snips = {
 	},
 	
 	create: function(snip){
-		var type = snip.type + (snip.code ? ' code' : '');
-		var info = new Element('div', {'class': 'info', 'text': type});
-		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).store('snip:id', snip.id);
-		var wrapper = new Element('div', {'class': snip.type + ' snip'}).adopt(info, content);
+		var type = (snip.type == 'note' ? 'div' : 'pre');
+		
+		var info = new Element('div', {
+			'class': 'info',
+			'text': snip.type
+		});
+		
+		var content = new Element(type, {
+			'class': 'content',
+			'html': snip.content.unescape()
+		});
+		
+		var wrapper = new Element('div', {
+			'class': snip.type + ' snip'
+		}).adopt(info, content);
 		
 		new Editable(content, {
 			enter: true,
@@ -50,23 +60,23 @@ Snippely.Snips = {
 			onBlur: this.save.bind(this)
 		});
 		
+		content.store('snip:id', snip.id);
+		content.store('snip:type', snip.type);
+		
 		this.container.adopt(wrapper);
 		return wrapper;
 	},
 	
-	add: function(note){
+	add: function(type){
 		var snippet = Snippely.Snippets.selected;
 		if (!snippet) return;
 		
-		var code = 1;
 		var rank = this.elements.length + 1;
-		var type = 'javascript';
 		var content = 'Some Content';
 		
 		var callback = function(result){
 			var element = this.create({
 				id: result.lastInsertRowID,
-				code: code,
 				type: type,
 				content: content
 			});
@@ -75,7 +85,6 @@ Snippely.Snips = {
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.insert, callback, {
-			code: code,
 			rank: rank,
 			type: type,
 			content: content,
@@ -95,12 +104,14 @@ Snippely.Snips = {
 	
 };
 
+//Snip related queries
+
 Snippely.Snips.Queries = {
 	
 	select: "SELECT * FROM snips WHERE snippet_id = :snippet_id ORDER BY rank ASC",
 	
 	update: "UPDATE snips SET content = :content WHERE id = :id",
 	
-	insert: "INSERT INTO snips (snippet_id, rank, type, code, content) VALUES (:snippet_id, :rank, :type, :code, :content)"
+	insert: "INSERT INTO snips (snippet_id, rank, type, content) VALUES (:snippet_id, :rank, :type, :content)"
 	
 };
