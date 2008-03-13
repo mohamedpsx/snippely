@@ -4,6 +4,9 @@ Snippely.Snippet = {
 		this.title = $('snippet-title');
 		this.container = $('snippet-container');
 		this.description = $('snippet-description');
+		
+		new Editable(this.title, { onBlur: this.saveTitle.bind(this) });
+		new Editable(this.description, { enter: true, onBlur: this.saveDescription.bind(this) });
 	},
 
 	load: function(id){
@@ -30,9 +33,6 @@ Snippely.Snippet = {
 		this.id = snippet.id;
 		this.title.set('text', snippet.title);
 		this.description.set('text', snippet.description);
-		
-		new Editable(this.title, { onBlur: this.saveTitle.bind(this) });
-		new Editable(this.description, { enter: true, onBlur: this.saveDescription.bind(this) });
 	},
 	
 	saveTitle: function(element){

@@ -112,7 +112,7 @@ Snippely.Snippets = {
 	
 };
 
-//Snippet related queries
+//Snippets list related queries
 
 Snippely.Snippets.Queries = {
 	

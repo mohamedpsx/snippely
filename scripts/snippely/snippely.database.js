@@ -40,7 +40,6 @@ Snippely.Database = new Class({
 			"  snippet_id INTEGER, " +
 			"  rank INTEGER, " +
 			"  type TEXT, " +
-			"  code INTEGER, " +
 			"  content TEXT" +
 			")";
 		

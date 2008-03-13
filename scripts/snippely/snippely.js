@@ -116,7 +116,8 @@ var Snippely = {
 			metaButtons.removeClass('active');
 		});
 		
-		$('add-code').addEvent('click', this.Snips.add.bind(this.Snips));
+		$('add-code').addEvent('click', this.Snips.add.bind(this.Snips, 'code'));
+		$('add-note').addEvent('click', this.Snips.add.bind(this.Snips, 'note'));
 	},
 	
 	redraw: function(){
