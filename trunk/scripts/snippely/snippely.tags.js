@@ -13,7 +13,10 @@ Snippely.Tags = {
 		var callback = function(result){
 			var tags = [];
 			if (result.data) $each(result.data, function(tag){
-				tags.push({id: tag.id, name: tag.name.unescape()});
+				tags.push({
+					id: tag.id,
+					name: tag.name.unescape()
+				});
 			});
 			this.build(tags);
 		}.bind(this);
