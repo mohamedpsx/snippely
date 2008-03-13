@@ -19,19 +19,20 @@ var Snippely = {
 		this.topResizer = $('top-resizer');
 		this.leftResizer = $('left-resizer');
 		
+		this.initializeMenus();
+		this.initializeMetas();
+		this.initializeLayout();
+		
 		this.database = new Snippely.Database({
 			onOpen: function(database){
-				this.initializeMenus();
-				this.initializeLayout();
-				this.initializeMetas();
-				
 				this.Tags.initialize();
+				this.Snips.initialize();
+				this.Snippet.initialize();
 				this.Snippets.initialize();
-				this.Snippet.initialize(); //TODO - Load active tag / snippet from last session
-				
-				this.activate();
 			}.bind(this)
 		});
+		
+		this.activate();
 	},
 	
 	initializeMenus: function(){
@@ -115,7 +116,7 @@ var Snippely = {
 			metaButtons.removeClass('active');
 		});
 		
-		$('add-code').addEvent('click', this.Snippet.add.bind(this.Snippet));
+		$('add-code').addEvent('click', this.Snips.add.bind(this.Snips));
 	},
 	
 	redraw: function(){

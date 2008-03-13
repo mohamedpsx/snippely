@@ -1,13 +1,9 @@
 Snippely.Snippets = {
 
-	//set up properties and perform actions for initial load
-	
 	initialize: function(){
 		this.list = $('snippets-list');
 	},
 	
-	//load all snippets in a particular tag from the database
-
 	load: function(tag_id){
 		var callback = function(result){
 			var snippets = [];
@@ -25,16 +21,12 @@ Snippely.Snippets = {
 		});
 	},
 	
-	//build the snippets list from the snippets passed in
-	
 	build: function(snippets){
 		this.list.empty();
 		var elements = snippets.map(this.create, this);
 		this.elements = $$(elements);
 		this.redraw();
 	},
-	
-	//create a snippet element and insert it into the snippets list
 	
 	create: function(snippet){
 		var element = new Element('li', {
@@ -51,8 +43,6 @@ Snippely.Snippets = {
 		
 		return element;
 	},
-	
-	//add a new snippet to the database and create an editable list item for it
 	
 	add: function(){
 		var tag = Snippely.Tags.selected;
@@ -74,8 +64,6 @@ Snippely.Snippets = {
 		});
 	},
 	
-	//remove the currently selected snippet from the database and the snippets list
-	
 	remove: function(){
 		if (!this.selected || !confirm("Are you sure you want to remove this Snippet?")) return;
 		
@@ -87,14 +75,10 @@ Snippely.Snippets = {
 		this.selected.destroy();
 	},
 	
-	//invoke the inline editor for the currently selected snippet
-	
 	rename: function(){
 		if (!this.selected) return;
 		this.selected.fireEvent('dblclick');
 	},
-	
-	//save the title of a snippet to the database
 	
 	save: function(element){
 		var id = element.retrieve('snippet:id');
@@ -109,8 +93,6 @@ Snippely.Snippets = {
 		});
 	},
 	
-	//select a snippet from the list and load it into the snippet viewer / editor
-	
 	select: function(element){
 		if (element == this.selected) return;
 		
@@ -119,9 +101,8 @@ Snippely.Snippets = {
 		
 		var id = element.retrieve('snippet:id');
 		Snippely.Snippet.load(id);
+		Snippely.Snips.load(id);
 	},
-	
-	//zebra stripe the list and re-render the scrollbars
 	
 	redraw: function(){
 		this.elements.removeClass('odd');
