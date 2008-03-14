@@ -60,30 +60,22 @@ Snippely.Snips = {
 			return;
 		}
 		
-		var fake = content.clone(true, true);
-		fake.getElements('div').each(function(el){
-			document.newElement('span', {html: '\n'}).injectBefore(el);
-		});
-		
 		content.setStyle('display', 'none');
 		
-		content.store('highlighted', new Highlighter(type).highlight(fake.get('text')).addClass('content').inject(wrapper).addEvent('click', function(){
+		content.store('highlighted', new Highlighter(type).highlight(content.get('text')).addClass('content').inject(wrapper).addEvent('click', function(){
 			this.destroy();
 			content.eliminate('highlighted');
-			content.setStyle('display', 'block').fireEvent('mousedown').focus();
+			content.setStyle('display', 'block').fireEvent('mousedown');
 		}));
 	},
 	
 	create: function(snip){
-		
 		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
-		
 		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).inject(wrapper);
+		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
 		
 		this.highlight(snip.type, content, wrapper);
-		
-		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
 		
 		info.addEvent('dblclick', this.remove.bind(this, wrapper));
 		
@@ -96,7 +88,7 @@ Snippely.Snips = {
 		}.bind(this));
 		
 		new Editable(content, {
-			blockTab: snip.type != 'Note',
+			code: snip.type != 'Note',
 			enter: true,
 			wrapper: wrapper,
 			activation: 'mousedown',
@@ -107,8 +99,8 @@ Snippely.Snips = {
 			}.bind(this)
 		});
 		
-		wrapper.store('content', content);
 		wrapper.store('select', select);
+		wrapper.store('content', content);
 		
 		wrapper.store('snip:id', snip.id);
 		wrapper.store('snip:type', snip.type);

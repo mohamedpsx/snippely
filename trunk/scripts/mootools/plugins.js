@@ -7,7 +7,7 @@ var Editable = new Class({
 	options: {/*
 		onEdit: $empty,
 		onBlur: $empty,*/
-		blockTab: false,
+		code: false,
 		enter: false,
 		wrapper: false,
 		className: 'editing',
@@ -16,22 +16,15 @@ var Editable = new Class({
 	
 	initialize: function(element, options){
 		this.setOptions(options);
-
 		this.element = $(element);
-		
-		if (this.options.blockTab) this.element.addEvent('keydown', this.blockTab);
-		
 		this.wrapper = this.options.wrapper || this.element;
 		this.element.addEvent(this.options.activation, this.edit.bind(this));
 		this.element.addEvent('blur', this.blur.bind(this));
+		if (this.options.code) this.element.addEvent('keydown', this.process);
 		if (!this.options.enter) this.element.addEvent('keydown', function(event){
 			if (event.key == 'enter') this.blur();
 		});
 		this.element.store('editable', this);
-	},
-	
-	blockTab: function(event){
-		if (event.key == 'tab') event.preventDefault();
 	},
 	
 	edit: function(){
@@ -44,6 +37,19 @@ var Editable = new Class({
 		this.element.contentEditable = false;
 		this.wrapper.removeClass(this.options.className);
 		this.fireEvent('onBlur', this.element);
+	},
+	
+	process: function(event, node){
+		var selection = window.getSelection();
+		var range = selection.getRangeAt(0);
+		switch (event.key){
+			case 'tab': node = document.createTextNode('\t'); break;
+			case 'enter': node = document.createTextNode('\n'); break;
+		}
+		if (!node) return;
+		range.insertNode(node);
+		selection.setPosition(node, 1);
+		event.preventDefault();
 	}
 	
 });
