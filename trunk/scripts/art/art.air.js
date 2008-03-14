@@ -82,6 +82,7 @@ ART.Menu.Item = new Class({
 		checked: undefined,
 		disabled: undefined,
 		shortcut: undefined,
+		separator: false,
 		_item: null
 	},
 	
@@ -94,7 +95,7 @@ ART.Menu.Item = new Class({
 		if (this.options._item){
 			this.item = this.options._item;
 		} else {
-			this.item = new AIR.NativeMenuItem(name);
+			this.item = new AIR.NativeMenuItem(name, this.options.separator);
 
 			this.item.addEventListener('select', function(){
 				this.fireEvent('onSelect', this);
