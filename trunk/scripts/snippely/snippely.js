@@ -73,12 +73,6 @@ var Snippely = {
 			
 			var item = new ART.Menu.Item(name, {onSelect: function(){
 				Snippely.Snips.changeType(name);
-				
-				Snippely.Menus.brushMenuItems.each(function(item){
-					item.checked = false;
-				});
-				
-				item.checked = true;
 			}});
 			Snippely.Menus.brushMenu.addItem(item);
 			

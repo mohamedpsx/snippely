@@ -56,7 +56,15 @@ Snippely.Snips = {
 		
 		select.addEvent('mousedown', function(event){
 			
-			Snippely.Snips.active = wrapper;
+			Snippely.Menus.brushMenuItems.each(function(menu){
+				if (menu.name == snip.type){
+					menu.checked = true;
+				} else {
+					menu.checked = false;
+				}
+			});
+			
+			Snippely.Snips.active = content;
 			
 			Snippely.Menus.brushMenu.display(event.client);
 			
@@ -72,6 +80,9 @@ Snippely.Snips = {
 		
 		content.store('snip:id', snip.id);
 		content.store('snip:type', snip.type);
+		content.store('snip:object', snip);
+		
+		content.store('select', select);
 		
 		this.container.adopt(wrapper);
 		return wrapper;
@@ -111,7 +122,12 @@ Snippely.Snips = {
 	},
 	
 	changeType: function(type){
-		this.active.getElement('.select-type').set('text', type);
+		var select = this.active.retrieve('select');
+		select.set('text', type);
+		
+		//replace me with some real db
+		
+		this.active.retrieve('snip:object').type = type;
 		
 		//push type into db please!
 	},
