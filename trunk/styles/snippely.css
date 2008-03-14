@@ -222,56 +222,75 @@ body {
 #snippet-description {
 	font-size: 12px;
 	padding: 10px 0px;
-	line-height: 1.6;
+	line-height: 16px;
 	border-top: 1px dotted #bbb;
 	border-bottom: 1px dotted #bbb;
 }
 
 div.snip {
+	font-size: 11px;
 	position: relative;
 	margin: 10px 0;
 	padding: 6px 10px;
-	border: 1px solid rgba(0, 0, 0, 0.3);
-	-webkit-border-radius: 6px;
 	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	-webkit-border-radius: 6px;
+}
+
+div.snip.code {
+	border: 1px solid rgba(0, 0, 0, 0.3);
 	background: #fff url(../images/grad.png) bottom left repeat-x;
 }
 
-div.snip.editing {
+div.snip.note {
+	border: 1px solid #bbb;
+	background: #eee url(../images/grad.png) bottom left repeat-x;
+}
+
+div.snip.code.editing {
 	border: 1px solid #4792e5;
-	background: #f8fafb;
+	background: #fff;
+}
+
+div.snip.note.editing {
+	border: 1px solid #333;
+	background: #eee;
 }
 
 div.info {
-	color: #888;
 	font-size: 9px;
 	margin-bottom: 6px;
 	padding-bottom: 5px;
+}
+
+div.snip.code div.info {
+	color: #888;
 	border-bottom: 1px solid #eee;
 }
 
-div.note {
-	font-size: 11px;
-	line-height: 1.6;
-	margin: 10px 0;
-	padding: 6px 10px;
-	border: 1px solid #ddd;
-	-webkit-border-radius: 6px;
+div.snip.note div.info {
+	color: #555;
+	border-bottom: 1px solid #ddd;
 }
 
-div.snip.code, div.snip div.info {
+/*.content*/
+
+div.snip.code div.content, div.snip div.info {
 	font-family: "Andale Mono", "Monaco", Courier;
+}
+
+div.snip div.content {	
+	cursor: text;
+	outline: none;
 }
 
 div.snip.code div.content {
 	overflow: hidden;
 	white-space: pre;
-	line-height: 1.4;
+	line-height: 13px;
 }
 
-div.snip .content {
-	cursor: text;
-	outline: none;
+div.snip.note div.content {
+	line-height: 16px;
 }
 
 /* @end */

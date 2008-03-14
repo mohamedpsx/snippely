@@ -43,25 +43,26 @@ Snippely.Snips = {
 	},
 	
 	create: function(snip){
-		var type = (snip.type == 'note' ? 'div' : 'pre');
+		var klass = (snip.type == 'Note') ? 'note' : 'code';
+		
+		var wrapper = new Element('div', {
+			'class': 'snip ' + klass
+		});
+		
+		
+		var info = new Element('div', {
+			'class': 'info'
+		}).inject(wrapper);
+		
+		var content = new Element('div', {
+			'class': 'content',
+			'html': snip.content.unescape()
+		}).inject(wrapper);
 		
 		var select = new Element('span', {
 			'class': 'select-type',
 			'text': snip.type
-		});
-		
-		var info = new Element('div', {
-			'class': 'info'
-		}).adopt(select);
-		
-		var content = new Element(type, {
-			'class': 'content',
-			'html': snip.content.unescape()
-		});
-		
-		var wrapper = new Element('div', {
-			'class': snip.type + ' snip'
-		}).adopt(info, content);
+		}).inject(info);
 		
 		select.addEvent('mousedown', function(event){
 			this.active = wrapper;
@@ -138,11 +139,14 @@ Snippely.Snips = {
 	
 	updateType: function(type){
 		if (!this.active) return;
-		var snip = this.active.retrieve('snip');
-		var select = this.active.retrieve('select');
+		var active = this.active;
+		var snip = active.retrieve('snip');
+		var select = active.retrieve('select');
 		var callback = function(){
 			select.set('text', type);
 			snip.type = type;
+			if (type == 'Note') active.removeClass('code').addClass('note');
+			else active.removeClass('note').addClass('code');
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.updateType, callback, { id: snip.id, type: type });
