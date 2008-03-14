@@ -33,7 +33,7 @@ Snippely.Snips = {
 			handle: 'div.info',
 			onComplete: function(){
 				var order = this.sortables.serialize(function(element){
-					return element.retrieve('snip:id');
+					return element.retrieve('snip').id;
 				});
 				this.updatePositions(order);
 			}.bind(this)
@@ -45,9 +45,14 @@ Snippely.Snips = {
 	create: function(snip){
 		var type = (snip.type == 'note' ? 'div' : 'pre');
 		
+		var select = new Element('span', {
+			'class': 'select-type',
+			'text': snip.type
+		});
+		
 		var info = new Element('div', {
 			'class': 'info'
-		});
+		}).adopt(select);
 		
 		var content = new Element(type, {
 			'class': 'content',
@@ -58,18 +63,13 @@ Snippely.Snips = {
 			'class': snip.type + ' snip'
 		}).adopt(info, content);
 		
-		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
-		
 		select.addEvent('mousedown', function(event){
+			this.active = wrapper;
 			var items = Snippely.Menus.brushMenu.items;
 			for (var item in items) items[item].checked = !!(item == snip.type);
-			
-			Snippely.Snips.active = wrapper;
-			
 			Snippely.Menus.brushMenu.display(event.client);
-			
 			event.stop();
-		});
+		}.bind(this));
 		
 		new Editable(content, {
 			enter: true,
@@ -79,24 +79,11 @@ Snippely.Snips = {
 		});
 		
 		wrapper.store('snip', snip);
-		
-		wrapper.store('snip:id', snip.id);
-		wrapper.store('snip:type', snip.type);
-		
-		
 		wrapper.store('select', select);
+		content.store('snip:id', snip.id);
 		
 		this.container.adopt(wrapper);
 		return wrapper;
-	},
-	
-	changeType: function(type){
-		var select = this.active.retrieve('select');
-		select.set('text', type);
-		
-		Snippely.database.execute(this.Queries.updateType, {id: this.active.retrieve('snip:id'), type: this.active.retrieve('snip:type')});
-		
-		this.active.retrieve('snip').type = type;
 	},
 	
 	add: function(type){
@@ -145,6 +132,24 @@ Snippely.Snips = {
 	
 	removeBySnippet: function(snippet_id, callback){
 		Snippely.database.execute(this.Queries.removeBySnippet, { snippet_id: snippet_id });
+	},
+	
+	//update helpers
+	
+	updateType: function(type){
+		if (!this.active) return;
+		
+		var snip = this.active.retrieve('snip');
+		var select = this.active.retrieve('select');
+		var callback = function(){
+			select.set('text', type);
+			snip.type = type;
+		}.bind(this);
+		
+		Snippely.database.execute(this.Queries.updateType, callback, {
+			id: snip.id,
+			type: type
+		});
 	},
 	
 	updatePositions: function(order){
