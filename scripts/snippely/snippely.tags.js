@@ -2,6 +2,7 @@ Snippely.Tags = {
 
 	initialize: function(){
 		this.list = $('tags-list');
+		$('tags').addEvent('click', this.deselect.bind(this));
 		this.load();
 	},
 	
@@ -36,7 +37,10 @@ Snippely.Tags = {
 		new Editable(element, { onBlur: this.save.bind(this) });
 		
 		this.list.adopt(element.addEvents({
-			click: this.select.bind(this, element),
+			click: function(event){
+				event.stop();
+				this.select(element);
+			}.bind(this),
 			mousedown: function(event){ event.stopPropagation(); }
 		}).store('tag:id', tag.id));
 		
@@ -54,21 +58,6 @@ Snippely.Tags = {
 		Snippely.database.execute(this.Queries.insert, callback);
 	},
 	
-	remove: function(){
-		if (!this.selected || !confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
-		
-		var id = this.selected.retrieve('tag:id');
-		Snippely.database.execute(this.Queries.remove, { id: id });
-		Snippely.Snippets.removeByTag(id);
-		
-		this.selected.destroy();
-	},
-	
-	rename: function(){
-		if (!this.selected) return;
-		this.selected.fireEvent('dblclick');
-	},
-	
 	save: function(element){
 		Snippely.database.execute(this.Queries.update, {
 			id: element.retrieve('tag:id'),
@@ -78,12 +67,34 @@ Snippely.Tags = {
 	
 	select: function(element){
 		if (element == this.selected) return;
-		
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
-		
-		var id = element.retrieve('tag:id');
-		Snippely.Snippets.load(id);
+		Snippely.Snippets.load(element.retrieve('tag:id'));
+	},
+	
+	deselect: function(event){
+		this.elements.removeClass('selected');
+		Snippely.Snippets.deselect();
+		this.selected = null;
+	},
+	
+	rename: function(){
+		if (!this.selected) return;
+		this.selected.fireEvent('dblclick');
+	},
+	
+	remove: function(){
+		if (!this.selected || !confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
+		this.removeById(this.selected.retrieve('tag:id'));
+		this.deselect();
+		this.selected.destroy();
+	},
+	
+	// remove helpers
+	
+	removeById: function(id){
+		Snippely.database.execute(this.Queries.remove, { id: id });
+		Snippely.Snippets.removeByTag(id);
 	}
 	
 };
