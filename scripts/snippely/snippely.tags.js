@@ -34,7 +34,7 @@ Snippely.Tags = {
 			text: tag.name
 		});
 		
-		new Editable(element, { onBlur: this.save.bind(this) });
+		new Editable(element, { onBlur: this.update.bind(this) });
 		
 		this.list.adopt(element.addEvents({
 			click: function(event){
@@ -58,7 +58,7 @@ Snippely.Tags = {
 		Snippely.database.execute(this.Queries.insert, callback);
 	},
 	
-	save: function(element){
+	update: function(element){
 		Snippely.database.execute(this.Queries.update, {
 			id: element.retrieve('tag:id'),
 			name: element.get('text')
