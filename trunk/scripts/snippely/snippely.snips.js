@@ -29,8 +29,9 @@ Snippely.Snips = {
 		
 		this.sortables = new Sortables('snippet-snips', {
 			clone: true,
-			opacity: 0.3,
+			opacity: 0,
 			handle: 'div.info',
+			onStart: function(){ this.clone.setStyle('z-index', 1000); },
 			onComplete: function(){
 				var order = this.sortables.serialize(function(element){
 					return element.retrieve('snip:id');
