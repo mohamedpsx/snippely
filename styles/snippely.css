@@ -391,3 +391,12 @@ div.snip.note div.content {
 }
 
 /* @end */
+
+/* @group Highlight */
+
+.comment { color: #aaa;}
+.string { color: #008200;}
+.keyword { color: #069;}
+.preprocessor { color: gray;}
+
+/* @end */

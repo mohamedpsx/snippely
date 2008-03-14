@@ -43,10 +43,38 @@ Snippely.Snips = {
 		Snippely.redraw();
 	},
 	
+	highlight: function(type, content, wrapper){
+
+		var highlighted = content.retrieve('highlighted');
+		
+		if (highlighted){
+			highlighted = highlighted.destroy();
+			content.eliminate('highlighted');
+		}
+		
+		if (type == 'Note'){
+			content.setStyle('display', 'block');
+			return;
+		}
+		
+		content.setStyle('display', 'none');
+		
+		content.store('highlighted', new Highlighter(type).highlight(content.get('text')).addClass('content').inject(wrapper).addEvent('click', function(){
+			this.destroy();
+			content.eliminate('highlighted');
+			content.setStyle('display', 'block').fireEvent('mousedown').focus();
+		}));
+	},
+	
 	create: function(snip){
+		
 		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
+		
 		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).inject(wrapper);
+		
+		this.highlight(snip.type, content, wrapper);
+		
 		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
 		
 		info.addEvent('dblclick', this.remove.bind(this, wrapper));
@@ -60,11 +88,19 @@ Snippely.Snips = {
 		}.bind(this));
 		
 		new Editable(content, {
+			blockTab: snip.type != 'Note',
 			enter: true,
 			wrapper: wrapper,
 			activation: 'mousedown',
-			onBlur: this.updateContent.bind(this)
+			onBlur: function(){
+				this.updateContent(content, wrapper);
+				var type = wrapper.retrieve('snip:type'); 
+				this.highlight(type, content, wrapper);
+			}.bind(this)
 		});
+		
+		wrapper.store('content', content);
+		wrapper.store('select', select);
 		
 		wrapper.store('snip:id', snip.id);
 		wrapper.store('snip:type', snip.type);
@@ -121,17 +157,18 @@ Snippely.Snips = {
 		var id = this.active.retrieve('snip:id');
 		var callback = function(){
 			this.active.store('snip:type', type);
-			this.active.getElement('span').set('text', type);
+			this.active.retrieve('select').set('text', type);
 			this.active.set('class', ((type == 'Note') ? 'note' : 'code') + ' snip');
+			this.highlight(type, this.active.retrieve('content'), this.active);
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.updateType, callback, { id: id, type: type });
 	},
 	
-	updateContent: function(element){
+	updateContent: function(content, wrapper){
 		Snippely.database.execute(this.Queries.updateContent, {
-			id: element.getParent().retrieve('snip:id'),
-			content: element.get('html').escape()
+			id: wrapper.retrieve('snip:id'),
+			content: content.get('html').escape()
 		});
 	},
 	
