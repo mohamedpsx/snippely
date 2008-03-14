@@ -79,7 +79,13 @@ var Snippely = {
 		//brush menu
 		this.Menus.brushMenu = new ART.Menu('BrushMenu');
 		
+		var i = 0;
+		
 		for (var name in Brushes) (function(name){
+			
+			i++;
+			
+			if (i == 2) Snippely.Menus.brushMenu.addItem(new ART.Menu.Item('-----', {separator: true}));
 			
 			var item = new ART.Menu.Item(name, {onSelect: function(){
 				Snippely.Snips.updateType(name);
