@@ -138,7 +138,6 @@ Snippely.Snips = {
 	
 	updateType: function(type){
 		if (!this.active) return;
-		
 		var snip = this.active.retrieve('snip');
 		var select = this.active.retrieve('select');
 		var callback = function(){
@@ -146,10 +145,7 @@ Snippely.Snips = {
 			snip.type = type;
 		}.bind(this);
 		
-		Snippely.database.execute(this.Queries.updateType, callback, {
-			id: snip.id,
-			type: type
-		});
+		Snippely.database.execute(this.Queries.updateType, callback, { id: snip.id, type: type });
 	},
 	
 	updatePositions: function(order){

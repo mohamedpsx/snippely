@@ -17,9 +17,7 @@ Snippely.Snippets = {
 			this.build(snippets);
 		}.bind(this);
 		
-		Snippely.database.execute(this.Queries.select, callback, {
-			tag_id: tag_id
-		});
+		Snippely.database.execute(this.Queries.select, callback, { tag_id: tag_id });
 	},
 	
 	build: function(snippets){
@@ -104,6 +102,7 @@ Snippely.Snippets = {
 	redraw: function(){
 		this.elements.removeClass('odd');
 		this.list.getElements(':odd').addClass('odd');
+		Snippely.Snippet.hide();
 		Snippely.redraw();
 	},
 	
