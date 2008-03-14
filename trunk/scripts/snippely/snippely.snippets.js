@@ -94,9 +94,9 @@ Snippely.Snippets = {
 		Snippely.Snips.load(id);
 	},
 	
-	deselect: function(){
-		if (!this.selected) return;
-		this.elements.removeClass('selected');
+	deselect: function(destroy){
+		if (destroy == true) this.elements.destroy();
+		else this.elements.removeClass('selected');
 		Snippely.Snippet.hide();
 		this.selected = null;
 	},
@@ -115,8 +115,8 @@ Snippely.Snippets = {
 	remove: function(){
 		if (!this.selected || !confirm("Are you sure you want to remove this Snippet?")) return;
 		this.removeById(this.selected.retrieve('snippet:id'));
-		this.deselect();
 		this.selected.destroy();
+		this.deselect();
 	},
 	
 	//remove helpers

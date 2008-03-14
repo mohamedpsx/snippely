@@ -72,9 +72,9 @@ Snippely.Tags = {
 		Snippely.Snippets.load(element.retrieve('tag:id'));
 	},
 	
-	deselect: function(event){
+	deselect: function(){
 		this.elements.removeClass('selected');
-		Snippely.Snippets.deselect();
+		Snippely.Snippets.deselect(true);
 		this.selected = null;
 	},
 	
@@ -86,8 +86,8 @@ Snippely.Tags = {
 	remove: function(){
 		if (!this.selected || !confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
 		this.removeById(this.selected.retrieve('tag:id'));
-		this.deselect();
 		this.selected.destroy();
+		this.deselect();
 	},
 	
 	// remove helpers
