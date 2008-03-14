@@ -33,7 +33,7 @@ Snippely.Snips = {
 			handle: 'div.info',
 			onComplete: function(){
 				var order = this.sortables.serialize(function(element){
-					return element.retrieve('snip').id;
+					return element.retrieve('snip:id');
 				});
 				this.updatePositions(order);
 			}.bind(this)
@@ -43,31 +43,15 @@ Snippely.Snips = {
 	},
 	
 	create: function(snip){
-		var klass = (snip.type == 'Note') ? 'note' : 'code';
-		
-		var wrapper = new Element('div', {
-			'class': 'snip ' + klass
-		});
-		
-		
-		var info = new Element('div', {
-			'class': 'info'
-		}).inject(wrapper);
-		
-		var content = new Element('div', {
-			'class': 'content',
-			'html': snip.content.unescape()
-		}).inject(wrapper);
-		
-		var select = new Element('span', {
-			'class': 'select-type',
-			'text': snip.type
-		}).inject(info);
+		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
+		var info = new Element('div', {'class': 'info'}).inject(wrapper);
+		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).inject(wrapper);
+		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
 		
 		select.addEvent('mousedown', function(event){
 			this.active = wrapper;
 			var items = Snippely.Menus.brushMenu.items;
-			for (var item in items) items[item].checked = !!(item == snip.type);
+			for (var item in items) items[item].checked = !!(item == wrapper.retrieve('snip:type'));
 			Snippely.Menus.brushMenu.display(event.client);
 			event.stop();
 		}.bind(this));
@@ -76,12 +60,11 @@ Snippely.Snips = {
 			enter: true,
 			wrapper: wrapper,
 			activation: 'mousedown',
-			onBlur: this.save.bind(this)
+			onBlur: this.updateContent.bind(this)
 		});
 		
-		wrapper.store('snip', snip);
-		wrapper.store('select', select);
-		content.store('snip:id', snip.id);
+		wrapper.store('snip:id', snip.id);
+		wrapper.store('snip:type', snip.type);
 		
 		this.container.adopt(wrapper);
 		return wrapper;
@@ -93,7 +76,6 @@ Snippely.Snips = {
 		
 		var position = this.elements.length;
 		var content = 'Some Content';
-		
 		var callback = function(result){
 			var element = this.create({
 				id: result.lastInsertRowID,
@@ -113,13 +95,6 @@ Snippely.Snips = {
 		});
 	},
 	
-	save: function(element){
-		Snippely.database.execute(this.Queries.update, {
-			id: element.retrieve('snip:id'),
-			content: element.get('html').escape()
-		});
-	},
-	
 	remove: function(element){
 		this.removeById(element.retrieve('snip:id'));
 		element.destroy();
@@ -131,7 +106,7 @@ Snippely.Snips = {
 		Snippely.database.execute(this.Queries.remove, { id: id });
 	},
 	
-	removeBySnippet: function(snippet_id, callback){
+	removeBySnippet: function(snippet_id){
 		Snippely.database.execute(this.Queries.removeBySnippet, { snippet_id: snippet_id });
 	},
 	
@@ -139,17 +114,21 @@ Snippely.Snips = {
 	
 	updateType: function(type){
 		if (!this.active) return;
-		var active = this.active;
-		var snip = active.retrieve('snip');
-		var select = active.retrieve('select');
+		var id = this.active.retrieve('snip:id');
 		var callback = function(){
-			select.set('text', type);
-			snip.type = type;
-			if (type == 'Note') active.removeClass('code').addClass('note');
-			else active.removeClass('note').addClass('code');
+			this.active.store('snip:type', type);
+			this.active.getElement('span').set('text', type);
+			this.active.set('class', ((type == 'Note') ? 'note' : 'code') + ' snip');
 		}.bind(this);
 		
-		Snippely.database.execute(this.Queries.updateType, callback, { id: snip.id, type: type });
+		Snippely.database.execute(this.Queries.updateType, callback, { id: id, type: type });
+	},
+	
+	updateContent: function(element){
+		Snippely.database.execute(this.Queries.updateContent, {
+			id: element.getParent().retrieve('snip:id'),
+			content: element.get('html').escape()
+		});
 	},
 	
 	updatePositions: function(order){
@@ -170,12 +149,27 @@ Snippely.Snips.Queries = {
 	
 	remove: "DELETE FROM snips WHERE id = :id",
 	
-	update: "UPDATE snips SET content = :content WHERE id = :id",
-	
 	updateType: "UPDATE snips SET type = :type WHERE id = :id",
+	
+	updateContent: "UPDATE snips SET content = :content WHERE id = :id",
 	
 	updatePosition: "UPDATE snips SET position = :position WHERE id = :id",
 	
 	removeBySnippet: "DELETE FROM snips WHERE snippet_id = :snippet_id"
 	
 };
+
+//snip content history for later
+/*
+content.history = [content.get('html')];
+content.addEvent('keydown', function(event){
+	if (event.meta && event.key == 'z'){
+		event.preventDefault();
+		var start = this.selectionStart;
+		var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
+		this.set('html', previous);
+	} else {
+		if (this.get('html') != this.history.getLast()) this.history.push(this.get('html'));
+	}
+});
+*/
