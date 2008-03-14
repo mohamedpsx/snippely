@@ -2,6 +2,7 @@ Snippely.Snippets = {
 
 	initialize: function(){
 		this.list = $('snippets-list');
+		$('snippets').addEvent('click', this.deselect.bind(this));
 	},
 	
 	load: function(tag_id){
@@ -37,8 +38,13 @@ Snippely.Snippets = {
 		new Editable(element, { onBlur: this.save.bind(this) });
 		
 		this.list.adopt(element.addEvents({
-			click: this.select.bind(this, element),
-			mousedown: function(event){ event.stopPropagation(); }
+			click: function(event){
+				event.stop();
+				this.select(element);
+			}.bind(this),
+			mousedown: function(event){
+				event.stopPropagation();
+			}
 		}).store('snippet:id', snippet.id));
 		
 		return element;
@@ -62,17 +68,6 @@ Snippely.Snippets = {
 		Snippely.database.execute(this.Queries.insert, callback, {
 			tag_id: tag.retrieve('tag:id')
 		});
-	},
-	
-	remove: function(){
-		if (!this.selected || !confirm("Are you sure you want to remove this Snippet?")) return;
-		this.removeById(this.selected.retrieve('snippet:id'));
-		this.selected.destroy();
-	},
-	
-	rename: function(){
-		if (!this.selected) return;
-		this.selected.fireEvent('dblclick');
 	},
 	
 	save: function(element){
@@ -99,10 +94,29 @@ Snippely.Snippets = {
 		Snippely.Snips.load(id);
 	},
 	
+	deselect: function(){
+		if (!this.selected) return;
+		this.elements.removeClass('selected');
+		Snippely.Snippet.hide();
+		this.selected = null;
+	},
+	
 	redraw: function(){
 		this.elements.removeClass('odd');
 		this.list.getElements(':odd').addClass('odd');
 		Snippely.redraw();
+	},
+	
+	rename: function(){
+		if (!this.selected) return;
+		this.selected.fireEvent('dblclick');
+	},
+	
+	remove: function(){
+		if (!this.selected || !confirm("Are you sure you want to remove this Snippet?")) return;
+		this.removeById(this.selected.retrieve('snippet:id'));
+		this.deselect();
+		this.selected.destroy();
 	},
 	
 	//remove helpers

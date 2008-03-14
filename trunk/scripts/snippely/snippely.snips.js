@@ -92,11 +92,6 @@ Snippely.Snips = {
 		});
 	},
 	
-	remove: function(element){
-		this.removeById(element.retrieve('snip:id'));
-		element.destroy();
-	},
-	
 	save: function(element){
 		var id = element.retrieve('snip:id');
 		var text = element.get('html');
@@ -107,18 +102,19 @@ Snippely.Snips = {
 		});
 	},
 	
+	remove: function(element){
+		this.removeById(element.retrieve('snip:id'));
+		element.destroy();
+	},
+	
 	//remove helpers
 	
 	removeById: function(id){
-		Snippely.database.execute(this.Queries.remove, {
-			id: id
-		});
+		Snippely.database.execute(this.Queries.remove, { id: id });
 	},
 	
 	removeBySnippet: function(snippet_id, callback){
-		Snippely.database.execute(this.Queries.removeBySnippet, {
-			snippet_id: snippet_id
-		});
+		Snippely.database.execute(this.Queries.removeBySnippet, { snippet_id: snippet_id });
 	}
 	
 };

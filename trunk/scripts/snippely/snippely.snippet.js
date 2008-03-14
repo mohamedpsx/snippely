@@ -27,7 +27,7 @@ Snippely.Snippet = {
 	},
 	
 	build: function(snippet){
-		this.container.setStyle('display', (snippet ? '' : 'none'));
+		this[snippet ? 'show' : 'hide']();
 		if (!snippet) return;
 		
 		this.id = snippet.id;
@@ -55,6 +55,14 @@ Snippely.Snippet = {
 			id: this.id,
 			description: element.get('text').escape()
 		});
+	},
+	
+	hide: function(){
+		this.container.setStyle('display', 'none');
+	},
+	
+	show: function(){
+		this.container.setStyle('display', '');
 	}
 
 };
