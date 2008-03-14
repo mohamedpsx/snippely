@@ -134,5 +134,7 @@ Highlighter.RegExps = {
 	singleLineComment: (/\/\/.*$/gm),
 	singleLinePerlComment: (/#.*$/gm),
 	doubleQuotedString: (/"(?:\.|(\\\\\")|[^\""\\n])*/g),
-	singleQuotedString: (/'(?:\.|(\\\\\')|[^\''\n])*'/g)
+	singleQuotedString: (/'(?:\.|(\\\\\')|[^\''\n])*'/g),
+	integer: (/\b(\d+)\b/gm),
+	preprocessor: (/^\s*#.*/gm)
 };
