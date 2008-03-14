@@ -38,7 +38,7 @@ Snippely.Database = new Class({
 			"CREATE TABLE IF NOT EXISTS snips (" +
 			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"  snippet_id INTEGER, " +
-			"  rank INTEGER, " +
+			"  position INTEGER, " +
 			"  type TEXT, " +
 			"  content TEXT" +
 			")";
