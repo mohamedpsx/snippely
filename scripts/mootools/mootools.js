@@ -3635,9 +3635,13 @@ var Sortables = new Class({
 		this.fireEvent('onComplete', this.element);
 	},
 
-	serialize: function(index, modifier){
+	serialize: function(){
+		var params = Array.link(arguments, {modifier: Function.type, index: $defined});
+		var modifier = params.modifier;
+		var index = params.index;
+		
 		var serial = this.lists.map(function(list){
-			return list.getChildren().map(modifier || function(element, index){
+			return list.getChildren().map(modifier || function(element){
 				return element.get('id');
 			}, this);
 		}, this);

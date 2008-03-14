@@ -30,7 +30,13 @@ Snippely.Snips = {
 		this.sortables = new Sortables('snippet-snips', {
 			clone: true,
 			opacity: 0.3,
-			handle: 'div.info'
+			handle: 'div.info',
+			onComplete: function(){
+				var order = this.sortables.serialize(function(element){
+					return element.retrieve('snip:id');
+				});
+				this.updatePositions(order);
+			}.bind(this)
 		});
 		
 		Snippely.redraw();
@@ -78,7 +84,7 @@ Snippely.Snips = {
 			onBlur: this.save.bind(this)
 		});
 		
-		content.store('snip:id', snip.id);
+		wrapper.store('snip:id', snip.id);
 		content.store('snip:type', snip.type);
 		content.store('snip:object', snip);
 		
@@ -92,7 +98,7 @@ Snippely.Snips = {
 		var snippet = Snippely.Snippets.selected;
 		if (!snippet) return;
 		
-		var position = this.elements.length + 1;
+		var position = this.elements.length;
 		var content = 'Some Content';
 		
 		var callback = function(result){
@@ -145,6 +151,12 @@ Snippely.Snips = {
 	
 	removeBySnippet: function(snippet_id, callback){
 		Snippely.database.execute(this.Queries.removeBySnippet, { snippet_id: snippet_id });
+	},
+	
+	updatePositions: function(order){
+		order.each(function(id, position){
+			Snippely.database.execute(this.Queries.updatePosition, { id: id, position: position });
+		}, this);
 	}
 	
 };
@@ -160,6 +172,8 @@ Snippely.Snips.Queries = {
 	remove: "DELETE FROM snips WHERE id = :id",
 	
 	update: "UPDATE snips SET content = :content WHERE id = :id",
+	
+	updatePosition: "UPDATE snips SET position = :position WHERE id = :id",
 	
 	removeBySnippet: "DELETE FROM snips WHERE snippet_id = :snippet_id"
 	
