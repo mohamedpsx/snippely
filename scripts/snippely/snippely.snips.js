@@ -61,10 +61,8 @@ Snippely.Snips = {
 		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
 		
 		select.addEvent('mousedown', function(event){
-			
-			Snippely.Menus.brushMenuItems.each(function(item){
-				item.checked = !!(item.name == snip.type);
-			});
+			var items = Snippely.Menus.brushMenu.items;
+			for (var item in items) items[item].checked = !!(item == snip.type);
 			
 			Snippely.Snips.active = wrapper;
 			
