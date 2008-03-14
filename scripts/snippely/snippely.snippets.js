@@ -92,18 +92,19 @@ Snippely.Snippets = {
 		if (element == this.selected) return;
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
-		
 		var id = element.retrieve('snippet:id');
 		Snippely.Snippet.load(id);
 		Snippely.Snips.load(id);
+		Snippely.toggleMenus('Snippet', true);
 	},
 	
 	deselect: function(destroy){
 		if (!this.elements) return;
 		if (destroy == true) this.elements.destroy();
 		else this.elements.removeClass('selected');
-		Snippely.Snippet.hide();
 		this.selected = null;
+		Snippely.Snippet.hide();
+		Snippely.toggleMenus('Snippet', false);
 	},
 	
 	rename: function(){

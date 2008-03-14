@@ -74,13 +74,13 @@ ART.Menu = new Class({
 
 ART.Menu.Item = new Class({
 	
-	Exposes: ['checked', 'disabled', 'shortcut'],
+	Exposes: ['checked', 'enabled', 'shortcut'],
 	
 	Implements: [Events, Options],
 	
 	options: {
 		checked: undefined,
-		disabled: undefined,
+		enabled: undefined,
 		shortcut: undefined,
 		separator: false,
 		_item: null
@@ -102,7 +102,7 @@ ART.Menu.Item = new Class({
 			}.bind(this));
 			
 			this.checked = this.options.checked;
-			this.disabled = this.options.disabled;
+			this.enabled = this.options.enabled;
 			this.shortcut = this.options.shortcut;
 		}
 	},
@@ -118,6 +118,14 @@ ART.Menu.Item = new Class({
 	
 	// Exposed class properties
 	
+	checked: function(value){
+		return (value !== undefined) ? this.item.checked = value : this.item.checked;
+	},
+	
+	enabled: function(value){
+		return (value !== undefined) ? this.item.enabled = value : this.item.enabled;
+	},
+	
 	shortcut: function(shortcut){
 		if (shortcut === undefined) return this._shortcut;
 		var keys = shortcut.split('+');
@@ -128,14 +136,6 @@ ART.Menu.Item = new Class({
 		});
 		this.item.keyEquivalentModifiers = modifiers;
 		return this._shortcut = shortcut;
-	},
-	
-	checked: function(value){
-		return (value !== undefined) ? this.item.checked = value : this.item.checked;
-	},
-	
-	disabled: function(value){
-		return (value !== undefined) ? this.item.disabled = value : this.item.disabled;
 	}
 	
 });
