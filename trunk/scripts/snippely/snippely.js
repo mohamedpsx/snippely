@@ -37,17 +37,12 @@ var Snippely = {
 	},
 	
 	initializeMenus: function(){
-		
-		this.Menus = {};
-		
 		//main menus
 		var mainMenu = new ART.Menu('MainMenu');
-		var fileMenu = new ART.Menu('File');
-		var saveItem = new ART.Menu.Item('Save');
-		var loadItem = new ART.Menu.Item('Load');
-		saveItem.shortcut = 'command+s';
-		loadItem.shortcut = 'command+l';
-		fileMenu.addItems(saveItem, loadItem);
+		var fileMenu = new ART.Menu('File').addItems(
+			new ART.Menu.Item('Save', {shortcut: 'command+s'}),
+			new ART.Menu.Item('Load', {shortcut: 'command+l'})
+		);
 		mainMenu.addMenu(fileMenu);
 		
 		//add menu
@@ -63,36 +58,31 @@ var Snippely = {
 		//action menu
 		var actionMenu = new ART.Menu('ActionMenu').addItems(
 			new ART.Menu.Item('Remove Tag...', {
+				enabled: false,
 				onSelect: this.Tags.remove.bind(this.Tags)
 			}),
 			new ART.Menu.Item('Rename Tag...', {
+				enabled: false,
 				onSelect: this.Tags.rename.bind(this.Tags)
 			}),
 			new ART.Menu.Item('-----', {separator: true}),
 			new ART.Menu.Item('Remove Snippet...', {
+				enabled: false,
 				onSelect: this.Snippets.remove.bind(this.Snippets)
 			}),
 			new ART.Menu.Item('Rename Snippet...', {
+				enabled: false,
 				onSelect: this.Snippets.rename.bind(this.Snippets)
 			})
 		);
 		
 		//brush menu
-		this.Menus.brushMenu = new ART.Menu('BrushMenu');
-		
-		var i = 0;
-		
+		var brushMenu = new ART.Menu('BrushMenu');
 		for (var name in Brushes) (function(name){
-			
-			i++;
-			
-			if (i == 2) Snippely.Menus.brushMenu.addItem(new ART.Menu.Item('-----', {separator: true}));
-			
-			var item = new ART.Menu.Item(name, {onSelect: function(){
-				Snippely.Snips.updateType(name);
-			}});
-			Snippely.Menus.brushMenu.addItem(item);
-			
+			brushMenu.addItem(new ART.Menu.Item(name, {
+				onSelect: Snippely.Snips.updateType.bind(Snippely.Snips, name)
+			}));
+			if (name == "Note") brushMenu.addItem(new ART.Menu.Item('-----', {separator: true}));
 		})(name);
 		
 		$('button-add').addEvent('mousedown', function(event){
@@ -108,6 +98,17 @@ var Snippely = {
 			this.removeClass('active');
 			event.stop();
 		});
+		
+		this.Menus = {
+			addMenu: addMenu,
+			actionMenu: actionMenu,
+			brushMenu: brushMenu
+		};
+	},
+	
+	toggleMenus: function(type, state){
+		this.Menus.actionMenu.items['Remove ' + type + '...'].enabled = state;
+		this.Menus.actionMenu.items['Rename ' + type + '...'].enabled = state;
 	},
 	
 	initializeLayout: function(){

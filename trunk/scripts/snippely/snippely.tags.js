@@ -69,13 +69,16 @@ Snippely.Tags = {
 		if (element == this.selected) return;
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
+		Snippely.Snippets.deselect(true);
 		Snippely.Snippets.load(element.retrieve('tag:id'));
+		Snippely.toggleMenus('Tag', true);
 	},
 	
 	deselect: function(){
 		this.elements.removeClass('selected');
-		Snippely.Snippets.deselect(true);
 		this.selected = null;
+		Snippely.Snippets.deselect(true);
+		Snippely.toggleMenus('Tag', false);
 	},
 	
 	rename: function(){
