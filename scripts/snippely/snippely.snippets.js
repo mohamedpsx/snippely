@@ -94,6 +94,7 @@ Snippely.Snippets = {
 	},
 	
 	deselect: function(destroy){
+		if (!this.elements) return;
 		if (destroy == true) this.elements.destroy();
 		else this.elements.removeClass('selected');
 		Snippely.Snippet.hide();
