@@ -46,27 +46,9 @@ Snippely.Snips = {
 		Snippely.redraw();
 	},
 	
-	highlight: function(type, content, wrapper){
-
-		var highlighted = content.retrieve('highlighted');
-		
-		if (highlighted){
-			highlighted = highlighted.destroy();
-			content.eliminate('highlighted');
-		}
-		
-		if (type == 'Note'){
-			content.setStyle('display', 'block');
-			return;
-		}
-		
-		content.setStyle('display', 'none');
-		
-		content.store('highlighted', new Highlighter(type).highlight(content.get('text')).addClass('content').inject(wrapper).addEvent('click', function(){
-			this.destroy();
-			content.eliminate('highlighted');
-			content.setStyle('display', 'block').fireEvent('mousedown');
-		}));
+	highlight: function(type, content){
+		if (type == 'Note') return content.get('html');
+		return new Highlighter(type).highlight(content.get('text')).get('html');
 	},
 	
 	create: function(snip){
@@ -75,7 +57,7 @@ Snippely.Snips = {
 		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).inject(wrapper);
 		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
 		
-		this.highlight(snip.type, content, wrapper);
+		content.set('html', this.highlight(snip.type, content));
 		
 		info.addEvent('dblclick', this.remove.bind(this, wrapper));
 		
@@ -92,10 +74,10 @@ Snippely.Snips = {
 			enter: true,
 			wrapper: wrapper,
 			activation: 'mousedown',
-			onBlur: function(){
+			onBlur: function(element){
+				var type = wrapper.retrieve('snip:type');
+				element.set('html', this.highlight(snip.type, element));
 				this.updateContent(content, wrapper);
-				var type = wrapper.retrieve('snip:type'); 
-				this.highlight(type, content, wrapper);
 			}.bind(this)
 		});
 		
