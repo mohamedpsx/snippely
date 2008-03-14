@@ -40,8 +40,7 @@ Snippely.Snips = {
 		var type = (snip.type == 'note' ? 'div' : 'pre');
 		
 		var info = new Element('div', {
-			'class': 'info',
-			'text': snip.type
+			'class': 'info'
 		});
 		
 		var content = new Element(type, {
@@ -52,6 +51,17 @@ Snippely.Snips = {
 		var wrapper = new Element('div', {
 			'class': snip.type + ' snip'
 		}).adopt(info, content);
+		
+		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
+		
+		select.addEvent('mousedown', function(event){
+			
+			Snippely.Snips.active = wrapper;
+			
+			Snippely.Menus.brushMenu.display(event.client);
+			
+			event.stop();
+		});
 		
 		new Editable(content, {
 			enter: true,
@@ -98,6 +108,12 @@ Snippely.Snips = {
 			id: element.retrieve('snip:id'),
 			content: element.get('html').escape()
 		});
+	},
+	
+	changeType: function(type){
+		this.active.getElement('.select-type').set('text', type);
+		
+		//push type into db please!
 	},
 	
 	remove: function(element){

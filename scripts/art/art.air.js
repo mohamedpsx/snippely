@@ -40,8 +40,8 @@ ART.Menu = new Class({
 		return this;
 	},
 	
-	addItems: function(items){
-		items.each(this.addItem, this);
+	addItems: function(){
+		$A(arguments).flatten().each(this.addItem, this);
 		return this;
 	},
 	
@@ -83,6 +83,7 @@ ART.Menu.Item = new Class({
 	},
 	
 	initialize: function(name, options){
+		
 		this.setOptions(options);
 		
 		if (this.options._item){

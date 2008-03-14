@@ -11,6 +11,7 @@ Application.autoExit = true;
 var Snippely = {
 	
 	initialize: function(){
+		
 		this.meta = $('meta');
 		this.tags = $('tags');
 		this.footer = $('footer');
@@ -36,6 +37,9 @@ var Snippely = {
 	},
 	
 	initializeMenus: function(){
+		
+		this.Menus = [];
+		
 		//main menus
 		var mainMenu = new ART.Menu('MainMenu');
 		var fileMenu = new ART.Menu('File');
@@ -47,18 +51,40 @@ var Snippely = {
 		mainMenu.addMenu(fileMenu);
 		
 		//add menu
-		var addMenu = new ART.Menu('AddMenu').addItems([
-			new ART.Menu.Item('Add Tag...', { onSelect: this.Tags.add.bind(this.Tags) }),
-			new ART.Menu.Item('Add Snippet...', { onSelect: this.Snippets.add.bind(this.Snippets) })
-		]);
+		var addMenu = new ART.Menu('AddMenu').addItems(
+			new ART.Menu.Item('Add Tag...', {onSelect: this.Tags.add.bind(this.Tags)}),
+			new ART.Menu.Item('Add Snippet...', {onSelect: this.Snippets.add.bind(this.Snippets)})
+		);
 		
 		//action menu
-		var actionMenu = new ART.Menu('ActionMenu').addItems([
-			new ART.Menu.Item('Remove Tag...', { onSelect: this.Tags.remove.bind(this.Tags) }),
-			new ART.Menu.Item('Rename Tag...', { onSelect: this.Tags.rename.bind(this.Tags) }),
-			new ART.Menu.Item('Remove Snippet...', { onSelect: this.Snippets.remove.bind(this.Snippets) }),
-			new ART.Menu.Item('Rename Snippet...', { onSelect: this.Snippets.rename.bind(this.Snippets) })
-		]);
+		var actionMenu = new ART.Menu('ActionMenu').addItems(
+			new ART.Menu.Item('Remove Tag...', {onSelect: this.Tags.remove.bind(this.Tags)}),
+			new ART.Menu.Item('Rename Tag...', {onSelect: this.Tags.rename.bind(this.Tags)}),
+			new ART.Menu.Item('Remove Snippet...', {onSelect: this.Snippets.remove.bind(this.Snippets)}),
+			new ART.Menu.Item('Rename Snippet...', {onSelect: this.Snippets.rename.bind(this.Snippets)})
+		);
+		
+		//brush menu
+		this.Menus.brushMenu = new ART.Menu('BrushMenu');
+		
+		this.Menus.brushMenuItems = [];
+		
+		for (var name in Brushes) (function(name){
+			
+			var item = new ART.Menu.Item(name, {onSelect: function(){
+				Snippely.Snips.changeType(name);
+				
+				Snippely.Menus.brushMenuItems.each(function(item){
+					item.checked = false;
+				});
+				
+				item.checked = true;
+			}});
+			Snippely.Menus.brushMenu.addItem(item);
+			
+			Snippely.Menus.brushMenuItems.push(item);
+			
+		})(name);
 		
 		$('button-add').addEvent('mousedown', function(event){
 			this.addClass('active');
@@ -117,8 +143,8 @@ var Snippely = {
 			metaButtons.removeClass('active');
 		});
 		
-		$('add-code').addEvent('click', this.Snips.add.bind(this.Snips, 'code'));
-		$('add-note').addEvent('click', this.Snips.add.bind(this.Snips, 'note'));
+		$('add-code').addEvent('click', this.Snips.add.bind(this.Snips, 'Plain Text'));
+		$('add-note').addEvent('click', this.Snips.add.bind(this.Snips, 'Note'));
 	},
 	
 	redraw: function(){
