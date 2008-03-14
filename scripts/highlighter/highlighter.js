@@ -15,7 +15,7 @@ var Highlighter = new Class({
 	
 	highlight: function(code){
 		
-		this.code = (code || '').trim();
+		this.code = (code || '').replace(/^\n*/, '').replace(/\n*$/, '');
 		
 		this.matches = [];
 		
