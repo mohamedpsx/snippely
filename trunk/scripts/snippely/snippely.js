@@ -47,7 +47,7 @@ var Snippely = {
 		var loadItem = new ART.Menu.Item('Load');
 		saveItem.shortcut = 'command+s';
 		loadItem.shortcut = 'command+l';
-		fileMenu.addItems([saveItem, loadItem]);
+		fileMenu.addItems(saveItem, loadItem);
 		mainMenu.addMenu(fileMenu);
 		
 		//add menu
@@ -82,7 +82,7 @@ var Snippely = {
 		for (var name in Brushes) (function(name){
 			
 			var item = new ART.Menu.Item(name, {onSelect: function(){
-				Snippely.Snips.changeType(name);
+				Snippely.Snips.updateType(name);
 			}});
 			Snippely.Menus.brushMenu.addItem(item);
 			
