@@ -38,7 +38,7 @@ var Snippely = {
 	
 	initializeMenus: function(){
 		
-		this.Menus = [];
+		this.Menus = {};
 		
 		//main menus
 		var mainMenu = new ART.Menu('MainMenu');
