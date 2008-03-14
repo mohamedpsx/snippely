@@ -287,11 +287,15 @@ div.snip div.content {
 div.snip.code div.content {
 	overflow: hidden;
 	white-space: pre;
-	line-height: 13px;
+	line-height: 14px;
+}
+
+body div.snip.code.editing div.content div {
+	line-height: 14px;
 }
 
 div.snip.note div.content {
-	line-height: 16px;
+	line-height: 14px;
 }
 
 /* @end */

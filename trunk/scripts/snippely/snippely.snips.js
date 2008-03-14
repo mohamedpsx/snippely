@@ -57,9 +57,14 @@ Snippely.Snips = {
 			return;
 		}
 		
+		var fake = content.clone(true, true);
+		fake.getElements('div').each(function(el){
+			document.newElement('span', {html: '\n'}).injectBefore(el);
+		});
+		
 		content.setStyle('display', 'none');
 		
-		content.store('highlighted', new Highlighter(type).highlight(content.get('text')).addClass('content').inject(wrapper).addEvent('click', function(){
+		content.store('highlighted', new Highlighter(type).highlight(fake.get('text')).addClass('content').inject(wrapper).addEvent('click', function(){
 			this.destroy();
 			content.eliminate('highlighted');
 			content.setStyle('display', 'block').fireEvent('mousedown').focus();
