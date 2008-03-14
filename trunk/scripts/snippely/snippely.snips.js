@@ -49,6 +49,8 @@ Snippely.Snips = {
 		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).inject(wrapper);
 		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
 		
+		info.addEvent('dblclick', this.remove.bind(this, wrapper));
+		
 		select.addEvent('mousedown', function(event){
 			this.active = wrapper;
 			var items = Snippely.Menus.brushMenu.items;
@@ -98,7 +100,8 @@ Snippely.Snips = {
 	
 	remove: function(element){
 		this.removeById(element.retrieve('snip:id'));
-		element.destroy();
+		this.sortables.removeItems(element).destroy();
+		this.sortables.fireEvent('onComplete');
 	},
 	
 	//remove helpers
