@@ -1,6 +1,6 @@
 // Highlighter is based on dp.SyntaxHighlighter, http://googlecode.com/p/syntaxhighlighter
 
-var Brushes = {};
+var Brushes = {'Note': {}, 'Plain Text': {}};
 
 var Highlighter = new Class({
 	

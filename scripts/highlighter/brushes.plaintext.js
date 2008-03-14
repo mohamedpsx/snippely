@@ -1,1 +1,0 @@
-Brushes['Plain Text'] = {};

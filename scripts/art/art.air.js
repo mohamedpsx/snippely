@@ -33,9 +33,12 @@ ART.Menu = new Class({
 		this.setOptions(options);
 		this.menu = this.options._menu || new AIR.NativeMenu();
 		this.name = name;
+		
+		this.items = {};
 	},
 	
 	addItem: function(item){
+		this.items[item.name] = item;
 		this.menu.addItem(item.item);
 		return this;
 	},
@@ -104,7 +107,7 @@ ART.Menu.Item = new Class({
 	},
 	
 	attachTo: function(menu){
-		menu.addItem(this.item);
+		menu.addItem(this);
 		return this;
 	},
 	
