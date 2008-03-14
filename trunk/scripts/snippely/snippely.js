@@ -88,9 +88,10 @@ var Snippely = {
 		new Drag(this.snippets, {
 			modifiers: {y: 'height', x: null},
 			handle: this.topResizer,
-			limit: {y: [38, function(){
-				return $('snippets-wrap').scrollHeight;
-			}]},
+			limit: {y: [0, function(){
+				return window.getHeight() - this.topResizer.getHeight();
+				}.bind(this)
+			]},
 			onDrag: redraw
 		});
 		
