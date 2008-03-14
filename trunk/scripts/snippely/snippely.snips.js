@@ -80,6 +80,7 @@ Snippely.Snips = {
 				type: type,
 				content: content
 			});
+			this.sortables.addItems(element);
 			this.elements.push(element);
 			Snippely.redraw();
 		}.bind(this);
