@@ -63,7 +63,7 @@ var Highlighter = new Class({
 		for (var css in this.brush){
 		
 			$splat(this.brush[css]).each(function(regExp){
-				if (typeof regExp == 'string') regExp = new RegExp('\\b' + regExp.escapeRegExp() + '\\b', 'gm');
+				if (typeof regExp == 'string') regExp = new RegExp('\\b' + regExp.escapeRegExp().split(' ').join('\\b|\\b') + '\\b', 'gm');
 				this.regExps.push([regExp, css]);
 			}, this);
 			
