@@ -43,12 +43,18 @@ Snippely.Database = new Class({
 			"  content TEXT" +
 			")";
 		
+		var session = 
+			"CREATE TABLE IF NOT EXISTS session (" +
+			"  id TEXT PRIMARY KEY, " +
+			"  tag_id INTEGER, " +
+			"  snippet_id INTEGER" +
+			")";
+			
 		var self = this;
-		self.execute(tags, function(){
-			self.execute(snippets, function(){
-				self.execute(snips, callback);
-			});
-		});
+		var queries = [tags, snippets, snips];
+		(function(){
+			self.execute(queries.shift(), (queries.length ? arguments.callee : callback));
+		})();
 	},
 	
 	execute: function(){

@@ -31,6 +31,7 @@ Snippely.Snips = {
 			clone: true,
 			opacity: 0,
 			handle: 'div.info',
+			constrain: true,
 			onStart: function(){ this.clone.setStyle('z-index', 1000); },
 			onComplete: function(){
 				var order = this.sortables.serialize(function(element){

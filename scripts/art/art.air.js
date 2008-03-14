@@ -87,10 +87,8 @@ ART.Menu.Item = new Class({
 	},
 	
 	initialize: function(name, options){
-		
-		this.name = name;
-		
 		this.setOptions(options);
+		this.name = name;
 		
 		if (this.options._item){
 			this.item = this.options._item;
