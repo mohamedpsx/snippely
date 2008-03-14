@@ -4,9 +4,9 @@ Brushes.PHP = {
 	
 	'string': [Highlighter.RegExps.singleQuotedString, Highlighter.RegExps.doubleQuotedString],
 	
-	'preprocessor': (/^\s*#.*/gm),
+	'integer': Highlighter.RegExps.integer,
 	
-	'integer': (/\b(\d+)\b/gm),
+	'preprocessor': Highlighter.RegExps.preprocessor,
 	
 	'special': (/\$\w+/g),
 	

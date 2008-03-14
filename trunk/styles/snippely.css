@@ -392,9 +392,9 @@ div.snip.code div.content {
 
 .comment { color: #aaa; }
 .string { color: #418241; }
-.special { color: #069; }
-.keyword { color: #808018; }
-.boolean, .integer { color: #c43434; }
+.special, .variable { color: #069; }
+.keyword, .function { color: #808018; }
+.boolean, .integer, .symbol { color: #c43434; }
 .preprocessor { color: gray; }
 
 div.editing .content span { color:#333; }
