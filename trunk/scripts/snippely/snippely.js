@@ -52,22 +52,32 @@ var Snippely = {
 		
 		//add menu
 		var addMenu = new ART.Menu('AddMenu').addItems(
-			new ART.Menu.Item('Add Tag...', {onSelect: this.Tags.add.bind(this.Tags)}),
-			new ART.Menu.Item('Add Snippet...', {onSelect: this.Snippets.add.bind(this.Snippets)})
+			new ART.Menu.Item('Add Tag...', {
+				onSelect: this.Tags.add.bind(this.Tags)
+			}),
+			new ART.Menu.Item('Add Snippet...', {
+				onSelect: this.Snippets.add.bind(this.Snippets)
+			})
 		);
 		
 		//action menu
 		var actionMenu = new ART.Menu('ActionMenu').addItems(
-			new ART.Menu.Item('Remove Tag...', {onSelect: this.Tags.remove.bind(this.Tags)}),
-			new ART.Menu.Item('Rename Tag...', {onSelect: this.Tags.rename.bind(this.Tags)}),
-			new ART.Menu.Item('Remove Snippet...', {onSelect: this.Snippets.remove.bind(this.Snippets)}),
-			new ART.Menu.Item('Rename Snippet...', {onSelect: this.Snippets.rename.bind(this.Snippets)})
+			new ART.Menu.Item('Remove Tag...', {
+				onSelect: this.Tags.remove.bind(this.Tags)
+			}),
+			new ART.Menu.Item('Rename Tag...', {
+				onSelect: this.Tags.rename.bind(this.Tags)
+			}),
+			new ART.Menu.Item('Remove Snippet...', {
+				onSelect: this.Snippets.remove.bind(this.Snippets)
+			}),
+			new ART.Menu.Item('Rename Snippet...', {
+				onSelect: this.Snippets.rename.bind(this.Snippets)
+			})
 		);
 		
 		//brush menu
 		this.Menus.brushMenu = new ART.Menu('BrushMenu');
-		
-		this.Menus.brushMenuItems = [];
 		
 		for (var name in Brushes) (function(name){
 			
@@ -75,8 +85,6 @@ var Snippely = {
 				Snippely.Snips.changeType(name);
 			}});
 			Snippely.Menus.brushMenu.addItem(item);
-			
-			Snippely.Menus.brushMenuItems.push(item);
 			
 		})(name);
 		
