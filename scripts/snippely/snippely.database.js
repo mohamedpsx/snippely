@@ -12,8 +12,8 @@ Snippely.Database = new Class({
 		this.setOptions(options);
 		
 		this.connection = new air.SQLConnection();
-		this.connection.addEventListener(air.SQLEvent.OPEN, this.onOpen.bind(this));
-		this.connection.addEventListener(air.SQLErrorEvent.ERROR, this.onError);
+		this.connection.addEventListener('open', this.onOpen.bind(this));
+		this.connection.addEventListener('error', this.onError);
 		
 		this.dbFile = air.File.applicationStorageDirectory.resolvePath(this.options.filename);
 		this.connection.openAsync(this.dbFile);
