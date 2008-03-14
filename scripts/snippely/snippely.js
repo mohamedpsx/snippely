@@ -118,6 +118,7 @@ var Snippely = {
 	},
 	
 	initializeLayout: function(){
+		
 		var redraw = this.redraw.bind(this);
 		
 		new Drag(this.tags, {
@@ -147,7 +148,44 @@ var Snippely = {
 		this.snippetScrollbar = new ART.ScrollBar('snippet', 'snippet-wrap');
 		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
 		
+		this.retrieveProperties();
+		
+		nativeWindow.addEventListener('closing', this.storeProperties.bind(this));
+
 		this.redraw();
+	},
+	
+	retrieveProperties: function(){
+		
+		var top = ART.retrieve('window:y') || 100;
+		var left = ART.retrieve('window:x') || 100;
+		var height = ART.retrieve('window:height') || 480;
+		var width = ART.retrieve('window:width') || 640;
+		
+		nativeWindow.height = height;
+		nativeWindow.width = width;
+		nativeWindow.x = left;
+		nativeWindow.y = top;
+		
+		var tagsWidth = ART.retrieve('tags:width') || 200;
+		this.tags.setStyle('width', tagsWidth);
+		
+		var snippetsHeight = ART.retrieve('snippets:height');
+		snippetsHeight = snippetsHeight || 0;
+		
+		this.snippets.setStyle('height', snippetsHeight);
+		
+	},
+	
+	storeProperties: function(){
+		ART.store('window:y', nativeWindow.y);
+		ART.store('window:x', nativeWindow.x);
+		ART.store('window:height', nativeWindow.height);
+		ART.store('window:width', nativeWindow.width);
+		
+		ART.store('tags:width', this.tags.clientWidth);
+		
+		ART.store('snippets:height', this.snippets.offsetHeight || 0);
 	},
 	
 	initializeMetas: function(){
@@ -164,13 +202,26 @@ var Snippely = {
 	},
 	
 	redraw: function(){
-		var left = this.tags.offsetWidth;
-		$$(this.snippets, this.topResizer, this.meta, this.snippet).setStyle('left', left);
 		
+		//width
+		
+		var left = this.tags.offsetWidth;
+		$$(this.snippets, this.topResizer, this.meta, this.snippet).setStyle('left', left);		
 		this.footer.setStyle('width', this.tags.clientWidth);
-		this.topResizer.setStyle('top', this.snippets.offsetHeight);
+		
+		//height
+		
+		var sniptoph = this.snippets.offsetHeight + this.topResizer.offsetHeight;
+		var winh = window.getHeight();
+		if (sniptoph >= winh) this.snippets.setStyle('height', winh - this.topResizer.offsetHeight);
+		
+		//top
+
+		this.topResizer.setStyle('top', this.snippets.offsetHeight);		
 		this.meta.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight);
 		this.snippet.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
+		
+		//scrollbars
 		
 		this.tagsScrollbar.update();
 		this.snippetScrollbar.update();
