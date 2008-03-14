@@ -55,7 +55,7 @@ Snippely.Snips = {
 		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
 		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).inject(wrapper);
-		var select = new Element('span', {'class': 'select-type', 'text': snip.type}).inject(info);
+		var select = new Element('span', {'class': 'select', 'text': snip.type}).inject(info);
 		
 		content.set('html', this.highlight(snip.type, content));
 		
@@ -76,7 +76,7 @@ Snippely.Snips = {
 			activation: 'mousedown',
 			onBlur: function(element){
 				var type = wrapper.retrieve('snip:type');
-				element.set('html', this.highlight(snip.type, element));
+				element.set('html', this.highlight(type, element));
 				this.updateContent(content, wrapper);
 			}.bind(this)
 		});
@@ -141,7 +141,8 @@ Snippely.Snips = {
 			this.active.store('snip:type', type);
 			this.active.retrieve('select').set('text', type);
 			this.active.set('class', ((type == 'Note') ? 'note' : 'code') + ' snip');
-			this.highlight(type, this.active.retrieve('content'), this.active);
+			var content = this.active.retrieve('content');
+			content.set('html', this.highlight(type, content));
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.updateType, callback, { id: id, type: type });

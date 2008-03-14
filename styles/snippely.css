@@ -263,6 +263,11 @@ div.info {
 	padding-bottom: 5px;
 }
 
+div.info span.select:hover {
+	color: #333;
+	cursor: pointer;
+}
+
 div.snip.code div.info {
 	color: #888;
 	border-bottom: 1px solid #eee;
@@ -403,6 +408,6 @@ div.snip.note div.content {
 .keyword { color: #069; }
 .preprocessor { color: gray; }
 
-div.editing span { color:#333; }
+div.editing .content span { color:#333; }
 
 /* @end */
