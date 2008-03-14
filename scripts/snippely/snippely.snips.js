@@ -46,18 +46,13 @@ Snippely.Snips = {
 		Snippely.redraw();
 	},
 	
-	highlight: function(type, content){
-		if (type == 'Note') return content.get('html');
-		return new Highlighter(type).highlight(content.get('text')).get('html');
-	},
-	
 	create: function(snip){
 		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
 		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).inject(wrapper);
 		var select = new Element('span', {'class': 'select', 'text': snip.type}).inject(info);
 		
-		content.set('html', this.highlight(snip.type, content));
+		content.paint(snip.type);
 		
 		info.addEvent('dblclick', this.remove.bind(this, wrapper));
 		
@@ -70,13 +65,12 @@ Snippely.Snips = {
 		}.bind(this));
 		
 		new Editable(content, {
-			code: snip.type != 'Note',
+			code: true,
 			enter: true,
 			wrapper: wrapper,
 			activation: 'mousedown',
 			onBlur: function(element){
-				var type = wrapper.retrieve('snip:type');
-				element.set('html', this.highlight(type, element));
+				element.paint(wrapper.retrieve('snip:type'));
 				this.updateContent(content, wrapper);
 			}.bind(this)
 		});
@@ -141,18 +135,17 @@ Snippely.Snips = {
 			this.active.store('snip:type', type);
 			this.active.retrieve('select').set('text', type);
 			this.active.set('class', ((type == 'Note') ? 'note' : 'code') + ' snip');
-			var content = this.active.retrieve('content');
-			content.set('html', this.highlight(type, content));
+			this.active.retrieve('content').paint(type);
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.updateType, callback, { id: id, type: type });
 	},
 	
 	updateContent: function(content, wrapper){
-		Snippely.database.execute(this.Queries.updateContent, {
-			id: wrapper.retrieve('snip:id'),
-			content: content.get('html').escape()
-		});
+		var id = wrapper.retrieve('snip:id');
+		var type = wrapper.retrieve('snip:type');
+		content = content.get((type == 'Note') ? 'html' : 'text').escape();
+		Snippely.database.execute(this.Queries.updateContent, { id: id, content: content });
 	},
 	
 	updatePositions: function(order){
