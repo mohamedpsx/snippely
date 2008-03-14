@@ -62,15 +62,11 @@ Snippely.Snips = {
 		
 		select.addEvent('mousedown', function(event){
 			
-			Snippely.Menus.brushMenuItems.each(function(menu){
-				if (menu.name == snip.type){
-					menu.checked = true;
-				} else {
-					menu.checked = false;
-				}
+			Snippely.Menus.brushMenuItems.each(function(item){
+				item.checked = !!(item.name == snip.type);
 			});
 			
-			Snippely.Snips.active = content;
+			Snippely.Snips.active = wrapper;
 			
 			Snippely.Menus.brushMenu.display(event.client);
 			
@@ -84,14 +80,25 @@ Snippely.Snips = {
 			onBlur: this.save.bind(this)
 		});
 		
-		wrapper.store('snip:id', snip.id);
-		content.store('snip:type', snip.type);
-		content.store('snip:object', snip);
+		wrapper.store('snip', snip);
 		
-		content.store('select', select);
+		wrapper.store('snip:id', snip.id);
+		wrapper.store('snip:type', snip.type);
+		
+		
+		wrapper.store('select', select);
 		
 		this.container.adopt(wrapper);
 		return wrapper;
+	},
+	
+	changeType: function(type){
+		var select = this.active.retrieve('select');
+		select.set('text', type);
+		
+		Snippely.database.execute(this.Queries.updateType, {id: this.active.retrieve('snip:id'), type: this.active.retrieve('snip:type')});
+		
+		this.active.retrieve('snip').type = type;
 	},
 	
 	add: function(type){
@@ -125,17 +132,6 @@ Snippely.Snips = {
 			id: element.retrieve('snip:id'),
 			content: element.get('html').escape()
 		});
-	},
-	
-	changeType: function(type){
-		var select = this.active.retrieve('select');
-		select.set('text', type);
-		
-		//replace me with some real db
-		
-		this.active.retrieve('snip:object').type = type;
-		
-		//push type into db please!
 	},
 	
 	remove: function(element){
@@ -172,6 +168,8 @@ Snippely.Snips.Queries = {
 	remove: "DELETE FROM snips WHERE id = :id",
 	
 	update: "UPDATE snips SET content = :content WHERE id = :id",
+	
+	updateType: "UPDATE snips SET type = :type WHERE id = :id",
 	
 	updatePosition: "UPDATE snips SET position = :position WHERE id = :id",
 	
