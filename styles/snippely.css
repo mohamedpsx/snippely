@@ -404,8 +404,12 @@ div.snip.note div.content {
 /* @group Highlight */
 
 .comment { color: #aaa; }
-.string { color: #008200; }
-.keyword { color: #069; }
+.string { color: #418241; }
+.special { color: #069; }
+.keyword { color: #808018; }
+.boolean, .integer {
+	color: #c43434;
+}
 .preprocessor { color: gray; }
 
 div.editing .content span { color:#333; }
