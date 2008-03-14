@@ -51,6 +51,7 @@ var Snippely = {
 				onSelect: this.Tags.add.bind(this.Tags)
 			}),
 			new ART.Menu.Item('Add Snippet...', {
+				enabled: false,
 				onSelect: this.Snippets.add.bind(this.Snippets)
 			})
 		);
@@ -65,7 +66,9 @@ var Snippely = {
 				enabled: false,
 				onSelect: this.Tags.rename.bind(this.Tags)
 			}),
-			new ART.Menu.Item('-----', {separator: true}),
+			new ART.Menu.Item('Separator', {
+				separator: true
+			}),
 			new ART.Menu.Item('Remove Snippet...', {
 				enabled: false,
 				onSelect: this.Snippets.remove.bind(this.Snippets)
@@ -82,7 +85,9 @@ var Snippely = {
 			brushMenu.addItem(new ART.Menu.Item(name, {
 				onSelect: Snippely.Snips.updateType.bind(Snippely.Snips, name)
 			}));
-			if (name == "Note") brushMenu.addItem(new ART.Menu.Item('-----', {separator: true}));
+			if (name == "Note") brushMenu.addItem(new ART.Menu.Item('Separator', {
+				separator: true
+			}));
 		})(name);
 		
 		$('button-add').addEvent('mousedown', function(event){
@@ -109,6 +114,7 @@ var Snippely = {
 	toggleMenus: function(type, state){
 		this.Menus.actionMenu.items['Remove ' + type + '...'].enabled = state;
 		this.Menus.actionMenu.items['Rename ' + type + '...'].enabled = state;
+		if (type == 'Tag') this.Menus.addMenu.items['Add Snippet...'].enabled = state;
 	},
 	
 	initializeLayout: function(){
@@ -184,7 +190,7 @@ var Snippely = {
 	
 	blur: function(){
 		document.body.id = 'blur';
-	} 
+	}
 	
 };
 
