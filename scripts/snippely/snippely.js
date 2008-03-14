@@ -68,6 +68,7 @@ var Snippely = {
 			new ART.Menu.Item('Rename Tag...', {
 				onSelect: this.Tags.rename.bind(this.Tags)
 			}),
+			new ART.Menu.Item('-----', {separator: true}),
 			new ART.Menu.Item('Remove Snippet...', {
 				onSelect: this.Snippets.remove.bind(this.Snippets)
 			}),
