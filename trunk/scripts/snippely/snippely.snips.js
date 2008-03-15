@@ -6,15 +6,13 @@ Snippely.Snips = {
 	
 	load: function(id){
 		var callback = function(result){
+			this.container.empty();
 			var snips = result.data;
 			if (!snips) return;
-			this.container.empty();
 			this.build(snips);
 		}.bind(this);
 		
-		Snippely.database.execute(this.Queries.select, callback, {
-			snippet_id: id
-		});
+		Snippely.database.execute(this.Queries.select, callback, { snippet_id: id });
 	},
 	
 	build: function(snips){
