@@ -1,34 +1,33 @@
-Snippely.Tags = {
+Snippely.Groups = {
 
 	initialize: function(){
-		this.list = $('tags-list');
-		$('tags').addEvent('click', this.deselect.bind(this));
-		this.id = ART.retrieve('tags:active') || 0;
+		this.list = $('groups-list');
+		$('groups').addEvent('click', this.deselect.bind(this));
+		this.id = ART.retrieve('groups:active') || 0;
 		this.load();
 	},
 	
 	load: function(){
 		var callback = function(result){
-			var tags = result.data;
-			if (!tags) return;
-			this.build(tags);
+			var groups = result.data || [];
+			this.build(groups);
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.select, callback);
 	},
 	
-	build: function(tags){
+	build: function(groups){
 		this.list.empty();
-		var elements = tags.map(this.create, this);
+		var elements = groups.map(this.create, this);
 		this.elements = $$(elements);
-		this.select($('tag_' + this.id));
+		this.select($('group_' + this.id));
 		Snippely.redraw();
 	},
 
-	create: function(tag){
+	create: function(group){
 		var element = new Element('li', {
-			id: 'tag_' + tag.id,
-			text: tag.name
+			id: 'group_' + group.id,
+			text: group.name
 		});
 		
 		new Editable(element, { onBlur: this.update.bind(this) });
@@ -39,14 +38,14 @@ Snippely.Tags = {
 				this.select(element);
 			}.bind(this),
 			mousedown: function(event){ event.stopPropagation(); }
-		}).store('tag:id', tag.id));
+		}).store('group:id', group.id));
 		
 		return element;
 	},
 	
 	add: function(){
 		var callback = function(result){
-			var element = this.create({name: 'New Tag', id: result.lastInsertRowID});
+			var element = this.create({name: 'New Group', id: result.lastInsertRowID});
 			this.elements.push(element);
 			this.select(element);
 			Snippely.redraw();
@@ -57,7 +56,7 @@ Snippely.Tags = {
 	
 	update: function(element){
 		Snippely.database.execute(this.Queries.update, this.load.bind(this), {
-			id: element.retrieve('tag:id'),
+			id: element.retrieve('group:id'),
 			name: element.get('text')
 		});
 	},
@@ -66,17 +65,17 @@ Snippely.Tags = {
 		if (!element || element == this.selected) return;
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
-		this.id = element.retrieve('tag:id');
+		this.id = element.retrieve('group:id');
 		Snippely.Snippets.deselect(true);
 		Snippely.Snippets.load(this.id);
-		Snippely.toggleMenus('Tag', true);
+		Snippely.toggleMenus('Group', true);
 	},
 	
 	deselect: function(){
 		this.elements.removeClass('selected');
 		this.selected = this.id = null;
 		Snippely.Snippets.deselect(true);
-		Snippely.toggleMenus('Tag', false);
+		Snippely.toggleMenus('Group', false);
 	},
 	
 	rename: function(){
@@ -85,29 +84,29 @@ Snippely.Tags = {
 	},
 	
 	remove: function(){
-		if (!this.selected || !confirm("Are you sure you want to remove this Tag and all of it's Snippets?")) return;
-		this.removeById(this.selected.retrieve('tag:id'));
+		if (!this.selected || !confirm("Are you sure you want to remove this Group and all of it's Snippets?")) return;
+		this.removeById(this.selected.retrieve('group:id'));
 		this.selected.destroy();
 		this.deselect();
 	},
 	
 	removeById: function(id){
 		Snippely.database.execute(this.Queries.remove, { id: id });
-		Snippely.Snippets.removeByTag(id);
+		Snippely.Snippets.removeByGroup(id);
 	}
 	
 };
 
-//Tag related queries
+//Group related queries
 
-Snippely.Tags.Queries = {
+Snippely.Groups.Queries = {
 	
-	select: "SELECT * FROM tags ORDER BY UPPER(name) ASC",
+	select: "SELECT * FROM groups ORDER BY UPPER(name) ASC",
 	
-	insert: "INSERT INTO tags (name) VALUES ('New Tag')",
+	insert: "INSERT INTO groups (name) VALUES ('New Group')",
 	
-	remove: "DELETE FROM tags WHERE id = :id",
+	remove: "DELETE FROM groups WHERE id = :id",
 	
-	update: "UPDATE tags SET name = :name WHERE id = :id"
+	update: "UPDATE groups SET name = :name WHERE id = :id"
 	
 };

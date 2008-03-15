@@ -7,14 +7,13 @@ Snippely.Snippets = {
 	},
 	
 	load: function(id){
-		var tag_id = id || Snippely.Tags.id;
+		var group_id = id || Snippely.Groups.id;
 		var callback = function(result){
-			var snippets = result.data;
-			if (!snippets) return;
+			var snippets = result.data || [];
 			this.build(snippets);
 		}.bind(this);
 		
-		Snippely.database.execute(this.Queries.select, callback, { tag_id: tag_id });
+		Snippely.database.execute(this.Queries.select, callback, { group_id: group_id });
 	},
 	
 	build: function(snippets){
@@ -47,8 +46,8 @@ Snippely.Snippets = {
 	},
 	
 	add: function(){
-		var tag = Snippely.Tags.selected;
-		if (!tag) return;
+		var group = Snippely.Groups.selected;
+		if (!group) return;
 		
 		var callback = function(result){
 			var element = this.create({
@@ -62,7 +61,7 @@ Snippely.Snippets = {
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.insert, callback, {
-			tag_id: tag.retrieve('tag:id')
+			group_id: group.retrieve('group:id')
 		});
 	},
 	
@@ -110,16 +109,16 @@ Snippely.Snippets = {
 		Snippely.Snips.removeBySnippet(id);
 	},
 	
-	removeByTag: function(tag_id){
+	removeByGroup: function(group_id){
 		var callback = function(result){
 			if (result.data) $each(result.data, function(snippet){
 				Snippely.Snips.removeBySnippet(snippet.id);
 			}, this);
 			
-			Snippely.database.execute(this.Queries.removeByTag, { tag_id: tag_id });
+			Snippely.database.execute(this.Queries.removeByGroup, { group_id: group_id });
 		}.bind(this);
 		
-		Snippely.database.execute(this.Queries.select, callback, { tag_id: tag_id });
+		Snippely.database.execute(this.Queries.select, callback, { group_id: group_id });
 	},
 	
 	redraw: function(){
@@ -138,14 +137,14 @@ Snippely.Snippets = {
 
 Snippely.Snippets.Queries = {
 	
-	select: "SELECT id, title FROM snippets WHERE tag_id = :tag_id ORDER BY UPPER(title) ASC",
+	select: "SELECT id, title FROM snippets WHERE group_id = :group_id ORDER BY UPPER(title) ASC",
 	
-	insert: "INSERT INTO snippets (tag_id, title, description) VALUES (:tag_id, 'New Snippet', 'Description')",
+	insert: "INSERT INTO snippets (group_id, title, description) VALUES (:group_id, 'New Snippet', 'Description')",
 	
 	remove: "DELETE FROM snippets WHERE id = :id",
 	
 	update: "UPDATE snippets SET title = :title WHERE id = :id",
 	
-	removeByTag: "DELETE FROM snippets WHERE tag_id = :tag_id"
+	removeByGroup: "DELETE FROM snippets WHERE group_id = :group_id"
 	
 };
