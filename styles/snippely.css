@@ -272,6 +272,17 @@ div.snip.note div.info {
 	border-bottom: 1px solid #ddd;
 }
 
+div.info span.remove, div.info span.update {
+	float:right;
+	display:none;
+	cursor:pointer;
+	margin-left:10px;
+}
+
+.editing div.info span.remove, .editing div.info span.update {
+	display:inline;
+}
+
 /*.content*/
 
 div.snip.code div.content, div.snip div.info {
