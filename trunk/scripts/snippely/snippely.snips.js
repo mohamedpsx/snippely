@@ -44,11 +44,9 @@ Snippely.Snips = {
 	create: function(snip){
 		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
-		var content = new Element('div', {'class': 'content'}).inject(wrapper);
+		var content = new Element('div', {'class': 'content', 'text': snip.content}).paint(snip.type).inject(wrapper);
 		var remove = new Element('span', {'class': 'remove', 'text': 'remove'}).inject(info);
 		var select = new Element('span', {'class': 'select', 'text': snip.type}).inject(info);
-		
-		content.set((snip.type == "Note") ? 'html' : 'text', snip.content).paint(snip.type);
 		
 		var editable = new Editable(content, {
 			code: true,
@@ -143,10 +141,10 @@ Snippely.Snips = {
 	},
 	
 	updateContent: function(content, wrapper){
-		var id = wrapper.retrieve('snip:id');
-		var type = wrapper.retrieve('snip:type');
-		content = content.get((type == 'Note') ? 'html' : 'text');
-		Snippely.database.execute(this.Queries.updateContent, { id: id, content: content });
+		Snippely.database.execute(this.Queries.updateContent, {
+			id: wrapper.retrieve('snip:id'),
+			content: content.get('text')
+		});
 	},
 	
 	updatePositions: function(order){
