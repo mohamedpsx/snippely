@@ -4,13 +4,15 @@ var console = AIR.Introspector.Console;
 
 // Configuration
 
-Application.autoExit = true;
+Application.autoExit = false;
 
 // Snippely Object
 
 var Snippely = {
 	
 	initialize: function(){
+		
+		Application.addEventListener('invoke', Snippely.activate);
 		
 		this.meta = $('meta');
 		this.groups = $('groups');
@@ -32,8 +34,6 @@ var Snippely = {
 				this.Snippets.initialize();
 			}.bind(this)
 		});
-		
-		this.activate();
 	},
 	
 	initializeMenus: function(){
@@ -150,7 +150,12 @@ var Snippely = {
 		
 		this.retrieveProperties();
 		
-		nativeWindow.addEventListener('closing', this.storeProperties.bind(this));
+		nativeWindow.addEventListener('closing', function(event){
+			Snippely.storeProperties();
+			Snippely.deactivate();
+			// event = new Event(event);
+			event.preventDefault();
+		});
 
 		this.redraw();
 	},
@@ -221,6 +226,10 @@ var Snippely = {
 		this.groupsScrollbar.update();
 		this.snippetScrollbar.update();
 		this.snippetsScrollbar.update();
+	},
+	
+	deactivate: function(){
+		nativeWindow.visible = false;
 	},
 	
 	activate: function(){
