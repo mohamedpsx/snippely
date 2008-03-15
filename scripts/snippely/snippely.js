@@ -11,6 +11,7 @@ Application.autoExit = true;
 var Snippely = {
 	
 	initialize: function(){
+		
 		this.meta = $('meta');
 		this.groups = $('groups');
 		this.footer = $('footer');
@@ -159,7 +160,7 @@ var Snippely = {
 		this.groups.setStyle('width', groupsWidth);
 		
 		var snippetsHeight = ART.retrieve('snippets:height');
-		snippetsHeight = (snippetsHeight != undefined) ? snippetsHeight : 0;
+		snippetsHeight = (snippetsHeight != undefined) ? snippetsHeight : 100;
 		
 		this.snippets.setStyle('height', snippetsHeight);
 	},
