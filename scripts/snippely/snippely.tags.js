@@ -64,10 +64,8 @@ Snippely.Tags = {
 	
 	select: function(element){
 		if (!element || element == this.selected) return;
-		
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
-		
 		this.id = element.retrieve('tag:id');
 		Snippely.Snippets.deselect(true);
 		Snippely.Snippets.load(this.id);

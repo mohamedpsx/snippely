@@ -6,9 +6,8 @@ Snippely.Snips = {
 	
 	load: function(id){
 		var callback = function(result){
+			var snips = result.data || [];
 			this.container.empty();
-			var snips = result.data;
-			if (!snips) return;
 			this.build(snips);
 		}.bind(this);
 		
