@@ -2,14 +2,8 @@ Snippely.Snippets = {
 
 	initialize: function(){
 		this.list = $('snippets-list');
+		this.session = ART.retrieve('snippets:active') || 0;
 		$('snippets').addEvent('click', this.deselect.bind(this));
-	},
-	
-	redraw: function(){
-		this.elements.removeClass('odd');
-		this.list.getElements(':odd').addClass('odd');
-		Snippely.Snippet.hide();
-		Snippely.redraw();
 	},
 	
 	load: function(tag_id){
@@ -32,6 +26,18 @@ Snippely.Snippets = {
 		var elements = snippets.map(this.create, this);
 		this.elements = $$(elements);
 		this.redraw();
+		
+		if (this.session){
+			var snippet = $('snippet_' + this.session);
+			if (snippet) this.select(snippet);
+		}
+	},
+	
+	redraw: function(){
+		this.elements.removeClass('odd');
+		this.list.getElements(':odd').addClass('odd');
+		Snippely.Snippet.hide();
+		Snippely.redraw();
 	},
 	
 	create: function(snippet){

@@ -138,9 +138,7 @@ ART.Menu.Item = new Class({
 	
 });
 
-
 // storage wrappers
-
 
 ART.Storage = {
 	

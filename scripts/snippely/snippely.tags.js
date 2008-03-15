@@ -2,6 +2,7 @@ Snippely.Tags = {
 
 	initialize: function(){
 		this.list = $('tags-list');
+		this.session = ART.retrieve('tags:active') || 0;
 		$('tags').addEvent('click', this.deselect.bind(this));
 		this.load();
 	},
@@ -26,6 +27,11 @@ Snippely.Tags = {
 		var elements = tags.map(this.create, this);
 		this.elements = $$(elements);
 		Snippely.redraw();
+		
+		if (this.session){
+			var tag = $('tag_' + this.session);
+			if (tag) this.select(tag);
+		}
 	},
 
 	create: function(tag){
