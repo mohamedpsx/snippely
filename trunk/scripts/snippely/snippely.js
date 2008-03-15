@@ -182,11 +182,10 @@ var Snippely = {
 		ART.store('window:width', nativeWindow.width);
 		
 		ART.store('tags:width', this.tags.clientWidth);
+		ART.store('tags:active', this.Tags.id);
 		
 		ART.store('snippets:height', this.snippets.offsetHeight || 0);
-		
-		this.Tags.storeActive();
-		this.Snippets.storeActive();
+		ART.store('snippet:active', this.Snippets.id);
 	},
 	
 	initializeMetas: function(){

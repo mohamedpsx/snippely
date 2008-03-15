@@ -3,12 +3,11 @@ Snippely.Snippets = {
 	initialize: function(){
 		this.list = $('snippets-list');
 		$('snippets').addEvent('click', this.deselect.bind(this));
+		this.id = ART.retrieve('snippet:active') || 0;
 	},
 	
-	load: function(tag_id){
-		if (!tag_id) return;
-		this.tag_id = tag_id;
-		
+	load: function(id){
+		var tag_id = id || Snippely.Tags.id;
 		var callback = function(result){
 			var snippets = result.data;
 			if (!snippets) return;
@@ -22,8 +21,8 @@ Snippely.Snippets = {
 		this.list.empty();
 		var elements = snippets.map(this.create, this);
 		this.elements = $$(elements);
+		this.select($('snippet_' + this.id));
 		this.redraw();
-		this.loadActive();
 	},
 	
 	create: function(snippet){
@@ -68,19 +67,21 @@ Snippely.Snippets = {
 	},
 	
 	update: function(element){
-		Snippely.database.execute(this.Queries.update, this.refresh.bind(this), {
+		Snippely.database.execute(this.Queries.update, this.reload.bind(this), {
 			id: element.retrieve('snippet:id'),
 			title: element.get('text')
 		});
 	},
 	
 	select: function(element){
-		if (element == this.selected) return;
+		if (!element || element == this.selected) return;
+		
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
-		var id = element.retrieve('snippet:id');
-		Snippely.Snippet.load(id);
-		Snippely.Snips.load(id);
+		
+		this.id = element.retrieve('snippet:id');
+		Snippely.Snippet.load(this.id);
+		Snippely.Snips.load(this.id);
 		Snippely.toggleMenus('Snippet', true);
 	},
 	
@@ -88,7 +89,7 @@ Snippely.Snippets = {
 		if (!this.elements) return;
 		if (destroy == true) this.elements.destroy();
 		else this.elements.removeClass('selected');
-		this.selected = null;
+		this.selected = this.id = null;
 		Snippely.Snippet.hide();
 		Snippely.toggleMenus('Snippet', false);
 	},
@@ -105,8 +106,6 @@ Snippely.Snippets = {
 		this.deselect();
 		this.redraw();
 	},
-	
-	//remove helpers
 	
 	removeById: function(id){
 		Snippely.database.execute(this.Queries.remove, { id: id });
@@ -125,31 +124,14 @@ Snippely.Snippets = {
 		Snippely.database.execute(this.Queries.select, callback, { tag_id: tag_id });
 	},
 	
-	// storage helpers
-	
 	redraw: function(){
 		this.elements.removeClass('odd');
 		this.list.getElements(':odd').addClass('odd');
 		Snippely.Snippet.hide();
 	},
 	
-	refresh: function(){
-		this.storeActive();
-		this.load(this.tag_id);
-	},
-	
-	storeActive: function(){
-		var snippet = this.selected;
-		snippet = snippet ? snippet.retrieve('snippet:id') : 0;
-		ART.store('snippet:active', snippet);
-	},
-	
-	loadActive: function(){
-		var active = ART.retrieve('snippet:active') || 0;
-		if (active){
-			var snippet = $('snippet_' + active);
-			if (snippet) this.select(snippet);
-		}
+	reload: function(){
+		this.load();
 	}
 	
 };
@@ -158,7 +140,7 @@ Snippely.Snippets = {
 
 Snippely.Snippets.Queries = {
 	
-	select: "SELECT id, title FROM snippets WHERE tag_id = :tag_id ORDER BY title ASC",
+	select: "SELECT id, title FROM snippets WHERE tag_id = :tag_id ORDER BY UPPER(title) ASC",
 	
 	insert: "INSERT INTO snippets (tag_id, title, description) VALUES (:tag_id, 'New Snippet', 'Description')",
 	

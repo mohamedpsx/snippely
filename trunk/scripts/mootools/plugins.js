@@ -19,10 +19,7 @@ var Editable = new Class({
 		this.element = $(element);
 		this.wrapper = this.options.wrapper || this.element;
 		this.element.addEvent(this.options.activation, this.edit.bind(this));
-		if (this.options.code) this.element.addEvent('keydown', this.process.bind(this));
-		if (!this.options.enter) this.element.addEvent('keydown', function(event){
-			if (event.key == 'enter') this.blur();
-		});
+		this.element.addEvent('keydown', this.process.bind(this));
 		this.element.addEvent('blur', this.blur.bind(this));
 		this.element.store('editable', this);
 	},
@@ -40,16 +37,21 @@ var Editable = new Class({
 	},
 	
 	process: function(event, node){
-		var selection = window.getSelection();
-		var range = selection.getRangeAt(0);
-		switch (event.key){
-			case 'tab': node = document.createTextNode('\t'); break;
-			case 'enter': node = document.createTextNode('\n'); break;
+		var key = event.key;
+		if (event.meta && (key == 's' || key == 'enter')) this.element.blur();
+		else if (!this.options.enter && key == 'enter') this.element.blur();
+		else if (this.options.code){
+			var selection = window.getSelection();
+			var range = selection.getRangeAt(0);
+			switch (key){
+				case 'tab': node = document.createTextNode('\t'); break;
+				case 'enter': node = document.createTextNode('\n'); break;
+			}
+			if (!node) return;
+			range.insertNode(node);
+			selection.setPosition(node, 1);
+			event.preventDefault();
 		}
-		if (!node) return;
-		range.insertNode(node);
-		selection.setPosition(node, 1);
-		event.preventDefault();
 	}
 	
 });

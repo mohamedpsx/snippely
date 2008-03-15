@@ -112,8 +112,6 @@ Snippely.Snips = {
 		this.sortables.fireEvent('onComplete');
 	},
 	
-	//remove helpers
-	
 	removeById: function(id){
 		Snippely.database.execute(this.Queries.remove, { id: id });
 	},
@@ -121,8 +119,6 @@ Snippely.Snips = {
 	removeBySnippet: function(snippet_id){
 		Snippely.database.execute(this.Queries.removeBySnippet, { snippet_id: snippet_id });
 	},
-	
-	//update helpers
 	
 	updateType: function(type){
 		var wrapper = this.active;

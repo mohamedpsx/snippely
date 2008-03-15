@@ -1,8 +1,8 @@
 /* @group Main */
 
 * {
-	margin: 0;
-	padding: 0;
+	margin: 0px;
+	padding: 0px;
 	cursor: default;
 }
 
@@ -38,17 +38,17 @@ body {
 	border-right: 1px solid #a5a5a5;
 }
 
-#tags-wrap {
-	height: 100%;
-	overflow: hidden;
-}
-
 #blur #tags {
 	background-color: #e8e8e8;
 }
 
 #focus #tags {
 	background-color: #d5dde6;
+}
+
+#tags-wrap {
+	height: 100%;
+	overflow: hidden;
 }
 
 #tags h3 {
@@ -75,11 +75,6 @@ body {
 	padding: 4px 6px 5px 25px;
 }
 
-#tags li.editing::selection {
-	color: #fff;
-	background-color: #ccc;
-}
-
 #tags li.selected {
 	color: #fff;
 	font-weight: bold;
@@ -92,6 +87,11 @@ body {
 
 #focus #tags li.selected {
 	background-image: url(../images/selected-focus.png);
+}
+
+#tags li.editing::selection {
+	color: #fff;
+	background-color: #ccc;
 }
 
 /* @end */
@@ -164,19 +164,21 @@ body {
 	background: #f5f5f5;
 }
 
-#snippets li.editing::selection {
+#snippets li.selected {
 	color: #fff;
-	background-color: #ccc;
 }
 
 #focus #snippets li.selected {
-	color: #fff;
 	background-color: #637282;
 }
 
 #blur #snippets li.selected {
-	color: #fff;
 	background-color: #828282;
+}
+
+#snippets li.editing::selection {
+	color: #fff;
+	background-color: #ccc;
 }
 
 #top-resizer {
@@ -220,7 +222,7 @@ body {
 
 #snippet-description {
 	font-size: 12px;
-	padding: 10px 0px;
+	padding: 8px 4px;
 	line-height: 16px;
 	border-top: 1px dotted #bbb;
 	border-bottom: 1px dotted #bbb;
@@ -228,37 +230,38 @@ body {
 
 div.snip {
 	font-size: 11px;
-	position: relative;
 	margin: 10px 0;
 	padding: 6px 10px;
-	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	position: relative;
+	border: 1px solid #bbb;
 	-webkit-border-radius: 6px;
+	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	background: url(../images/grad.png) bottom left repeat-x;
+}
+
+div.snip.editing {
+	background-image: none;
+}
+
+div.snip.code {
+	background-color: #fff;
+}
+
+div.snip.code.editing {
+	border: 1px solid #4792e5;
+}
+
+div.snip.note {
+	background-color: #eee;
+}
+
+div.snip.note.editing {
+	border: 1px solid #333;
 }
 
 div.snip.sorting div.content {
 	overflow: hidden;
 	max-height: 42px;
-}
-
-div.snip.code {
-	border: 1px solid rgba(0, 0, 0, 0.3);
-	background-color: #fff;
-}
-
-div.snip.note {
-	border: 1px solid #bbb;
-	background-color: #eee;
-}
-
-div.snip.code.editing {
-	border: 1px solid #4792e5;
-	background: #fff;
-}
-
-div.snip.note.editing {
-	border: 1px solid #333;
-	background: #eee;
 }
 
 div.info {
@@ -278,14 +281,14 @@ div.snip.note div.info {
 	border-bottom: 1px solid #ddd;
 }
 
-div.info span.remove, div.info span.update {
+div.info span.remove {
 	float: right;
 	display: none;
 	cursor: pointer;
 	margin-left: 10px;
 }
 
-.editing div.info span.remove, .editing div.info span.update {
+.editing div.info span.remove {
 	display: inline;
 }
 
@@ -295,7 +298,7 @@ div.snip.code div.content, div.snip div.info {
 	font-family: "Andale Mono", "Monaco", Courier;
 }
 
-div.snip div.content {	
+div.snip div.content {
 	cursor: text;
 	outline: none;
 	overflow: hidden;
@@ -317,12 +320,12 @@ div.snip.note div.content {
 /* @group Meta */
 
 #meta {
-	position: absolute;
-	right: 0;
-	background: url(../images/grad.png) repeat-x left;
-	border-bottom: 1px solid #aaa;
-	border-top: 1px solid #e8eaed;
+	right: 0px;
 	padding: 3px 8px;
+	position: absolute;
+	border-top: 1px solid #e8eaed;
+	border-bottom: 1px solid #aaa;
+	background: url(../images/grad.png) repeat-x left;
 }
 
 #focus #meta {
@@ -334,16 +337,16 @@ div.snip.note div.content {
 }
 
 #meta .button {
-	height: 11px;
-	width: 84px;
-	display: block;
-	float: left;
-	text-align: center;
-	padding: 3px 0;
-	font-size: 9px;
 	color: #333;
-	background: url(../images/pill.png) no-repeat bottom left;
+	width: 84px;
+	height: 11px;
+	padding: 3px 0;
 	margin-right: 5px;
+	font-size: 9px;
+	float: left;
+	display: block;
+	text-align: center;
+	background: url(../images/pill.png) no-repeat bottom left;
 }
 
 #meta .button.active {
@@ -355,33 +358,33 @@ div.snip.note div.content {
 /* @group ART Scrollbar */
 
 .art-scrollbar {
-	position: absolute;
-	top: 0;
-	right: 0;
-	height: 100%;
+	top: 0px;
+	right: 0px;
 	width: 15px;
+	height: 100%;
+	position: absolute;
 }
 
 .art-scrollbar-track {
-	position: absolute;
-	top: 0;
-	right: 0;
-	height: 100%;
+	top: 0px;
+	right: 0px;
 	width: 100%;
+	height: 100%;
+	position: absolute;
 	background:
-		url(../images/track-bottom.png) bottom left no-repeat,
 		url(../images/track-top.png) top left no-repeat,
+		url(../images/track-bottom.png) bottom left no-repeat,
 		url(../images/track-center.png) top left repeat-y;
 }
 
 .art-scrollbar-thumb {
-	position: absolute;
 	width: 100%;
+	position: absolute;
 }
 
 .art-scrollbar-paint-top {
-	height: 15px;
 	width: 15px;
+	height: 15px;
 	background: url(../images/thumb-top.png) bottom left no-repeat;
 }
 
@@ -391,8 +394,8 @@ div.snip.note div.content {
 }
 
 .art-scrollbar-paint-bottom {
-	height: 15px;
 	width: 15px;
+	height: 15px;
 	background: url(../images/thumb-bottom.png) top left no-repeat;
 }
 

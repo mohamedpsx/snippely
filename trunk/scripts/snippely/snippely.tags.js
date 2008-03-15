@@ -3,6 +3,7 @@ Snippely.Tags = {
 	initialize: function(){
 		this.list = $('tags-list');
 		$('tags').addEvent('click', this.deselect.bind(this));
+		this.id = ART.retrieve('tags:active') || 0;
 		this.load();
 	},
 	
@@ -20,8 +21,8 @@ Snippely.Tags = {
 		this.list.empty();
 		var elements = tags.map(this.create, this);
 		this.elements = $$(elements);
+		this.select($('tag_' + this.id));
 		Snippely.redraw();
-		this.loadActive();
 	},
 
 	create: function(tag){
@@ -55,24 +56,27 @@ Snippely.Tags = {
 	},
 	
 	update: function(element){
-		Snippely.database.execute(this.Queries.update, this.refresh.bind(this), {
+		Snippely.database.execute(this.Queries.update, this.load.bind(this), {
 			id: element.retrieve('tag:id'),
 			name: element.get('text')
 		});
 	},
 	
 	select: function(element){
-		if (element == this.selected) return;
+		if (!element || element == this.selected) return;
+		
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
+		
+		this.id = element.retrieve('tag:id');
 		Snippely.Snippets.deselect(true);
-		Snippely.Snippets.load(element.retrieve('tag:id'));
+		Snippely.Snippets.load(this.id);
 		Snippely.toggleMenus('Tag', true);
 	},
 	
 	deselect: function(){
 		this.elements.removeClass('selected');
-		this.selected = null;
+		this.selected = this.id = null;
 		Snippely.Snippets.deselect(true);
 		Snippely.toggleMenus('Tag', false);
 	},
@@ -89,32 +93,9 @@ Snippely.Tags = {
 		this.deselect();
 	},
 	
-	// remove helpers
-	
 	removeById: function(id){
 		Snippely.database.execute(this.Queries.remove, { id: id });
 		Snippely.Snippets.removeByTag(id);
-	},
-	
-	// storage helpers
-	
-	refresh: function(){
-		this.storeActive();
-		this.load();
-	},
-	
-	storeActive: function(){
-		var tag = this.selected;
-		tag = tag ? tag.retrieve('tag:id') : 0;
-		ART.store('tags:active', tag);
-	},
-	
-	loadActive: function(){
-		var active = ART.retrieve('tags:active') || 0;
-		if (active){
-			var tag = $('tag_' + active);
-			if (tag) this.select(tag);
-		}
 	}
 	
 };
@@ -123,7 +104,7 @@ Snippely.Tags = {
 
 Snippely.Tags.Queries = {
 	
-	select: "SELECT * FROM tags ORDER BY name ASC",
+	select: "SELECT * FROM tags ORDER BY UPPER(name) ASC",
 	
 	insert: "INSERT INTO tags (name) VALUES ('New Tag')",
 	

@@ -29,20 +29,8 @@ Snippely.Snippet = {
 		this.description.set('text', snippet.description);
 	},
 	
-	hide: function(){
-		this.toolbar.setStyle('display', 'none');
-		this.container.setStyle('display', 'none');
-		Snippely.redraw();
-	},
-	
-	show: function(){
-		this.toolbar.setStyle('display', '');
-		this.container.setStyle('display', '');
-		Snippely.redraw();
-	},
-	
 	updateTitle: function(element){
-		Snippely.database.execute(this.Queries.updateTitle, Snippely.Snippets.refresh.bind(Snippely.Snippets), {
+		Snippely.database.execute(this.Queries.updateTitle, Snippely.Snippets.reload.bind(Snippely.Snippets), {
 			id: this.id,
 			title: element.get('text')
 		});
@@ -53,6 +41,18 @@ Snippely.Snippet = {
 			id: this.id,
 			description: element.get('text')
 		});
+	},
+	
+	hide: function(){
+		this.toolbar.setStyle('display', 'none');
+		this.container.setStyle('display', 'none');
+		Snippely.redraw();
+	},
+	
+	show: function(){
+		this.toolbar.setStyle('display', '');
+		this.container.setStyle('display', '');
+		Snippely.redraw();
 	}
 	
 };
