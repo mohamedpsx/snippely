@@ -2,6 +2,7 @@ Snippely.Snippet = {
 	
 	initialize: function(){
 		this.title = $('snippet-title');
+		this.toolbar = $('meta');
 		this.container = $('snippet-container');
 		this.description = $('snippet-description');
 		
@@ -10,11 +11,15 @@ Snippely.Snippet = {
 	},
 	
 	hide: function(){
+		this.toolbar.setStyle('display', 'none');
 		this.container.setStyle('display', 'none');
+		Snippely.redraw();
 	},
 	
 	show: function(){
+		this.toolbar.setStyle('display', '');
 		this.container.setStyle('display', '');
+		Snippely.redraw();
 	},
 	
 	load: function(id){
