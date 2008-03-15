@@ -233,6 +233,7 @@ div.snip {
 	padding: 6px 10px;
 	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	-webkit-border-radius: 6px;
+	background: url(../images/grad.png) bottom left repeat-x;
 }
 
 div.snip.sorting div.content {
@@ -242,12 +243,12 @@ div.snip.sorting div.content {
 
 div.snip.code {
 	border: 1px solid rgba(0, 0, 0, 0.3);
-	background: #fff url(../images/grad.png) bottom left repeat-x;
+	background-color: #fff;
 }
 
 div.snip.note {
 	border: 1px solid #bbb;
-	background: #eee url(../images/grad.png) bottom left repeat-x;
+	background-color: #eee;
 }
 
 div.snip.code.editing {

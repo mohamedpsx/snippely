@@ -2,11 +2,13 @@ Snippely.Snippets = {
 
 	initialize: function(){
 		this.list = $('snippets-list');
-		this.session = ART.retrieve('snippets:active') || 0;
 		$('snippets').addEvent('click', this.deselect.bind(this));
 	},
 	
 	load: function(tag_id){
+		if (!tag_id) return;
+		this.tag_id = tag_id;
+		
 		var callback = function(result){
 			var snippets = [];
 			if (result.data) $each(result.data, function(snippet){
@@ -26,11 +28,7 @@ Snippely.Snippets = {
 		var elements = snippets.map(this.create, this);
 		this.elements = $$(elements);
 		this.redraw();
-		
-		if (this.session){
-			var snippet = $('snippet_' + this.session);
-			if (snippet) this.select(snippet);
-		}
+		this.loadActive();
 	},
 	
 	redraw: function(){
@@ -83,11 +81,8 @@ Snippely.Snippets = {
 	update: function(element){
 		var id = element.retrieve('snippet:id');
 		var title = element.get('text');
-		var callback = function(){
-			if (Snippely.Snippet.id && Snippely.Snippet.id == id) Snippely.Snippet.title.set('text', title);
-		};
 		
-		Snippely.database.execute(this.Queries.update, callback, {
+		Snippely.database.execute(this.Queries.update, this.refresh.bind(this), {
 			id: id,
 			title: title.escape()
 		});
@@ -142,6 +137,27 @@ Snippely.Snippets = {
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.select, callback, { tag_id: tag_id });
+	},
+	
+	// storage helpers
+	
+	refresh: function(){
+		this.storeActive();
+		this.load(this.tag_id);
+	},
+	
+	storeActive: function(){
+		var snippet = this.selected;
+		snippet = snippet ? snippet.retrieve('snippet:id') : 0;
+		ART.store('snippet:active', snippet);
+	},
+	
+	loadActive: function(){
+		var active = ART.retrieve('snippet:active') || 0;
+		if (active){
+			var snippet = $('snippet_' + active);
+			if (snippet) this.select(snippet);
+		}
 	}
 	
 };
@@ -150,7 +166,7 @@ Snippely.Snippets = {
 
 Snippely.Snippets.Queries = {
 	
-	select: "SELECT id, title FROM snippets WHERE tag_id = :tag_id",
+	select: "SELECT id, title FROM snippets WHERE tag_id = :tag_id ORDER BY title ASC",
 	
 	insert: "INSERT INTO snippets (tag_id, title, description) VALUES (:tag_id, 'New Snippet', 'Description')",
 	

@@ -2,7 +2,6 @@ Snippely.Tags = {
 
 	initialize: function(){
 		this.list = $('tags-list');
-		this.session = ART.retrieve('tags:active') || 0;
 		$('tags').addEvent('click', this.deselect.bind(this));
 		this.load();
 	},
@@ -27,11 +26,7 @@ Snippely.Tags = {
 		var elements = tags.map(this.create, this);
 		this.elements = $$(elements);
 		Snippely.redraw();
-		
-		if (this.session){
-			var tag = $('tag_' + this.session);
-			if (tag) this.select(tag);
-		}
+		this.loadActive();
 	},
 
 	create: function(tag){
@@ -65,7 +60,7 @@ Snippely.Tags = {
 	},
 	
 	update: function(element){
-		Snippely.database.execute(this.Queries.update, {
+		Snippely.database.execute(this.Queries.update, this.refresh.bind(this), {
 			id: element.retrieve('tag:id'),
 			name: element.get('text')
 		});
@@ -104,6 +99,27 @@ Snippely.Tags = {
 	removeById: function(id){
 		Snippely.database.execute(this.Queries.remove, { id: id });
 		Snippely.Snippets.removeByTag(id);
+	},
+	
+	// storage helpers
+	
+	refresh: function(){
+		this.storeActive();
+		this.load();
+	},
+	
+	storeActive: function(){
+		var tag = this.selected;
+		tag = tag ? tag.retrieve('tag:id') : 0;
+		ART.store('tags:active', tag);
+	},
+	
+	loadActive: function(){
+		var active = ART.retrieve('tags:active') || 0;
+		if (active){
+			var tag = $('tag_' + active);
+			if (tag) this.select(tag);
+		}
 	}
 	
 };
@@ -112,7 +128,7 @@ Snippely.Tags = {
 
 Snippely.Tags.Queries = {
 	
-	select: "SELECT * FROM tags",
+	select: "SELECT * FROM tags ORDER BY name ASC",
 	
 	insert: "INSERT INTO tags (name) VALUES ('New Tag')",
 	

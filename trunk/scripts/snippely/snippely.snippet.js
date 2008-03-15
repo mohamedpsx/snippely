@@ -49,17 +49,9 @@ Snippely.Snippet = {
 	},
 	
 	updateTitle: function(element){
-		var id = this.id;
-		var title = element.get('text');
-		
-		var callback = function(){
-			var snippet = $('snippet_' + id);
-			if (snippet) snippet.set('text', title);
-		};
-		
-		Snippely.database.execute(this.Queries.updateTitle, callback, {
-			id: id,
-			title: title.escape()
+		Snippely.database.execute(this.Queries.updateTitle, Snippely.Snippets.refresh.bind(Snippely.Snippets), {
+			id: this.id,
+			title: element.get('text').escape()
 		});
 	},
 	
