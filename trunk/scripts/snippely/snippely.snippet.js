@@ -10,6 +10,25 @@ Snippely.Snippet = {
 		new Editable(this.description, { enter: true, onBlur: this.updateDescription.bind(this) });
 	},
 	
+	load: function(id){
+		var callback = function(result){
+			var data = result.data && result.data[0];
+			if (!data) return;
+			this.build(data);
+		}.bind(this);
+		
+		Snippely.database.execute(this.Queries.select, callback, { id: id });
+	},
+	
+	build: function(snippet){
+		this[snippet ? 'show' : 'hide']();
+		if (!snippet) return;
+		
+		this.id = snippet.id;
+		this.title.set('text', snippet.title);
+		this.description.set('text', snippet.description);
+	},
+	
 	hide: function(){
 		this.toolbar.setStyle('display', 'none');
 		this.container.setStyle('display', 'none');
@@ -22,43 +41,17 @@ Snippely.Snippet = {
 		Snippely.redraw();
 	},
 	
-	load: function(id){
-		var callback = function(result){
-			var data = result.data && result.data[0];
-			if (!data) return;
-			var snippet = {
-				id: data.id,
-				title: data.title.unescape(),
-				description: data.description.unescape()
-			};
-			this.build(snippet);
-		}.bind(this);
-		
-		Snippely.database.execute(this.Queries.select, callback, {
-			id: id
-		});
-	},
-	
-	build: function(snippet){
-		this[snippet ? 'show' : 'hide']();
-		if (!snippet) return;
-		
-		this.id = snippet.id;
-		this.title.set('text', snippet.title);
-		this.description.set('text', snippet.description);
-	},
-	
 	updateTitle: function(element){
 		Snippely.database.execute(this.Queries.updateTitle, Snippely.Snippets.refresh.bind(Snippely.Snippets), {
 			id: this.id,
-			title: element.get('text').escape()
+			title: element.get('text')
 		});
 	},
 	
 	updateDescription: function(element){
 		Snippely.database.execute(this.Queries.updateDescription, {
 			id: this.id,
-			description: element.get('text').escape()
+			description: element.get('text')
 		});
 	}
 	

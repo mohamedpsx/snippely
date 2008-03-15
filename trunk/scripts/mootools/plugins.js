@@ -53,27 +53,3 @@ var Editable = new Class({
 	}
 	
 });
-
-//String extensions
-
-String.implement({
-	
-	escape: function(){
-		return escape(this);
-	},
-	
-	unescape: function(){
-		return unescape(this);
-	}
-	
-});
-
-//Element extensions
-
-Element.implement({
-	
-	paint: function(brush){
-		return this.set('html', new Highlighter(brush).highlight(this.get('text')).get('html'));
-	}
-	
-});
