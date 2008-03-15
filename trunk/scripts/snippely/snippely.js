@@ -11,7 +11,6 @@ Application.autoExit = true;
 var Snippely = {
 	
 	initialize: function(){
-		
 		this.meta = $('meta');
 		this.groups = $('groups');
 		this.footer = $('footer');
@@ -37,14 +36,6 @@ var Snippely = {
 	},
 	
 	initializeMenus: function(){
-		//main menus
-		var mainMenu = new ART.Menu('MainMenu');
-		var fileMenu = new ART.Menu('File').addItems(
-			new ART.Menu.Item('Save', {shortcut: 'command+s'}),
-			new ART.Menu.Item('Load', {shortcut: 'command+l'})
-		);
-		mainMenu.addMenu(fileMenu);
-		
 		//add menu
 		var addMenu = new ART.Menu('AddMenu').addItems(
 			new ART.Menu.Item('Add Group...', {
@@ -118,7 +109,6 @@ var Snippely = {
 	},
 	
 	initializeLayout: function(){
-		
 		var redraw = this.redraw.bind(this);
 		
 		new Drag(this.groups, {
@@ -149,9 +139,8 @@ var Snippely = {
 		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
 		
 		this.retrieveProperties();
-		
 		nativeWindow.addEventListener('closing', this.storeProperties.bind(this));
-
+		
 		this.redraw();
 	},
 	
