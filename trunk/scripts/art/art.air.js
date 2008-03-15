@@ -155,7 +155,7 @@ ART.Storage = {
 	retrieve: function(key){
 		var stored = AIR.EncryptedLocalStore.getItem('application:storage');
 		var data = (stored && stored.length) ? JSON.decode(stored.readUTFBytes(stored.length)) : null;
-		if (data) return data[key] || null;
+		if (data) return (data[key] != undefined) ? data[key] : null;
 	}
 	
 };

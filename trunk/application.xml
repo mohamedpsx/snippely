@@ -60,16 +60,16 @@
 		<!--<resizable>false</resizable>-->
 
 		<!-- The window's initial width. Optional. -->
-		<width>800</width>
+		<!-- <width>800</width> -->
 
 		<!-- The window's initial height. Optional. -->
-		<height>600</height>
+		<!-- <height>600</height> -->
 
 		<!-- The window's initial x position. Optional. -->
-		<x>100</x>
+		<!-- <x>100</x> -->
 
 		<!-- The window's initial y position. Optional. -->
-		<y>100</y>
+		<!-- <y>100</y> -->
 
 		<!-- The window's minimum size, specified as a width/height pair, such as "400 200". Optional. -->
 		<minSize>600 400</minSize>
@@ -86,12 +86,14 @@
 
 	<!-- The icon the system uses for the application. For at least one resolution,
 		 specify the path to a PNG file included in the AIR package. Optional. -->
-	<!-- <icon>
-		<image16x16>icons/16.png</image16x16>
-		<image32x32>icons/32.png</image32x32>
-		<image48x48>icons/48.png</image48x48>
-		<image128x128>icons/128.png</image128x128>
-	</icon> -->
+	<icon>
+		<!-- <image16x16>icons/16.png</image16x16> -->
+		<image32x32>icon/snip-32.png</image32x32>
+		<image64x64>icon/snip-64.png</image64x64>
+		<image128x128>icon/snip-128.png</image128x128>
+		<image256x256>icon/snip-256.png</image256x256>
+		<image512x512>icon/snip-512.png</image512x512>
+	</icon>
 
 	<!-- Whether the application handles the update when a user double-clicks an update version
 	of the AIR file (true), or the default AIR application installer handles the update (false).
