@@ -49,10 +49,10 @@ Snippely.Snips = {
 	create: function(snip){
 		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
-		var content = new Element('div', {'class': 'content', 'html': snip.content.unescape()}).inject(wrapper);
+		var content = new Element('div', {'class': 'content'}).inject(wrapper);
 		var select = new Element('span', {'class': 'select', 'text': snip.type}).inject(info);
 		
-		content.paint(snip.type);
+		content.set((snip.type == "Note") ? 'html' : 'text', snip.content.unescape()).paint(snip.type);
 		
 		info.addEvent('dblclick', this.remove.bind(this, wrapper));
 		
@@ -77,7 +77,6 @@ Snippely.Snips = {
 		
 		wrapper.store('select', select);
 		wrapper.store('content', content);
-		
 		wrapper.store('snip:id', snip.id);
 		wrapper.store('snip:type', snip.type);
 		
