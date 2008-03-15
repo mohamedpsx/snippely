@@ -26,12 +26,6 @@ Snippely.Snippets = {
 		this.loadActive();
 	},
 	
-	redraw: function(){
-		this.elements.removeClass('odd');
-		this.list.getElements(':odd').addClass('odd');
-		Snippely.Snippet.hide();
-	},
-	
 	create: function(snippet){
 		var element = new Element('li', {
 			id: 'snippet_' + snippet.id,
@@ -74,12 +68,9 @@ Snippely.Snippets = {
 	},
 	
 	update: function(element){
-		var id = element.retrieve('snippet:id');
-		var title = element.get('text');
-		
 		Snippely.database.execute(this.Queries.update, this.refresh.bind(this), {
-			id: id,
-			title: title
+			id: element.retrieve('snippet:id'),
+			title: element.get('text')
 		});
 	},
 	
@@ -135,6 +126,12 @@ Snippely.Snippets = {
 	},
 	
 	// storage helpers
+	
+	redraw: function(){
+		this.elements.removeClass('odd');
+		this.list.getElements(':odd').addClass('odd');
+		Snippely.Snippet.hide();
+	},
 	
 	refresh: function(){
 		this.storeActive();

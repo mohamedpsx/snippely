@@ -262,7 +262,7 @@ div.snip.note.editing {
 }
 
 div.info {
-	cursor:move;
+	cursor: move;
 	font-size: 9px;
 	margin-bottom: 6px;
 	padding-bottom: 5px;
@@ -279,14 +279,14 @@ div.snip.note div.info {
 }
 
 div.info span.remove, div.info span.update {
-	float:right;
-	display:none;
-	cursor:pointer;
-	margin-left:10px;
+	float: right;
+	display: none;
+	cursor: pointer;
+	margin-left: 10px;
 }
 
 .editing div.info span.remove, .editing div.info span.update {
-	display:inline;
+	display: inline;
 }
 
 /*.content*/
@@ -298,13 +298,17 @@ div.snip.code div.content, div.snip div.info {
 div.snip div.content {	
 	cursor: text;
 	outline: none;
-	white-space: pre;
-	min-height:14px;
-	line-height:14px;
+	overflow: hidden;
+	min-height: 14px;
+	line-height: 14px;
 }
 
 div.snip.code div.content {
-	overflow: hidden;
+	white-space: pre;
+}
+
+div.snip.note div.content {
+	white-space: pre-wrap;
 }
 
 /* @end */
@@ -414,6 +418,6 @@ div.snip.code div.content {
 .boolean, .integer, .symbol { color: #c43434; }
 .preprocessor { color: gray; }
 
-div.editing .content span { color:#333; }
+div.editing .content span { color: #333; }
 
 /* @end */
