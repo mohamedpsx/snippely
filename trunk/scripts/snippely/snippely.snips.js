@@ -34,17 +34,16 @@ Snippely.Snips = {
 			handle: 'div.info',
 			onStart: function(){
 				container.addClass('sorting');
-				this.drag.options.modifiers = {x: false, y: 'top'};
-				this.clone.setStyle('z-index', 1000);
 				Snippely.redraw();
+				this.drag.options.modifiers = {x: false, y: 'top'};
+				this.clone.setStyles({'z-index': 1000, 'width': this.element.getStyle('width')});
 			},
 			onComplete: function(){
 				container.removeClass('sorting');
-				var order = this.sortables.serialize(function(element){
-					return element.retrieve('snip:id');
-				});
-				this.updatePositions(order);
 				Snippely.redraw();
+				this.updatePositions(this.sortables.serialize(function(element){
+					return element.retrieve('snip:id');
+				}));
 			}.bind(this)
 		});
 		
