@@ -207,27 +207,22 @@ var Snippely = {
 	},
 	
 	redraw: function(){
-		
 		//width
-		
 		var left = this.tags.offsetWidth;
 		$$(this.snippets, this.topResizer, this.meta, this.snippet).setStyle('left', left);		
 		this.footer.setStyle('width', this.tags.clientWidth);
 		
 		//height
-		
 		var sniptoph = this.snippets.offsetHeight + this.topResizer.offsetHeight;
 		var winh = window.getHeight();
 		if (sniptoph >= winh) this.snippets.setStyle('height', winh - this.topResizer.offsetHeight);
 		
 		//top
-
 		this.topResizer.setStyle('top', this.snippets.offsetHeight);		
 		this.meta.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight);
 		this.snippet.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
 		
 		//scrollbars
-		
 		this.tagsScrollbar.update();
 		this.snippetScrollbar.update();
 		this.snippetsScrollbar.update();

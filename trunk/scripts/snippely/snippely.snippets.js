@@ -37,7 +37,6 @@ Snippely.Snippets = {
 		this.elements.removeClass('odd');
 		this.list.getElements(':odd').addClass('odd');
 		Snippely.Snippet.hide();
-		Snippely.redraw();
 	},
 	
 	create: function(snippet){

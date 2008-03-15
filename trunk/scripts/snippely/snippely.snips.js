@@ -25,7 +25,6 @@ Snippely.Snips = {
 	
 	build: function(snips){
 		var elements = snips.map(this.create, this);
-		var container = this.container;
 		this.elements = $$(elements);
 		
 		this.sortables = new Sortables('snippet-snips', {
@@ -33,13 +32,13 @@ Snippely.Snips = {
 			opacity: 0,
 			handle: 'div.info',
 			onStart: function(){
-				container.addClass('sorting');
+				this.element.addClass('sorting');
 				Snippely.redraw();
 				this.drag.options.modifiers = {x: false, y: 'top'};
-				this.clone.setStyles({'z-index': 1000, 'width': this.element.getStyle('width')});
+				this.clone.addClass('sorting').setStyles({'z-index': 1000, 'width': this.element.getStyle('width')});
 			},
-			onComplete: function(){
-				container.removeClass('sorting');
+			onComplete: function(element){
+				if (element) element.removeClass('sorting');
 				Snippely.redraw();
 				this.updatePositions(this.sortables.serialize(function(element){
 					return element.retrieve('snip:id');

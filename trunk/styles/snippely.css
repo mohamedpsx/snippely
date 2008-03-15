@@ -150,11 +150,6 @@ body {
 	background-color: #fff;
 }
 
-#snippet-snips.sorting div.snip div.content {
-	overflow: hidden;
-	max-height: 42px;
-}
-
 #snippets-wrap {
 	height: 100%;
 	overflow: hidden;
@@ -238,6 +233,11 @@ div.snip {
 	padding: 6px 10px;
 	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	-webkit-border-radius: 6px;
+}
+
+div.snip.sorting div.content {
+	overflow: hidden;
+	max-height: 42px;
 }
 
 div.snip.code {
