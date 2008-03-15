@@ -153,8 +153,7 @@ var Snippely = {
 		nativeWindow.addEventListener('closing', function(event){
 			Snippely.storeProperties();
 			Snippely.deactivate();
-			// event = new Event(event);
-			event.preventDefault();
+			if (nativeWindow.visible) event.preventDefault();
 		});
 
 		this.redraw();
