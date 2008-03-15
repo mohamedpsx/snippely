@@ -25,6 +25,7 @@ Snippely.Snips = {
 	
 	build: function(snips){
 		var elements = snips.map(this.create, this);
+		var container = this.container;
 		this.elements = $$(elements);
 		
 		this.sortables = new Sortables('snippet-snips', {
@@ -32,14 +33,18 @@ Snippely.Snips = {
 			opacity: 0,
 			handle: 'div.info',
 			onStart: function(){
+				container.addClass('sorting');
 				this.drag.options.modifiers = {x: false, y: 'top'};
 				this.clone.setStyle('z-index', 1000);
+				Snippely.redraw();
 			},
 			onComplete: function(){
+				container.removeClass('sorting');
 				var order = this.sortables.serialize(function(element){
 					return element.retrieve('snip:id');
 				});
 				this.updatePositions(order);
+				Snippely.redraw();
 			}.bind(this)
 		});
 		
@@ -51,7 +56,6 @@ Snippely.Snips = {
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
 		var content = new Element('div', {'class': 'content'}).inject(wrapper);
 		var remove = new Element('span', {'class': 'remove', 'text': 'remove'}).inject(info);
-		var update = new Element('span', {'class': 'remove', 'text': 'save'}).inject(info);
 		var select = new Element('span', {'class': 'select', 'text': snip.type}).inject(info);
 		
 		content.set((snip.type == "Note") ? 'html' : 'text', snip.content.unescape()).paint(snip.type);
@@ -71,11 +75,6 @@ Snippely.Snips = {
 			this.remove(wrapper);
 			event.stop();
 		}.bind(this));
-		
-		update.addEvent('mousedown', function(event){
-			content.fireEvent('blur');
-			event.stop();
-		});
 		
 		select.addEvent('mousedown', function(event){
 			this.active = wrapper;

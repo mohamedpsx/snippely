@@ -150,6 +150,11 @@ body {
 	background-color: #fff;
 }
 
+#snippet-snips.sorting div.snip div.content {
+	overflow: hidden;
+	max-height: 42px;
+}
+
 #snippets-wrap {
 	height: 100%;
 	overflow: hidden;
