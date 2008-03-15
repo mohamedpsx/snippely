@@ -10,13 +10,8 @@ Snippely.Snippets = {
 		this.tag_id = tag_id;
 		
 		var callback = function(result){
-			var snippets = [];
-			if (result.data) $each(result.data, function(snippet){
-				snippets.push({
-					id: snippet.id,
-					title: snippet.title.unescape()
-				});
-			});
+			var snippets = result.data;
+			if (!snippets) return;
 			this.build(snippets);
 		}.bind(this);
 		
@@ -84,7 +79,7 @@ Snippely.Snippets = {
 		
 		Snippely.database.execute(this.Queries.update, this.refresh.bind(this), {
 			id: id,
-			title: title.escape()
+			title: title
 		});
 	},
 	

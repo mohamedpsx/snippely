@@ -138,3 +138,13 @@ Highlighter.RegExps = {
 	integer: (/\b(\d+)\b/gm),
 	preprocessor: (/^\s*#.*/gm)
 };
+
+// Element highlight extension
+
+Element.implement({
+	
+	paint: function(brush){
+		return this.set('html', new Highlighter(brush).highlight(this.get('text')).get('html'));
+	}
+	
+});
