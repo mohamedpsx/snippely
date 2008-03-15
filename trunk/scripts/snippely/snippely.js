@@ -33,7 +33,26 @@ var Snippely = {
 			}.bind(this)
 		});
 		
-		this.activate();
+		if (AIR.NativeApplication.supportsDockIcon){
+			
+			Application.addEventListener('exiting', function(){
+				Snippely.exiting = true;
+			});
+			
+			Application.addEventListener('invoke', function(){
+				Snippely.activate();
+			});
+			
+			nativeWindow.addEventListener('closing', function(e){
+				if (!Snippely.exiting){
+					e.preventDefault();
+					Snippely.deactivate();
+				}
+			});
+			
+		} else {
+			Snippely.activate();
+		}
 	},
 	
 	initializeMenus: function(){
@@ -211,6 +230,10 @@ var Snippely = {
 		this.groupsScrollbar.update();
 		this.snippetScrollbar.update();
 		this.snippetsScrollbar.update();
+	},
+	
+	deactivate: function(){
+		nativeWindow.visible = false;
 	},
 	
 	activate: function(){
