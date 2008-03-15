@@ -16,7 +16,7 @@ body {
 	background-color: #eee;
 }
 
-#snippets, #meta, #tags, #footer {
+#snippets, #meta, #groups, #footer {
 	-webkit-user-select: none;
 }
 
@@ -27,9 +27,9 @@ body {
 
 /* @end */
 
-/* @group Tags */
+/* @group Groups */
 
-#tags {
+#groups {
 	top: 0;
 	left: 0;
 	bottom: 22px;
@@ -38,20 +38,20 @@ body {
 	border-right: 1px solid #a5a5a5;
 }
 
-#blur #tags {
+#blur #groups {
 	background-color: #e8e8e8;
 }
 
-#focus #tags {
+#focus #groups {
 	background-color: #d5dde6;
 }
 
-#tags-wrap {
+#groups-wrap {
 	height: 100%;
 	overflow: hidden;
 }
 
-#tags h3 {
+#groups h3 {
 	padding: 0 12px;
 	margin: 8px 0 6px;
 	font-size: 11px;
@@ -60,36 +60,36 @@ body {
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-#blur #tags h3 {
+#blur #groups h3 {
 	color: #606060;
 }
 
-#focus #tags h3 {
+#focus #groups h3 {
 	color: #58697a;
 }
 
-#tags li {
+#groups li {
 	color: #222;
 	font-size: 11px;
 	line-height: 11px;
 	padding: 4px 6px 5px 25px;
 }
 
-#tags li.selected {
+#groups li.selected {
 	color: #fff;
 	font-weight: bold;
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 }
 
-#blur #tags li.selected {
+#blur #groups li.selected {
 	background-image: url(../images/selected-blur.png);
 }
 
-#focus #tags li.selected {
+#focus #groups li.selected {
 	background-image: url(../images/selected-focus.png);
 }
 
-#tags li.editing::selection {
+#groups li.editing::selection {
 	color: #fff;
 	background-color: #ccc;
 }

@@ -20,8 +20,8 @@ Snippely.Database = new Class({
 	},
 	
 	create: function(callback){
-		var tags =
-			"CREATE TABLE IF NOT EXISTS tags (" +
+		var groups =
+			"CREATE TABLE IF NOT EXISTS groups (" +
 			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"  name TEXT" +
 			")";
@@ -29,7 +29,7 @@ Snippely.Database = new Class({
 		var snippets =
 			"CREATE TABLE IF NOT EXISTS snippets (" +
 			"  id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-			"  tag_id INTEGER, " +
+			"  group_id INTEGER, " +
 			"  title TEXT, " +
 			"  description TEXT" +
 			")";
@@ -43,15 +43,8 @@ Snippely.Database = new Class({
 			"  content TEXT" +
 			")";
 		
-		var session = 
-			"CREATE TABLE IF NOT EXISTS session (" +
-			"  id TEXT PRIMARY KEY, " +
-			"  tag_id INTEGER, " +
-			"  snippet_id INTEGER" +
-			")";
-			
 		var self = this;
-		var queries = [tags, snippets, snips];
+		var queries = [groups, snippets, snips];
 		(function(){
 			self.execute(queries.shift(), (queries.length ? arguments.callee : callback));
 		})();
@@ -81,8 +74,6 @@ Snippely.Database = new Class({
 	
 	onOpen: function(event){
 		air.trace("database created / loaded");
-		console.log('database created / loaded');
-		
 		this.create(this.fireEvent.bind(this, 'onOpen'));
 	},
 	
@@ -94,7 +85,7 @@ Snippely.Database = new Class({
 	// Nuke the database
 	
 	nuke: function(){
-		['tags', 'snippets', 'snips'].each(function(table){
+		['groups', 'snippets', 'snips'].each(function(table){
 			this.execute("DROP TABLE " + table);
 		}, this);
 	}

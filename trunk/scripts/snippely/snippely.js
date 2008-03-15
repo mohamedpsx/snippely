@@ -13,7 +13,7 @@ var Snippely = {
 	initialize: function(){
 		
 		this.meta = $('meta');
-		this.tags = $('tags');
+		this.groups = $('groups');
 		this.footer = $('footer');
 		this.snippet = $('snippet');
 		this.snippets = $('snippets');
@@ -26,7 +26,7 @@ var Snippely = {
 		
 		this.database = new Snippely.Database({
 			onOpen: function(database){
-				this.Tags.initialize();
+				this.Groups.initialize();
 				this.Snips.initialize();
 				this.Snippet.initialize();
 				this.Snippets.initialize();
@@ -47,8 +47,8 @@ var Snippely = {
 		
 		//add menu
 		var addMenu = new ART.Menu('AddMenu').addItems(
-			new ART.Menu.Item('Add Tag...', {
-				onSelect: this.Tags.add.bind(this.Tags)
+			new ART.Menu.Item('Add Group...', {
+				onSelect: this.Groups.add.bind(this.Groups)
 			}),
 			new ART.Menu.Item('Add Snippet...', {
 				enabled: false,
@@ -58,13 +58,13 @@ var Snippely = {
 		
 		//action menu
 		var actionMenu = new ART.Menu('ActionMenu').addItems(
-			new ART.Menu.Item('Remove Tag...', {
+			new ART.Menu.Item('Remove Group...', {
 				enabled: false,
-				onSelect: this.Tags.remove.bind(this.Tags)
+				onSelect: this.Groups.remove.bind(this.Groups)
 			}),
-			new ART.Menu.Item('Rename Tag...', {
+			new ART.Menu.Item('Rename Group...', {
 				enabled: false,
-				onSelect: this.Tags.rename.bind(this.Tags)
+				onSelect: this.Groups.rename.bind(this.Groups)
 			}),
 			new ART.Menu.Item('Separator', {
 				separator: true
@@ -114,14 +114,14 @@ var Snippely = {
 	toggleMenus: function(type, state){
 		this.Menus.actionMenu.items['Remove ' + type + '...'].enabled = state;
 		this.Menus.actionMenu.items['Rename ' + type + '...'].enabled = state;
-		if (type == 'Tag') this.Menus.addMenu.items['Add Snippet...'].enabled = state;
+		if (type == 'Group') this.Menus.addMenu.items['Add Snippet...'].enabled = state;
 	},
 	
 	initializeLayout: function(){
 		
 		var redraw = this.redraw.bind(this);
 		
-		new Drag(this.tags, {
+		new Drag(this.groups, {
 			modifiers: {y: null, x: 'width'},
 			handle: this.leftResizer,
 			limit: {x: [150, 300]},
@@ -144,7 +144,7 @@ var Snippely = {
 		nativeWindow.addEventListener('activate', this.focus);
 		nativeWindow.addEventListener('deactivate', this.blur);
 
-		this.tagsScrollbar = new ART.ScrollBar('tags', 'tags-wrap');
+		this.groupsScrollbar = new ART.ScrollBar('groups', 'groups-wrap');
 		this.snippetScrollbar = new ART.ScrollBar('snippet', 'snippet-wrap');
 		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
 		
@@ -166,8 +166,8 @@ var Snippely = {
 		nativeWindow.x = left;
 		nativeWindow.y = top;
 		
-		var tagsWidth = ART.retrieve('tags:width') || 200;
-		this.tags.setStyle('width', tagsWidth);
+		var groupsWidth = ART.retrieve('groups:width') || 200;
+		this.groups.setStyle('width', groupsWidth);
 		
 		var snippetsHeight = ART.retrieve('snippets:height');
 		snippetsHeight = snippetsHeight || 0;
@@ -181,8 +181,8 @@ var Snippely = {
 		ART.store('window:height', nativeWindow.height);
 		ART.store('window:width', nativeWindow.width);
 		
-		ART.store('tags:width', this.tags.clientWidth);
-		ART.store('tags:active', this.Tags.id);
+		ART.store('groups:width', this.groups.clientWidth);
+		ART.store('groups:active', this.Groups.id);
 		
 		ART.store('snippets:height', this.snippets.offsetHeight || 0);
 		ART.store('snippet:active', this.Snippets.id);
@@ -203,9 +203,9 @@ var Snippely = {
 	
 	redraw: function(){
 		//width
-		var left = this.tags.offsetWidth;
+		var left = this.groups.offsetWidth;
 		$$(this.snippets, this.topResizer, this.meta, this.snippet).setStyle('left', left);		
-		this.footer.setStyle('width', this.tags.clientWidth);
+		this.footer.setStyle('width', this.groups.clientWidth);
 		
 		//height
 		var sniptoph = this.snippets.offsetHeight + this.topResizer.offsetHeight;
@@ -218,7 +218,7 @@ var Snippely = {
 		this.snippet.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
 		
 		//scrollbars
-		this.tagsScrollbar.update();
+		this.groupsScrollbar.update();
 		this.snippetScrollbar.update();
 		this.snippetsScrollbar.update();
 	},
