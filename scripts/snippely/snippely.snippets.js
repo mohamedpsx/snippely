@@ -75,10 +75,8 @@ Snippely.Snippets = {
 	
 	select: function(element){
 		if (!element || element == this.selected) return;
-		
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
-		
 		this.id = element.retrieve('snippet:id');
 		Snippely.Snippet.load(this.id);
 		Snippely.Snips.load(this.id);

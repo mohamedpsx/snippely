@@ -41,11 +41,17 @@ Snippely.Snips = {
 	},
 	
 	create: function(snip){
+		//var clipboard = air.Clipboard.generalClipboard;
+		
 		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
 		var content = new Element('div', {'class': 'content', 'text': snip.content}).paint(snip.type).inject(wrapper);
-		var remove = new Element('span', {'class': 'remove', 'text': 'remove'}).inject(info);
+		var remove = new Element('span', {'class': 'action', 'text': 'remove'}).inject(info);
+		//var paste = new Element('span', {'class': 'action', 'text': 'paste'}).inject(info);
+		//var copy = new Element('span', {'class': 'action', 'text': 'copy'}).inject(info);
 		var select = new Element('span', {'class': 'select', 'text': snip.type}).inject(info);
+		
+		var history = new History(content);
 		
 		var editable = new Editable(content, {
 			code: true,
@@ -53,6 +59,7 @@ Snippely.Snips = {
 			wrapper: wrapper,
 			activation: 'mousedown',
 			onBlur: function(element){
+				history.reset();
 				element.paint(wrapper.retrieve('snip:type'));
 				this.updateContent(content, wrapper);
 			}.bind(this)
@@ -62,6 +69,19 @@ Snippely.Snips = {
 			this.remove(wrapper);
 			event.stop();
 		}.bind(this));
+		
+		/*
+		paste.addEvent('mousedown', function(event){
+			if (clipboard.hasFormat("text/plain")) content.set('text', clipboard.getData("text/plain"));
+			event.stop();
+		}.bind(this));
+		
+		copy.addEvent('mousedown', function(event){
+			clipboard.clear();
+			clipboard.setData(content.get('text'), "text/plain", false);
+			event.stop();
+		}.bind(this));
+		*/
 		
 		select.addEvent('mousedown', function(event){
 			this.active = wrapper;
@@ -169,18 +189,3 @@ Snippely.Snips.Queries = {
 	removeBySnippet: "DELETE FROM snips WHERE snippet_id = :snippet_id"
 	
 };
-
-//snip content history for later
-/*
-content.history = [content.get('html')];
-content.addEvent('keydown', function(event){
-	if (event.meta && event.key == 'z'){
-		event.preventDefault();
-		var start = this.selectionStart;
-		var previous = (this.history.length > 1) ? this.history.pop() : this.history[0];
-		this.set('html', previous);
-	} else {
-		if (this.get('html') != this.history.getLast()) this.history.push(this.get('html'));
-	}
-});
-*/
