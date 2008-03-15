@@ -391,7 +391,7 @@ div.snip.code div.content {
 /* @group Highlight */
 
 .comment { color: #aaa; }
-.string { color: #418241; }
+.string, .value { color: #418241; }
 .special, .variable { color: #069; }
 .keyword, .function { color: #808018; }
 .boolean, .integer, .symbol { color: #c43434; }
