@@ -50,21 +50,13 @@ Snippely.Snips = {
 		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
 		var content = new Element('div', {'class': 'content'}).inject(wrapper);
+		var remove = new Element('span', {'class': 'remove', 'text': 'remove'}).inject(info);
+		var update = new Element('span', {'class': 'remove', 'text': 'save'}).inject(info);
 		var select = new Element('span', {'class': 'select', 'text': snip.type}).inject(info);
 		
 		content.set((snip.type == "Note") ? 'html' : 'text', snip.content.unescape()).paint(snip.type);
 		
-		info.addEvent('dblclick', this.remove.bind(this, wrapper));
-		
-		select.addEvent('mousedown', function(event){
-			this.active = wrapper;
-			var items = Snippely.Menus.brushMenu.items;
-			for (var item in items) items[item].checked = !!(item == wrapper.retrieve('snip:type'));
-			Snippely.Menus.brushMenu.display(event.client);
-			event.stop();
-		}.bind(this));
-		
-		new Editable(content, {
+		var editable = new Editable(content, {
 			code: true,
 			enter: true,
 			wrapper: wrapper,
@@ -74,6 +66,24 @@ Snippely.Snips = {
 				this.updateContent(content, wrapper);
 			}.bind(this)
 		});
+		
+		remove.addEvent('mousedown', function(event){
+			this.remove(wrapper);
+			event.stop();
+		}.bind(this));
+		
+		update.addEvent('mousedown', function(event){
+			content.fireEvent('blur');
+			event.stop();
+		});
+		
+		select.addEvent('mousedown', function(event){
+			this.active = wrapper;
+			var items = Snippely.Menus.brushMenu.items;
+			for (var item in items) items[item].checked = !!(item == wrapper.retrieve('snip:type'));
+			Snippely.Menus.brushMenu.display(event.client);
+			event.stop();
+		}.bind(this));
 		
 		wrapper.store('select', select);
 		wrapper.store('content', content);
