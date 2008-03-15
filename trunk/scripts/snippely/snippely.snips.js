@@ -129,16 +129,19 @@ Snippely.Snips = {
 	//update helpers
 	
 	updateType: function(type){
-		if (!this.active) return;
-		var id = this.active.retrieve('snip:id');
+		var wrapper = this.active;
+		if (!wrapper) return;
+		var id = wrapper.retrieve('snip:id');
+		var content = wrapper.retrieve('content');
 		var callback = function(){
-			this.active.store('snip:type', type);
-			this.active.retrieve('select').set('text', type);
-			this.active.set('class', ((type == 'Note') ? 'note' : 'code') + ' snip');
-			this.active.retrieve('content').paint(type);
+			wrapper.set('class', ((type == 'Note') ? 'note' : 'code') + ' snip');
+			wrapper.retrieve('select').set('text', type);
+			wrapper.store('snip:type', type);
+			content.paint(type);
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.updateType, callback, { id: id, type: type });
+		this.updateContent(content, wrapper);
 	},
 	
 	updateContent: function(content, wrapper){

@@ -74,7 +74,6 @@ String.implement({
 Element.implement({
 	
 	paint: function(brush){
-		if (!brush || brush == 'Note') return this;
 		return this.set('html', new Highlighter(brush).highlight(this.get('text')).get('html'));
 	}
 	
