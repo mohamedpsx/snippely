@@ -170,7 +170,7 @@ var Snippely = {
 		this.groups.setStyle('width', groupsWidth);
 		
 		var snippetsHeight = ART.retrieve('snippets:height');
-		snippetsHeight = snippetsHeight || 0;
+		snippetsHeight = (snippetsHeight != undefined) ? snippetsHeight : 0;
 		
 		this.snippets.setStyle('height', snippetsHeight);
 	},
