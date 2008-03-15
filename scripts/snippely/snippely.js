@@ -176,21 +176,17 @@ var Snippely = {
 	},
 	
 	storeProperties: function(){
-		var tag = this.Tags.selected;
-		var snippet = this.Snippets.selected;
-		tag = tag ? tag.retrieve('tag:id') : 0;
-		snippet = snippet ? snippet.retrieve('snippet:id') : 0;
-		
 		ART.store('window:y', nativeWindow.y);
 		ART.store('window:x', nativeWindow.x);
 		ART.store('window:height', nativeWindow.height);
 		ART.store('window:width', nativeWindow.width);
 		
 		ART.store('tags:width', this.tags.clientWidth);
-		ART.store('tags:active', tag);
 		
 		ART.store('snippets:height', this.snippets.offsetHeight || 0);
-		ART.store('snippets:active', snippet);
+		
+		this.Tags.storeActive();
+		this.Snippets.storeActive();
 	},
 	
 	initializeMetas: function(){
