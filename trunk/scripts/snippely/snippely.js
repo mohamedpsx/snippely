@@ -156,7 +156,6 @@ var Snippely = {
 	},
 	
 	retrieveProperties: function(){
-		
 		var top = ART.retrieve('window:y') || 100;
 		var left = ART.retrieve('window:x') || 100;
 		var height = ART.retrieve('window:height') || 480;
@@ -174,18 +173,24 @@ var Snippely = {
 		snippetsHeight = snippetsHeight || 0;
 		
 		this.snippets.setStyle('height', snippetsHeight);
-		
 	},
 	
 	storeProperties: function(){
+		var tag = this.Tags.selected;
+		var snippet = this.Snippets.selected;
+		tag = tag ? tag.retrieve('tag:id') : 0;
+		snippet = snippet ? snippet.retrieve('snippet:id') : 0;
+		
 		ART.store('window:y', nativeWindow.y);
 		ART.store('window:x', nativeWindow.x);
 		ART.store('window:height', nativeWindow.height);
 		ART.store('window:width', nativeWindow.width);
 		
 		ART.store('tags:width', this.tags.clientWidth);
+		ART.store('tags:active', tag);
 		
 		ART.store('snippets:height', this.snippets.offsetHeight || 0);
+		ART.store('snippets:active', snippet);
 	},
 	
 	initializeMetas: function(){
