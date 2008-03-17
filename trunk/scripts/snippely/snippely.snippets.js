@@ -2,25 +2,24 @@ Snippely.Snippets = {
 
 	initialize: function(){
 		this.list = $('snippets-list');
-		$('snippets').addEvent('click', this.deselect.bind(this));
+		$('snippets').addEvent('mousedown', this.deselect.bind(this));
 		this.id = ART.retrieve('snippet:active') || 0;
 	},
 	
-	load: function(id){
-		var group_id = id || Snippely.Groups.id;
+	load: function(insert){
+		var focus = insert && insert.lastInsertRowID;
 		var callback = function(result){
 			var snippets = result.data || [];
-			this.build(snippets);
+			this.build(snippets, focus);
 		}.bind(this);
 		
-		Snippely.database.execute(this.Queries.select, callback, { group_id: group_id });
+		Snippely.database.execute(this.Queries.select, callback, { group_id: Snippely.Groups.id });
 	},
 	
-	build: function(snippets){
+	build: function(snippets, focus){
 		this.list.empty();
-		var elements = snippets.map(this.create, this);
-		this.elements = $$(elements);
-		this.select($('snippet_' + this.id));
+		this.elements = $$(snippets.map(this.create, this));
+		this.select($('snippet_' + (focus || this.id)), focus);
 		this.redraw();
 	},
 	
@@ -37,42 +36,25 @@ Snippely.Snippets = {
 				event.stop();
 				this.select(element);
 			}.bind(this),
-			mousedown: function(event){
-				event.stopPropagation();
-			}
+			mousedown: function(event){ event.stopPropagation(); }
 		}).store('snippet:id', snippet.id));
 		
 		return element;
 	},
 	
 	add: function(){
-		var group = Snippely.Groups.selected;
-		if (!group) return;
-		
-		var callback = function(result){
-			var element = this.create({
-				id: result.lastInsertRowID,
-				title: 'New Snippet'
-			});
-			this.elements.push(element);
-			this.select(element);
-			this.redraw();
-			element.fireEvent('dblclick');
-		}.bind(this);
-		
-		Snippely.database.execute(this.Queries.insert, callback, {
-			group_id: group.retrieve('group:id')
-		});
+		this.deselect();
+		Snippely.database.execute(this.Queries.insert, this.load.bind(this), { group_id: Snippely.Groups.id });
 	},
 	
 	update: function(element){
-		Snippely.database.execute(this.Queries.update, this.reload.bind(this), {
+		Snippely.database.execute(this.Queries.update, this.load.bind(this), {
 			id: element.retrieve('snippet:id'),
 			title: element.get('text')
 		});
 	},
 	
-	select: function(element){
+	select: function(element, focus){
 		if (!element || element == this.selected) return;
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
@@ -80,15 +62,20 @@ Snippely.Snippets = {
 		Snippely.Snippet.load(this.id);
 		Snippely.Snips.load(this.id);
 		Snippely.toggleMenus('Snippet', true);
+		if (focus) element.fireEvent('dblclick');
 	},
 	
 	deselect: function(destroy){
-		if (!this.elements) return;
-		if (destroy == true) this.elements.destroy();
-		else this.elements.removeClass('selected');
-		this.selected = this.id = null;
-		Snippely.Snippet.hide();
-		Snippely.toggleMenus('Snippet', false);
+		if (!this.elements || !this.selected) return;
+		if (this.selected.retrieve('editable').editing()){
+			this.selected.blur();
+		} else {
+			if (destroy == true) this.elements.destroy();
+			else this.elements.removeClass('selected');
+			this.selected = this.id = null;
+			Snippely.Snippet.hide();
+			Snippely.toggleMenus('Snippet', false);
+		}
 	},
 	
 	rename: function(){
@@ -125,10 +112,6 @@ Snippely.Snippets = {
 		this.elements.removeClass('odd');
 		this.list.getElements(':odd').addClass('odd');
 		Snippely.Snippet.hide();
-	},
-	
-	reload: function(){
-		this.load();
 	}
 	
 };

@@ -2,25 +2,25 @@ Snippely.Groups = {
 
 	initialize: function(){
 		this.list = $('groups-list');
-		$('groups').addEvent('click', this.deselect.bind(this));
+		$('groups').addEvent('mousedown', this.deselect.bind(this));
 		this.id = ART.retrieve('groups:active') || 0;
 		this.load();
 	},
 	
-	load: function(){
+	load: function(insert){
+		var focus = insert && insert.lastInsertRowID;
 		var callback = function(result){
 			var groups = result.data || [];
-			this.build(groups);
+			this.build(groups, focus);
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.select, callback);
 	},
 	
-	build: function(groups){
+	build: function(groups, focus){
 		this.list.empty();
-		var elements = groups.map(this.create, this);
-		this.elements = $$(elements);
-		this.select($('group_' + this.id));
+		this.elements = $$(groups.map(this.create, this));
+		this.select($('group_' + (focus || this.id)), focus);
 		Snippely.redraw();
 	},
 
@@ -44,14 +44,8 @@ Snippely.Groups = {
 	},
 	
 	add: function(){
-		var callback = function(result){
-			var element = this.create({name: 'New Group', id: result.lastInsertRowID});
-			this.elements.push(element);
-			this.select(element);
-			Snippely.redraw();
-			element.fireEvent('dblclick');
-		}.bind(this);
-		Snippely.database.execute(this.Queries.insert, callback);
+		this.deselect();
+		Snippely.database.execute(this.Queries.insert, this.load.bind(this));
 	},
 	
 	update: function(element){
@@ -61,21 +55,27 @@ Snippely.Groups = {
 		});
 	},
 	
-	select: function(element){
+	select: function(element, focus){
 		if (!element || element == this.selected) return;
 		this.elements.removeClass('selected');
 		this.selected = element.addClass('selected');
 		this.id = element.retrieve('group:id');
 		Snippely.Snippets.deselect(true);
-		Snippely.Snippets.load(this.id);
+		Snippely.Snippets.load();
 		Snippely.toggleMenus('Group', true);
+		if (focus) element.fireEvent('dblclick');
 	},
 	
 	deselect: function(){
-		this.elements.removeClass('selected');
-		this.selected = this.id = null;
-		Snippely.Snippets.deselect(true);
-		Snippely.toggleMenus('Group', false);
+		if (!this.selected) return;
+		if (this.selected.retrieve('editable').editing()){
+			this.selected.blur();
+		} else {
+			this.elements.removeClass('selected');
+			this.selected = this.id = null;
+			Snippely.Snippets.deselect(true);
+			Snippely.toggleMenus('Group', false);
+		}
 	},
 	
 	rename: function(){

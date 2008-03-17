@@ -103,16 +103,20 @@ var Snippely = {
 		
 		$('button-add').addEvent('mousedown', function(event){
 			this.addClass('active');
-			addMenu.display(event.client);
-			this.removeClass('active');
-			event.stop();
+			(function(){
+				addMenu.display(event.client);
+				this.removeClass('active');
+			}.delay(100, this));
+			event.stopPropagation();
 		});
 		
 		$('button-action').addEvent('mousedown', function(event){
 			this.addClass('active');
-			actionMenu.display(event.client);
-			this.removeClass('active');
-			event.stop();
+			(function(){
+				actionMenu.display(event.client);
+				this.removeClass('active');
+			}.delay(100, this));
+			event.stopPropagation();
 		});
 		
 		this.Menus = {
