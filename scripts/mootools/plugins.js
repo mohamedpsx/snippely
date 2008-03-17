@@ -26,12 +26,14 @@ var Editable = new Class({
 	
 	edit: function(){
 		this.element.contentEditable = true;
-		this.wrapper.addClass(this.options.className).focus();
+		this.element.setStyle('-webkit-user-modify', 'read-write-plaintext-only');
+		this.wrapper.addClass(this.options.className);
 		this.fireEvent('onEdit', this.element);
 	},
 	
 	blur: function(){
 		this.element.contentEditable = false;
+		this.element.setStyle('-webkit-user-modify', 'read-only');
 		this.wrapper.removeClass(this.options.className);
 		this.fireEvent('onBlur', this.element);
 	},
