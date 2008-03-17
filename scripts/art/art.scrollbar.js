@@ -17,7 +17,6 @@ ART.ScrollBar = new Class({
 		
 		this.document = this.scrolling.getDocument();
 		this.padding = this.scrolling.getStyle('padding-right').toInt();
-		
 		this.container = new Element('div').addClass('art-scrollbar').inject(this.scrolling);
 		
 		if (this.options.id) this.container.set('id', this.options.id);
@@ -30,7 +29,6 @@ ART.ScrollBar = new Class({
 		this.paintBottom = new Element('div', {'class': 'art-scrollbar-paint-bottom'}).inject(this.thumb);
 		
 		this.scroller = new Fx.Scroll(this.content, this.options.morph);
-
 		this.morphThumb = new Fx.Morph(this.thumb, this.options.morph);
 		
 		this.selection = (Browser.Engine.trident) ? 'selectstart' : 'mousedown';

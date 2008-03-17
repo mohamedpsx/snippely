@@ -41,18 +41,18 @@ Snippely.Snips = {
 	},
 	
 	create: function(snip){
-		//var clipboard = air.Clipboard.generalClipboard;
+		var items = Snippely.Menus.brushMenu.items;
+		var clipboard = air.Clipboard.generalClipboard;
 		
-		var wrapper = new Element('div', {'class': ((snip.type == 'Note') ? 'note' : 'code') + ' snip'});
+		var wrapper = new Element('div', {'class': (snip.type == 'Note' ? 'note' : 'code') + ' snip'});
 		var info = new Element('div', {'class': 'info'}).inject(wrapper);
-		var content = new Element('div', {'class': 'content', 'text': snip.content}).paint(snip.type).inject(wrapper);
 		var remove = new Element('span', {'class': 'action', 'text': 'remove'}).inject(info);
 		//var paste = new Element('span', {'class': 'action', 'text': 'paste'}).inject(info);
 		//var copy = new Element('span', {'class': 'action', 'text': 'copy'}).inject(info);
 		var select = new Element('span', {'class': 'select', 'text': snip.type}).inject(info);
+		var content = new Element('div', {'class': 'content', 'text': snip.content}).inject(wrapper).paint(snip.type);
 		
 		var history = new History(content);
-		
 		var editable = new Editable(content, {
 			code: true,
 			enter: true,
@@ -60,32 +60,26 @@ Snippely.Snips = {
 			activation: 'mousedown',
 			onBlur: function(element){
 				history.reset();
+				this.updateContent(wrapper);
 				element.paint(wrapper.retrieve('snip:type'));
-				this.updateContent(content, wrapper);
 			}.bind(this)
 		});
 		
-		remove.addEvent('mousedown', function(event){
-			this.remove(wrapper);
-			event.stop();
-		}.bind(this));
+		remove.addEvent('mousedown', this.remove.bind(this, wrapper));
 		
 		/*
 		paste.addEvent('mousedown', function(event){
-			if (clipboard.hasFormat("text/plain")) content.set('text', clipboard.getData("text/plain"));
-			event.stop();
+			content.set('text', clipboard.getData("text/plain"));
 		}.bind(this));
 		
 		copy.addEvent('mousedown', function(event){
 			clipboard.clear();
 			clipboard.setData(content.get('text'), "text/plain", false);
-			event.stop();
 		}.bind(this));
 		*/
 		
 		select.addEvent('mousedown', function(event){
 			this.active = wrapper;
-			var items = Snippely.Menus.brushMenu.items;
 			for (var item in items) items[item].checked = !!(item == wrapper.retrieve('snip:type'));
 			select.addClass('active');
 			Snippely.Menus.brushMenu.display(event.client);
@@ -98,15 +92,13 @@ Snippely.Snips = {
 		wrapper.store('snip:id', snip.id);
 		wrapper.store('snip:type', snip.type);
 		
-		this.container.adopt(wrapper);
-		return wrapper;
+		return wrapper.inject(this.container);
 	},
 	
 	add: function(type){
 		var snippet = Snippely.Snippets.selected;
 		if (!snippet) return;
 		
-		var position = this.elements.length;
 		var content = 'Some Content';
 		var callback = function(result){
 			var element = this.create({
@@ -122,7 +114,7 @@ Snippely.Snips = {
 		Snippely.database.execute(this.Queries.insert, callback, {
 			type: type,
 			content: content,
-			position: position,
+			position: this.elements.length,
 			snippet_id: snippet.retrieve('snippet:id')
 		});
 	},
@@ -144,23 +136,22 @@ Snippely.Snips = {
 	updateType: function(type){
 		var wrapper = this.active;
 		if (!wrapper) return;
-		var id = wrapper.retrieve('snip:id');
-		var content = wrapper.retrieve('content');
 		var callback = function(){
-			wrapper.set('class', ((type == 'Note') ? 'note' : 'code') + ' snip');
-			wrapper.retrieve('select').set('text', type);
-			wrapper.store('snip:type', type);
-			content.paint(type);
-		}.bind(this);
+			wrapper.store('snip:type', type).retrieve('select').set('text', type);
+			wrapper.set('class', (type == 'Note' ? 'note' : 'code') + ' snip');
+			wrapper.retrieve('content').paint(type);
+		};
 		
-		Snippely.database.execute(this.Queries.updateType, callback, { id: id, type: type });
-		this.updateContent(content, wrapper);
+		Snippely.database.execute(this.Queries.updateType, callback, {
+			id: wrapper.retrieve('snip:id'),
+			type: type
+		});
 	},
 	
-	updateContent: function(content, wrapper){
+	updateContent: function(wrapper){
 		Snippely.database.execute(this.Queries.updateContent, {
 			id: wrapper.retrieve('snip:id'),
-			content: content.get('text')
+			content: wrapper.retrieve('content').get('text')
 		});
 	},
 	
