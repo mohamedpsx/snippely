@@ -44,7 +44,7 @@ body {
 	right: 0px;
 	bottom: 0px;
 	position: absolute;
-	background: #eee url(../images/watermark.png) no-repeat center center;
+	background: #eee url(../images/wm-black.png) no-repeat center center;
 }
 
 #content-wrap {
