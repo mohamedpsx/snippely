@@ -11,12 +11,11 @@ Application.autoExit = true;
 var Snippely = {
 	
 	initialize: function(){
+		this.contentTop = $('content-top');
+		this.contentLeft = $('content-left');
+		this.contentRight = $('content-right');
+		this.contentBottom = $('content-bottom');
 		
-		this.meta = $('meta');
-		this.groups = $('groups');
-		this.footer = $('footer');
-		this.snippet = $('snippet');
-		this.snippets = $('snippets');
 		this.topResizer = $('top-resizer');
 		this.leftResizer = $('left-resizer');
 		
@@ -34,22 +33,18 @@ var Snippely = {
 		});
 		
 		if (AIR.NativeApplication.supportsDockIcon){
-			
 			Application.addEventListener('exiting', function(){
 				Snippely.exiting = true;
 			});
-			
 			Application.addEventListener('invoke', function(){
 				Snippely.activate();
 			});
-			
-			nativeWindow.addEventListener('closing', function(e){
+			nativeWindow.addEventListener('closing', function(event){
 				if (!Snippely.exiting){
-					e.preventDefault();
+					event.preventDefault();
 					Snippely.deactivate();
 				}
 			});
-			
 		} else {
 			Snippely.activate();
 		}
@@ -135,20 +130,17 @@ var Snippely = {
 	initializeLayout: function(){
 		var redraw = this.redraw.bind(this);
 		
-		new Drag(this.groups, {
-			modifiers: {y: null, x: 'width'},
+		new Drag(this.contentLeft, {
 			handle: this.leftResizer,
+			modifiers: {y: null, x: 'width'},
 			limit: {x: [150, 300]},
 			onDrag: redraw
 		});
 
-		new Drag(this.snippets, {
-			modifiers: {y: 'height', x: null},
+		new Drag(this.contentTop, {
 			handle: this.topResizer,
-			limit: {y: [0, function(){
-				return window.getHeight() - this.topResizer.getHeight();
-				}.bind(this)
-			]},
+			modifiers: {y: 'height', x: null},
+			limit: {y: [this.topResizer.getHeight.bind(this.topResizer), window.getHeight]},
 			onDrag: redraw
 		});
 		
@@ -157,35 +149,30 @@ var Snippely = {
 		nativeWindow.addEventListener('deactivate', redraw);
 		nativeWindow.addEventListener('activate', this.focus);
 		nativeWindow.addEventListener('deactivate', this.blur);
+		nativeWindow.addEventListener('closing', this.storeProperties.bind(this));
 		
 		this.groupsScrollbar = new ART.ScrollBar('groups', 'groups-wrap');
 		this.snippetScrollbar = new ART.ScrollBar('snippet', 'snippet-wrap');
 		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
 		
 		this.retrieveProperties();
-		nativeWindow.addEventListener('closing', this.storeProperties.bind(this));
-		
 		this.redraw();
 	},
 	
 	retrieveProperties: function(){
 		var top = ART.retrieve('window:y') || 100;
 		var left = ART.retrieve('window:x') || 100;
-		var height = ART.retrieve('window:height') || 480;
 		var width = ART.retrieve('window:width') || 640;
-		
-		nativeWindow.height = height;
-		nativeWindow.width = width;
-		nativeWindow.x = left;
-		nativeWindow.y = top;
-		
+		var height = ART.retrieve('window:height') || 480;
 		var groupsWidth = ART.retrieve('groups:width') || 200;
-		this.groups.setStyle('width', groupsWidth);
+		var snippetsHeight = ART.retrieve('snippets:height') || 100;
 		
-		var snippetsHeight = ART.retrieve('snippets:height');
-		snippetsHeight = (snippetsHeight != undefined) ? snippetsHeight : 100;
-		
-		this.snippets.setStyle('height', snippetsHeight);
+		nativeWindow.y = top;
+		nativeWindow.x = left;
+		nativeWindow.width = width;
+		nativeWindow.height = height;
+		this.contentLeft.setStyle('width', groupsWidth);
+		this.contentTop.setStyle('height', snippetsHeight);
 	},
 	
 	storeProperties: function(){
@@ -194,15 +181,15 @@ var Snippely = {
 		ART.store('window:height', nativeWindow.height);
 		ART.store('window:width', nativeWindow.width);
 		
-		ART.store('groups:width', this.groups.clientWidth);
+		ART.store('groups:width', this.contentLeft.clientWidth);
 		ART.store('groups:active', this.Groups.id);
 		
-		ART.store('snippets:height', this.snippets.offsetHeight || 0);
+		ART.store('snippets:height', this.contentTop.offsetHeight);
 		ART.store('snippet:active', this.Snippets.id);
 	},
 	
 	initializeMetas: function(){
-		var metaButtons = $$('#meta .button');
+		var metaButtons = $$('#snippet-toolbar .button');
 		metaButtons.addEvent('mousedown', function(){
 			this.addClass('active');
 		});
@@ -215,22 +202,9 @@ var Snippely = {
 	},
 	
 	redraw: function(){
-		//width
-		var left = this.groups.offsetWidth;
-		$$(this.snippets, this.topResizer, this.meta, this.snippet).setStyle('left', left);		
-		this.footer.setStyle('width', this.groups.clientWidth);
+		this.contentRight.setStyle('left', this.contentLeft.offsetWidth);
+		this.contentBottom.setStyle('top', this.contentTop.offsetHeight);
 		
-		//height
-		var sniptoph = this.snippets.offsetHeight + this.topResizer.offsetHeight;
-		var winh = window.getHeight();
-		if (sniptoph >= winh) this.snippets.setStyle('height', winh - this.topResizer.offsetHeight);
-		
-		//top
-		this.topResizer.setStyle('top', this.snippets.offsetHeight);		
-		this.meta.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight);
-		this.snippet.setStyle('top', this.snippets.offsetHeight + this.topResizer.offsetHeight + this.meta.offsetHeight);
-		
-		//scrollbars
 		this.groupsScrollbar.update();
 		this.snippetScrollbar.update();
 		this.snippetsScrollbar.update();

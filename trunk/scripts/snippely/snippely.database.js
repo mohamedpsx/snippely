@@ -52,10 +52,7 @@ Snippely.Database = new Class({
 	
 	execute: function(){
 		var args = Array.link(arguments, {sql: String.type, callback: Function.type, params: Object.type});
-		
-		var sql = args.sql;
-		var callback = args.callback || $empty;
-		var params = args.params || {};
+		var sql = args.sql, callback = args.callback || $empty, params = args.params || {};
 		
 		var statement = new air.SQLStatement();
 		statement.sqlConnection = this.connection;

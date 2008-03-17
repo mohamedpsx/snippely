@@ -44,7 +44,6 @@ Snippely.Groups = {
 	},
 	
 	add: function(){
-		this.deselect();
 		Snippely.database.execute(this.Queries.insert, this.load.bind(this));
 	},
 	
@@ -68,12 +67,12 @@ Snippely.Groups = {
 	
 	deselect: function(){
 		if (!this.selected) return;
-		if (this.selected.retrieve('editable').editing()){
-			this.selected.blur();
-		} else {
-			this.elements.removeClass('selected');
+		if (this.selected.retrieve('editable').editing()) this.selected.blur();
+		else {
 			this.selected = this.id = null;
-			Snippely.Snippets.deselect(true);
+			this.elements.removeClass('selected');
+			Snippely.Snippets.deselect();
+			Snippely.Snippets.hide();
 			Snippely.toggleMenus('Group', false);
 		}
 	},
