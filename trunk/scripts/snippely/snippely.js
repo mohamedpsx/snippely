@@ -153,7 +153,7 @@ var Snippely = {
 		nativeWindow.addEventListener('deactivate', redraw);
 		nativeWindow.addEventListener('activate', this.focus);
 		nativeWindow.addEventListener('deactivate', this.blur);
-
+		
 		this.groupsScrollbar = new ART.ScrollBar('groups', 'groups-wrap');
 		this.snippetScrollbar = new ART.ScrollBar('snippet', 'snippet-wrap');
 		this.snippetsScrollbar = new ART.ScrollBar('snippets', 'snippets-wrap');
@@ -232,10 +232,6 @@ var Snippely = {
 		this.snippetsScrollbar.update();
 	},
 	
-	deactivate: function(){
-		nativeWindow.visible = false;
-	},
-	
 	activate: function(){
 		(function(){
 			nativeWindow.visible = true;
@@ -243,6 +239,10 @@ var Snippely = {
 		}).delay(100);
 	},
 
+	deactivate: function(){
+		nativeWindow.visible = false;
+	},
+	
 	focus: function(){
 		document.body.id = 'focus';
 	},

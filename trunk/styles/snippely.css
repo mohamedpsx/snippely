@@ -310,7 +310,6 @@ div.snip div.content {
 	overflow: hidden;
 	min-height: 14px;
 	line-height: 14px;
-	-webkit-user-modify: read-write-plaintext-only;
 }
 
 div.snip.code div.content {
