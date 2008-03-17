@@ -87,7 +87,9 @@ Snippely.Snips = {
 			this.active = wrapper;
 			var items = Snippely.Menus.brushMenu.items;
 			for (var item in items) items[item].checked = !!(item == wrapper.retrieve('snip:type'));
+			select.addClass('active');
 			Snippely.Menus.brushMenu.display(event.client);
+			select.removeClass('active');
 			event.stop();
 		}.bind(this));
 		
