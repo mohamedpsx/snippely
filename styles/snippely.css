@@ -27,27 +27,67 @@ body {
 
 /* @end */
 
+/* @group Content */
+
+#content-left {
+	top:0px;
+	left:0px;
+	bottom:0px;
+	width:200px;
+	position: absolute;
+	border-right:1px solid #a5a5a5;
+}
+
+#content-right {
+	top:0px;
+	left:200px;
+	right:0px;
+	bottom:0px;
+	position:absolute;
+	background: #eee url(../images/watermark.png) no-repeat center center;
+}
+
+#content-wrap {
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+	position:absolute;
+	background-color:#eee;
+}
+
+#content-top {
+	top:0px;
+	left:0px;
+	right:0px;
+	width:100%;
+	height:100px;
+	position:absolute;
+}
+
+#content-bottom {
+	top:107px;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	width:100%;
+	position:absolute;
+}
+
+/* @end */
+
 /* @group Groups */
 
 #groups {
-	top: 0;
-	left: 0;
-	bottom: 22px;
-	width: 200px;
-	position: fixed;
-	border-right: 1px solid #a5a5a5;
-}
-
-#blur #groups {
-	background-color: #e8e8e8;
-}
-
-#focus #groups {
-	background-color: #d5dde6;
+	top:0px;
+	left:0px;
+	bottom:23px;
+	width:100%;
+	position:absolute;
 }
 
 #groups-wrap {
-	height: 100%;
+	height:100%;
 	overflow: hidden;
 }
 
@@ -58,14 +98,6 @@ body {
 	font-weight: bold;
 	text-transform: uppercase;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-#blur #groups h3 {
-	color: #606060;
-}
-
-#focus #groups h3 {
-	color: #58697a;
 }
 
 #groups li {
@@ -81,14 +113,6 @@ body {
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 }
 
-#blur #groups li.selected {
-	background-image: url(../images/selected-blur.png);
-}
-
-#focus #groups li.selected {
-	background-image: url(../images/selected-focus.png);
-}
-
 #groups li.editing::selection {
 	color: #fff;
 	background-color: #ccc;
@@ -99,8 +123,8 @@ body {
 /* @group Footer */
 
 #footer {
-	bottom: 0;
-	left: 0;
+	left: 0px;
+	bottom: 0px;
 	width: 100%;
 	height: 22px;
 	position: absolute;
@@ -133,8 +157,8 @@ body {
 }
 
 #left-resizer {
-	float: right;
 	width: 17px;
+	float: right;
 	background-image: url(../images/button-splitter.png);
 }
 
@@ -143,10 +167,11 @@ body {
 /* @group Snippets */
 
 #snippets {
-	top: 0;
-	right: 0;
-	height: 100px;
-	position: fixed;
+	top:0px;
+	left:0px;
+	right:0px;
+	bottom:7px;
+	position:absolute;
 	background-color: #fff;
 }
 
@@ -168,23 +193,17 @@ body {
 	color: #fff;
 }
 
-#focus #snippets li.selected {
-	background-color: #637282;
-}
-
-#blur #snippets li.selected {
-	background-color: #828282;
-}
-
 #snippets li.editing::selection {
 	color: #fff;
 	background-color: #ccc;
 }
 
 #top-resizer {
+	width: 100%;
 	height: 5px;
-	right: 0;
-	position: absolute;
+	left:0px;
+	bottom:0px;
+	position:absolute;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 	background:
@@ -196,10 +215,23 @@ body {
 
 /* @group Snippet */
 
+#snippet-toolbar {
+	top:0px;
+	left:0px;
+	right:0px;
+	height:18px;
+	padding:3px 0px;
+	border-top: 1px solid #e8eaed;
+	border-bottom: 1px solid #aaa;
+	background: url(../images/grad.png) repeat-x left;
+}
+
 #snippet {
+	top:26px;
+	left:0px;
+	right:0px;
+	bottom:0px;
 	position: absolute;
-	right: 0;
-	bottom: 0;
 	font-size: 12px;
 }
 
@@ -208,8 +240,8 @@ body {
 	overflow: hidden;
 }
 
-#snippet-pad {
-	padding: 10px;
+#snippet-container {
+	padding:10px;
 }
 
 #snippet-title {
@@ -233,6 +265,10 @@ body {
 #snippet-description.editing, #snippet-title.editing {
 	color: #217ffd;
 }
+
+/* @end */
+
+/* @group Snips */
 
 div.snip {
 	font-size: 11px;
@@ -298,8 +334,6 @@ div.info span.action {
 	display: inline;
 }
 
-/*.content*/
-
 div.snip.code div.content, div.snip div.info {
 	font-family: "Andale Mono", "Monaco", Courier;
 }
@@ -322,31 +356,14 @@ div.snip.note div.content {
 
 /* @end */
 
-/* @group Meta */
+/* @group Toolbar */
 
-#meta {
-	right: 0px;
-	padding: 3px 8px;
-	position: absolute;
-	border-top: 1px solid #e8eaed;
-	border-bottom: 1px solid #aaa;
-	background: url(../images/grad.png) repeat-x left;
-}
-
-#focus #meta {
-	background-color: #D5DDE6;
-}
-
-#blur #meta {
-	background-color: #e5e5e5;
-}
-
-#meta .button {
+#snippet-toolbar .button {
 	color: #333;
 	width: 84px;
 	height: 11px;
 	padding: 3px 0;
-	margin-right: 5px;
+	margin-left: 5px;
 	font-size: 9px;
 	float: left;
 	display: block;
@@ -354,7 +371,7 @@ div.snip.note div.content {
 	background: url(../images/pill.png) no-repeat bottom left;
 }
 
-#meta .button.active {
+#snippet-toolbar .button.active {
 	background-position: top left;
 }
 
@@ -404,18 +421,6 @@ div.snip.note div.content {
 	background: url(../images/thumb-bottom.png) top left no-repeat;
 }
 
-#blur .art-scrollbar-paint-bottom {
-	background-image: url(../images/thumb-bottom-blur.png);
-}
-
-#blur .art-scrollbar-paint-top {
-	background-image: url(../images/thumb-top-blur.png);
-}
-
-#blur .art-scrollbar-paint-center {
-	background-image: url(../images/thumb-center-blur.png);
-}
-
 /* @end */
 
 /* @group Highlight */
@@ -428,5 +433,28 @@ div.snip.note div.content {
 .preprocessor { color: gray; }
 
 div.editing .content span { color: #333; }
+
+/* @end */
+
+/* @group Focus / Blur Rules */
+
+#blur #content-left { background-color: #e8e8e8; }
+#focus #content-left { background-color: #d5dde6; }
+
+#blur #groups h3 { color: #606060; }
+#focus #groups h3 { color: #58697a; }
+
+#focus #groups li.selected { background-image: url(../images/selected-focus.png); }
+#blur #groups li.selected { background-image: url(../images/selected-blur.png); }
+
+#focus #snippets li.selected { background-color: #637282; }
+#blur #snippets li.selected { background-color: #828282; }
+
+#focus #snippet-toolbar { background-color: #D5DDE6; }
+#blur #snippet-toolbar { background-color: #e5e5e5; }
+
+#blur .art-scrollbar-paint-top { background-image: url(../images/thumb-top-blur.png); }
+#blur .art-scrollbar-paint-center { background-image: url(../images/thumb-center-blur.png); }
+#blur .art-scrollbar-paint-bottom { background-image: url(../images/thumb-bottom-blur.png); }
 
 /* @end */

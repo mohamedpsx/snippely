@@ -2,9 +2,9 @@ Snippely.Snippet = {
 	
 	initialize: function(){
 		this.title = $('snippet-title');
-		this.toolbar = $('meta');
-		this.container = $('snippet-container');
+		this.toolbar = $('snippet-toolbar');
 		this.description = $('snippet-description');
+		this.container = $('content-bottom');
 		
 		new Editable(this.title, { onBlur: this.updateTitle.bind(this) });
 		new Editable(this.description, { enter: true, onBlur: this.updateDescription.bind(this) });
@@ -43,16 +43,12 @@ Snippely.Snippet = {
 		});
 	},
 	
-	hide: function(){
-		this.toolbar.setStyle('display', 'none');
-		this.container.setStyle('display', 'none');
-		Snippely.redraw();
+	show: function(){
+		this.container.setStyle('display', '');
 	},
 	
-	show: function(){
-		this.toolbar.setStyle('display', '');
-		this.container.setStyle('display', '');
-		Snippely.redraw();
+	hide: function(){
+		this.container.setStyle('display', 'none');
 	}
 	
 };

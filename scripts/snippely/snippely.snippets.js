@@ -2,6 +2,7 @@ Snippely.Snippets = {
 
 	initialize: function(){
 		this.list = $('snippets-list');
+		this.container = $('content-wrap');
 		$('snippets').addEvent('mousedown', this.deselect.bind(this));
 		this.id = ART.retrieve('snippet:active') || 0;
 	},
@@ -43,7 +44,6 @@ Snippely.Snippets = {
 	},
 	
 	add: function(){
-		this.deselect();
 		Snippely.database.execute(this.Queries.insert, this.load.bind(this), { group_id: Snippely.Groups.id });
 	},
 	
@@ -65,14 +65,12 @@ Snippely.Snippets = {
 		if (focus) element.fireEvent('dblclick');
 	},
 	
-	deselect: function(destroy){
-		if (!this.elements || !this.selected) return;
-		if (this.selected.retrieve('editable').editing()){
-			this.selected.blur();
-		} else {
-			if (destroy == true) this.elements.destroy();
-			else this.elements.removeClass('selected');
+	deselect: function(){
+		if (!this.selected) return;
+		if (this.selected.retrieve('editable').editing()) this.selected.blur();
+		else {
 			this.selected = this.id = null;
+			this.elements.removeClass('selected');
 			Snippely.Snippet.hide();
 			Snippely.toggleMenus('Snippet', false);
 		}
@@ -108,10 +106,20 @@ Snippely.Snippets = {
 		Snippely.database.execute(this.Queries.select, callback, { group_id: group_id });
 	},
 	
+	show: function(){
+		this.container.setStyle('display', '');
+	},
+	
+	hide: function(){
+		this.container.setStyle('display', 'none');
+	},
+	
 	redraw: function(){
 		this.elements.removeClass('odd');
 		this.list.getElements(':odd').addClass('odd');
 		Snippely.Snippet.hide();
+		this.show();
+		Snippely.redraw();
 	}
 	
 };

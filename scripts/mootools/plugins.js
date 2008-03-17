@@ -45,7 +45,8 @@ var Editable = new Class({
 	process: function(event, node){
 		var key = event.key, meta = event.meta;
 		if (meta && (key == 's' || key == 'enter')) this.element.blur();
-		else if (!this.options.enter && key == 'enter') this.element.blur();
+		else if (key == 'enter' && !this.options.enter) this.element.blur();
+		else if (key == 'backspace' && this.element.get('text') == '') event.stop();
 		else if (!meta && this.options.code){
 			var selection = window.getSelection();
 			try {
