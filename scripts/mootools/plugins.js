@@ -5,36 +5,40 @@ var Editable = new Class({
 	Implements: [Events, Options],
 	
 	options: {/*
-		onEdit: $empty,
-		onBlur: $empty,*/
+		onBlur: $empty,
+		onFocus: $empty,*/
 		code: false,
 		enter: false,
 		wrapper: false,
 		className: 'editing',
-		activation: 'dblclick'
+		activation: 'dblclick',
+		policy: 'read-write-plaintext-only'
 	},
 	
 	initialize: function(element, options){
 		this.setOptions(options);
 		this.element = $(element);
 		this.wrapper = this.options.wrapper || this.element;
-		this.element.addEvent(this.options.activation, this.edit.bind(this));
+		this.element.addEvent(this.options.activation, this.focus.bind(this));
 		this.element.addEvent('keydown', this.process.bind(this));
 		this.element.addEvent('blur', this.blur.bind(this));
 		this.element.store('editable', this);
 	},
 	
-	edit: function(){
-		this.element.contentEditable = true;
-		this.element.setStyle('-webkit-user-modify', 'read-write-plaintext-only');
+	editing: function(){
+		return this.wrapper.hasClass(this.options.className);
+	},
+	
+	focus: function(){
 		this.wrapper.addClass(this.options.className);
-		this.fireEvent('onEdit', this.element);
+		this.element.setStyle('-webkit-user-modify', this.options.policy);
+		if (this.options.activation == 'dblclick') this.element.focus();
+		this.fireEvent('onFocus', this.element);
 	},
 	
 	blur: function(){
-		this.element.contentEditable = false;
-		this.element.setStyle('-webkit-user-modify', 'read-only');
 		this.wrapper.removeClass(this.options.className);
+		this.element.setStyle('-webkit-user-modify', 'read-only');
 		this.fireEvent('onBlur', this.element);
 	},
 	
