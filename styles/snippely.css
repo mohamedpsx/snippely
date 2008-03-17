@@ -16,7 +16,7 @@ body {
 	background-color: #eee;
 }
 
-#snippets, #meta, #groups, #footer {
+#snippets, #meta, #groups, #footer, #snippet-toolbar {
 	-webkit-user-select: none;
 }
 
