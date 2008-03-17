@@ -214,6 +214,11 @@ var Snippely = {
 	
 	redraw: function(){
 		this.contentRight.setStyle('left', this.contentLeft.offsetWidth);
+
+		var contentTopHeight = this.contentTop.offsetHeight;
+		var windowHeight = window.getHeight();
+		if (contentTopHeight > windowHeight) this.contentTop.setStyle('height', windowHeight);
+		
 		this.contentBottom.setStyle('top', this.contentTop.offsetHeight);
 		
 		this.groupsScrollbar.update();
