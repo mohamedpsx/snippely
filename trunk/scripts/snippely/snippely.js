@@ -20,8 +20,8 @@ var Snippely = {
 		this.leftResizer = $('left-resizer');
 		
 		this.initializeMenus();
-		this.initializeMetas();
 		this.initializeLayout();
+		this.initializeButtons();
 		
 		this.database = new Snippely.Database({
 			onOpen: function(database){
@@ -121,12 +121,6 @@ var Snippely = {
 		};
 	},
 	
-	toggleMenus: function(type, state){
-		this.Menus.actionMenu.items['Remove ' + type + '...'].enabled = state;
-		this.Menus.actionMenu.items['Rename ' + type + '...'].enabled = state;
-		if (type == 'Group') this.Menus.addMenu.items['Add Snippet...'].enabled = state;
-	},
-	
 	initializeLayout: function(){
 		var redraw = this.redraw.bind(this);
 		
@@ -159,6 +153,30 @@ var Snippely = {
 		this.redraw();
 	},
 	
+	initializeButtons: function(){
+		var previous;
+		var addClass = function(){ this.addClass('active'); };
+		var removeClass = function(){ this.removeClass('active'); };
+		
+		$$('#snippet-toolbar .button').addEvents({
+			mouseout: removeClass,
+			mousedown: function(event){
+				previous = this.addEvent('mouseover', addClass);
+				addClass.call(this);
+				event.stop();
+			}
+		});
+		
+		document.addEvent('mouseup', function(){
+			if (!previous) return;
+			removeClass.call(previous.removeEvent('mouseover', addClass));
+			previous = null;
+		});
+		
+		$('add-code').addEvent('click', this.Snips.add.bind(this.Snips, 'Plain Text'));
+		$('add-note').addEvent('click', this.Snips.add.bind(this.Snips, 'Note'));
+	},
+	
 	retrieveProperties: function(){
 		var top = ART.retrieve('window:y') || 100;
 		var left = ART.retrieve('window:x') || 100;
@@ -188,17 +206,10 @@ var Snippely = {
 		ART.store('snippet:active', this.Snippets.id);
 	},
 	
-	initializeMetas: function(){
-		var metaButtons = $$('#snippet-toolbar .button');
-		metaButtons.addEvent('mousedown', function(){
-			this.addClass('active');
-		});
-		document.addEvent('mouseup', function(){
-			metaButtons.removeClass('active');
-		});
-		
-		$('add-code').addEvent('click', this.Snips.add.bind(this.Snips, 'Plain Text'));
-		$('add-note').addEvent('click', this.Snips.add.bind(this.Snips, 'Note'));
+	toggleMenus: function(type, state){
+		this.Menus.actionMenu.items['Remove ' + type + '...'].enabled = state;
+		this.Menus.actionMenu.items['Rename ' + type + '...'].enabled = state;
+		if (type == 'Group') this.Menus.addMenu.items['Add Snippet...'].enabled = state;
 	},
 	
 	redraw: function(){
