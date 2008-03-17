@@ -16,7 +16,7 @@ body {
 	background-color: #eee;
 }
 
-#snippets, #meta, #groups, #footer, #snippet-toolbar {
+#snippets, #meta, #groups, #footer, #snippet-toolbar, #snippet-container, div.info {
 	-webkit-user-select: none;
 }
 
@@ -24,6 +24,8 @@ body {
 	cursor: text;
 	-webkit-user-select: text !important;
 }
+
+::selection { background-color: #d5dde6; }
 
 /* @end */
 
@@ -116,7 +118,6 @@ body {
 
 #groups li.editing::selection {
 	color: #fff;
-	background-color: #ccc;
 }
 
 /* @end */
@@ -196,7 +197,6 @@ body {
 
 #snippets li.editing::selection {
 	color: #fff;
-	background-color: #ccc;
 }
 
 #top-resizer {
@@ -265,7 +265,10 @@ body {
 	outline: none;
 }
 
-#snippet-description.editing, #snippet-title.editing {
+#snippet-title.editing,
+#snippet-title.editing::selection,
+#snippet-description.editing,
+#snippet-description.editing::selection {
 	color: #217ffd;
 }
 
