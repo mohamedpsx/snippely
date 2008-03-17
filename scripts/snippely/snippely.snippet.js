@@ -30,7 +30,7 @@ Snippely.Snippet = {
 	},
 	
 	updateTitle: function(element){
-		Snippely.database.execute(this.Queries.updateTitle, Snippely.Snippets.reload.bind(Snippely.Snippets), {
+		Snippely.database.execute(this.Queries.updateTitle, Snippely.Snippets.load.bind(Snippely.Snippets), {
 			id: this.id,
 			title: element.get('text')
 		});
