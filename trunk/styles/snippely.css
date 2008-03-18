@@ -14,13 +14,10 @@ html, body {
 body {
 	font: 11px/1 "Lucida Grande", Arial, sans-serif;
 	background-color: #eee;
-}
-
-#snippets, #meta, #groups, #footer, #snippet-toolbar, #snippet-container, div.info {
 	-webkit-user-select: none;
 }
 
-*.editing {
+.editing {
 	cursor: text;
 	-webkit-user-select: text !important;
 }

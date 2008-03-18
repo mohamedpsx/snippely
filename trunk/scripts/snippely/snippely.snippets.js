@@ -6,9 +6,10 @@ Snippely.Snippets = {
 		this.id = ART.retrieve('snippet:active') || 0;
 		this.buildMenu();
 		
-		$('snippets').addEvent('mousedown', function(event){
-			this[event.rightClick ? 'showMenu' : 'deselect'](event);
-		}.bind(this));
+		$('snippets').addEvents({
+			mousedown: this.deselect.bind(this),
+			contextmenu: this.showMenu.bind(this)
+		});
 	},
 	
 	load: function(insert){
@@ -35,8 +36,8 @@ Snippely.Snippets = {
 		}).store('snippet:id', snippet.id);
 		
 		element.addEvent('mousedown', function(event){
+			event.stopPropagation();
 			this.select(element);
-			if (!event.rightClick) event.stopPropagation();
 		}.bind(this));
 		
 		new Editable(element, { onBlur: this.update.bind(this) });
@@ -70,8 +71,8 @@ Snippely.Snippets = {
 		if (!this.selected) return;
 		if (this.selected.retrieve('editable').editing()) this.selected.blur();
 		else {
-			this.selected = this.id = null;
 			this.elements.removeClass('selected');
+			this.selected = this.id = null;
 			Snippely.Snippet.hide();
 			Snippely.toggleMenus('Snippet', false);
 		}
@@ -79,7 +80,7 @@ Snippely.Snippets = {
 	
 	rename: function(){
 		if (!this.selected) return;
-		this.selected.fireEvent('dblclick');
+		this.selected.fireEvent.delay(100, this.selected, 'dblclick');
 	},
 	
 	remove: function(){
@@ -123,8 +124,6 @@ Snippely.Snippets = {
 		Snippely.redraw();
 	},
 	
-	// right click menu
-	
 	buildMenu: function(){
 		this.menu = new ART.Menu('SnippetsMenu').addItems(
 			new ART.Menu.Item('Add Snippet...', { onSelect: this.add.bind(this) }),
@@ -134,11 +133,11 @@ Snippely.Snippets = {
 	},
 	
 	showMenu: function(event){
+		if (this.selected && this.selected.retrieve('editable').editing()) return;
 		var enabled = !!(this.selected);
 		this.menu.items['Remove Snippet...'].enabled = enabled;
 		this.menu.items['Rename Snippet...'].enabled = enabled;
 		this.menu.display(event.client);
-		event.stop();
 	}
 	
 };
