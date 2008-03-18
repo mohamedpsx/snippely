@@ -6,9 +6,10 @@ Snippely.Groups = {
 		this.buildMenu();
 		this.load();
 		
-		$('groups').addEvent('mousedown', function(event){
-			this[event.rightClick ? 'showMenu' : 'deselect'](event);
-		}.bind(this));
+		$('groups').addEvents({
+			mousedown: this.deselect.bind(this),
+			contextmenu: this.showMenu.bind(this)
+		});
 	},
 	
 	load: function(insert){
@@ -35,8 +36,8 @@ Snippely.Groups = {
 		}).store('group:id', group.id);
 		
 		element.addEvent('mousedown', function(event){
+			event.stopPropagation();
 			this.select(element);
-			if (!event.rightClick) event.stopPropagation();
 		}.bind(this));
 		
 		new Editable(element, { onBlur: this.update.bind(this) });
@@ -57,10 +58,9 @@ Snippely.Groups = {
 	
 	select: function(element, focus){
 		if (!element || element == this.selected) return;
-		this.elements.removeClass('selected');
-		this.selected = element.addClass('selected');
+		this.deselect();
 		this.id = element.retrieve('group:id');
-		Snippely.Snippets.deselect(true);
+		this.selected = element.addClass('selected');
 		Snippely.Snippets.load();
 		Snippely.toggleMenus('Group', true);
 		if (focus) element.fireEvent('dblclick');
@@ -70,8 +70,8 @@ Snippely.Groups = {
 		if (!this.selected) return;
 		if (this.selected.retrieve('editable').editing()) this.selected.blur();
 		else {
-			this.selected = this.id = null;
 			this.elements.removeClass('selected');
+			this.selected = this.id = null;
 			Snippely.Snippets.deselect();
 			Snippely.Snippets.hide();
 			Snippely.toggleMenus('Group', false);
@@ -95,8 +95,6 @@ Snippely.Groups = {
 		Snippely.Snippets.removeByGroup(id);
 	},
 	
-	// right click menu
-	
 	buildMenu: function(){
 		this.menu = new ART.Menu('GroupsMenu').addItems(
 			new ART.Menu.Item('Add Group...', { onSelect: this.add.bind(this) }),
@@ -106,11 +104,11 @@ Snippely.Groups = {
 	},
 	
 	showMenu: function(event){
+		if (this.selected && this.selected.retrieve('editable').editing()) return;
 		var enabled = !!(this.selected);
 		this.menu.items['Remove Group...'].enabled = enabled;
 		this.menu.items['Rename Group...'].enabled = enabled;
 		this.menu.display(event.client);
-		event.stop();
 	}
 	
 };
