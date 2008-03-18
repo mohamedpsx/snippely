@@ -2,9 +2,13 @@ Snippely.Groups = {
 
 	initialize: function(){
 		this.list = $('groups-list');
-		$('groups').addEvent('mousedown', this.deselect.bind(this));
 		this.id = ART.retrieve('groups:active') || 0;
+		this.buildMenu();
 		this.load();
+		
+		$('groups').addEvent('mousedown', function(event){
+			this[event.rightClick ? 'showMenu' : 'deselect'](event);
+		}.bind(this));
 	},
 	
 	load: function(insert){
@@ -28,19 +32,16 @@ Snippely.Groups = {
 		var element = new Element('li', {
 			id: 'group_' + group.id,
 			text: group.name
-		});
+		}).store('group:id', group.id);
+		
+		element.addEvent('mousedown', function(event){
+			this.select(element);
+			if (!event.rightClick) event.stopPropagation();
+		}.bind(this));
 		
 		new Editable(element, { onBlur: this.update.bind(this) });
 		
-		this.list.adopt(element.addEvents({
-			click: function(event){
-				event.stop();
-				this.select(element);
-			}.bind(this),
-			mousedown: function(event){ event.stopPropagation(); }
-		}).store('group:id', group.id));
-		
-		return element;
+		return element.inject(this.list);
 	},
 	
 	add: function(){
@@ -79,7 +80,7 @@ Snippely.Groups = {
 	
 	rename: function(){
 		if (!this.selected) return;
-		this.selected.fireEvent('dblclick');
+		this.selected.fireEvent.delay(100, this.selected, 'dblclick');
 	},
 	
 	remove: function(){
@@ -92,6 +93,24 @@ Snippely.Groups = {
 	removeById: function(id){
 		Snippely.database.execute(this.Queries.remove, { id: id });
 		Snippely.Snippets.removeByGroup(id);
+	},
+	
+	// right click menu
+	
+	buildMenu: function(){
+		this.menu = new ART.Menu('GroupsMenu').addItems(
+			new ART.Menu.Item('Add Group...', { onSelect: this.add.bind(this) }),
+			new ART.Menu.Item('Remove Group...', { onSelect: this.remove.bind(this) }),
+			new ART.Menu.Item('Rename Group...', { onSelect: this.rename.bind(this) })
+		);
+	},
+	
+	showMenu: function(event){
+		var enabled = !!(this.selected);
+		this.menu.items['Remove Group...'].enabled = enabled;
+		this.menu.items['Rename Group...'].enabled = enabled;
+		this.menu.display(event.client);
+		event.stop();
 	}
 	
 };
