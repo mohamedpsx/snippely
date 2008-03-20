@@ -64,24 +64,24 @@ var Snippely = {
 		
 		//action menu
 		var actionMenu = new ART.Menu('ActionMenu').addItems(
-			new ART.Menu.Item('Remove Group...', {
-				enabled: false,
-				onSelect: this.Groups.remove.bind(this.Groups)
-			}),
 			new ART.Menu.Item('Rename Group...', {
 				enabled: false,
 				onSelect: this.Groups.rename.bind(this.Groups)
 			}),
+			new ART.Menu.Item('Remove Group...', {
+				enabled: false,
+				onSelect: this.Groups.remove.bind(this.Groups)
+			}),
 			new ART.Menu.Item('Separator', {
 				separator: true
-			}),
-			new ART.Menu.Item('Remove Snippet...', {
-				enabled: false,
-				onSelect: this.Snippets.remove.bind(this.Snippets)
 			}),
 			new ART.Menu.Item('Rename Snippet...', {
 				enabled: false,
 				onSelect: this.Snippets.rename.bind(this.Snippets)
+			}),
+			new ART.Menu.Item('Remove Snippet...', {
+				enabled: false,
+				onSelect: this.Snippets.remove.bind(this.Snippets)
 			})
 		);
 		
@@ -213,12 +213,9 @@ var Snippely = {
 	},
 	
 	redraw: function(){
+		var height = window.getHeight();
+		if (this.contentTop.offsetHeight > height) this.contentTop.setStyle('height', height);
 		this.contentRight.setStyle('left', this.contentLeft.offsetWidth);
-
-		var contentTopHeight = this.contentTop.offsetHeight;
-		var windowHeight = window.getHeight();
-		if (contentTopHeight > windowHeight) this.contentTop.setStyle('height', windowHeight);
-		
 		this.contentBottom.setStyle('top', this.contentTop.offsetHeight);
 		
 		this.groupsScrollbar.update();

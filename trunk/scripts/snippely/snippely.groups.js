@@ -3,7 +3,7 @@ Snippely.Groups = {
 	initialize: function(){
 		this.list = $('groups-list');
 		this.id = ART.retrieve('groups:active') || 0;
-		this.buildMenu();
+		this.buildMenus();
 		this.load();
 		
 		$('groups').addEvents({
@@ -95,20 +95,30 @@ Snippely.Groups = {
 		Snippely.Snippets.removeByGroup(id);
 	},
 	
-	buildMenu: function(){
-		this.menu = new ART.Menu('GroupsMenu').addItems(
-			new ART.Menu.Item('Add Group...', { onSelect: this.add.bind(this) }),
-			new ART.Menu.Item('Remove Group...', { onSelect: this.remove.bind(this) }),
-			new ART.Menu.Item('Rename Group...', { onSelect: this.rename.bind(this) })
+	buildMenus: function(){
+		this.addMenu = new ART.Menu('GroupAddMenu').addItem(
+			new ART.Menu.Item('Add Group...', {
+				onSelect: this.add.bind(this)
+			})
+		);
+		this.actionMenu = new ART.Menu('GroupActionMenu').addItems(
+			new ART.Menu.Item('Add Snippet...', {
+				onSelect: Snippely.Snippets.add.bind(Snippely.Snippets)
+			}),
+			new ART.Menu.Item('Separator', {
+				separator: true
+			}),
+			new ART.Menu.Item('Rename Group...', {
+				onSelect: this.rename.bind(this)
+			}),
+			new ART.Menu.Item('Remove Group...', {
+				onSelect: this.remove.bind(this)
+			})
 		);
 	},
 	
 	showMenu: function(event){
-		if (this.selected && this.selected.retrieve('editable').editing()) return;
-		var enabled = !!(this.selected);
-		this.menu.items['Remove Group...'].enabled = enabled;
-		this.menu.items['Rename Group...'].enabled = enabled;
-		this.menu.display(event.client);
+		this[(event.target.get('tag') == 'li') ? 'actionMenu' : 'addMenu'].display(event.client);
 	}
 	
 };
