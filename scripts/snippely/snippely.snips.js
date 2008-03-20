@@ -101,14 +101,11 @@ Snippely.Snips = {
 		
 		var content = 'Some Content';
 		var callback = function(result){
-			var element = this.create({
-				id: result.lastInsertRowID,
-				type: type,
-				content: content
-			});
-			this.sortables.addItems(element);
-			this.elements.push(element);
+			var wrapper = this.create({ id: result.lastInsertRowID, type: type, content: content });
+			this.sortables.addItems(wrapper);
+			this.elements.push(wrapper);
 			Snippely.redraw();
+			wrapper.retrieve('content').fireEvent('mousedown').focus();
 		}.bind(this);
 		
 		Snippely.database.execute(this.Queries.insert, callback, {

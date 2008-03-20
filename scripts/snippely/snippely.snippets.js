@@ -4,7 +4,7 @@ Snippely.Snippets = {
 		this.list = $('snippets-list');
 		this.container = $('content-wrap');
 		this.id = ART.retrieve('snippet:active') || 0;
-		this.buildMenu();
+		this.buildMenus();
 		
 		$('snippets').addEvents({
 			mousedown: this.deselect.bind(this),
@@ -124,20 +124,24 @@ Snippely.Snippets = {
 		Snippely.redraw();
 	},
 	
-	buildMenu: function(){
-		this.menu = new ART.Menu('SnippetsMenu').addItems(
-			new ART.Menu.Item('Add Snippet...', { onSelect: this.add.bind(this) }),
-			new ART.Menu.Item('Remove Snippet...', { onSelect: this.remove.bind(this) }),
-			new ART.Menu.Item('Rename Snippet...', { onSelect: this.rename.bind(this) })
+	buildMenus: function(){
+		this.addMenu = new ART.Menu('SnippetAddMenu').addItem(
+			new ART.Menu.Item('Add Snippet...', {
+				onSelect: this.add.bind(this)
+			})
+		);
+		this.actionMenu = new ART.Menu('SnippetActionMenu').addItems(
+			new ART.Menu.Item('Rename Snippet...', {
+				onSelect: this.rename.bind(this)
+			}),
+			new ART.Menu.Item('Remove Snippet...', {
+				onSelect: this.remove.bind(this)
+			})
 		);
 	},
 	
 	showMenu: function(event){
-		if (this.selected && this.selected.retrieve('editable').editing()) return;
-		var enabled = !!(this.selected);
-		this.menu.items['Remove Snippet...'].enabled = enabled;
-		this.menu.items['Rename Snippet...'].enabled = enabled;
-		this.menu.display(event.client);
+		this[(event.target.get('tag') == 'li') ? 'actionMenu' : 'addMenu'].display(event.client);
 	}
 	
 };
