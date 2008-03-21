@@ -105,12 +105,14 @@ body {
 	font-size: 11px;
 	line-height: 11px;
 	padding: 4px 6px 5px 25px;
+	background: repeat-x left top;
 }
 
 #groups li.selected {
 	color: #fff;
 	font-weight: bold;
 	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5);
+	background-color: #425970;
 }
 
 #groups li.editing::selection {

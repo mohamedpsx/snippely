@@ -53,15 +53,15 @@ Snippely.Snips = {
 		var content = new Element('div', {'class': 'content', 'text': snip.content}).inject(wrapper).paint(snip.type);
 		
 		var history = new History(content);
-		var editable = new Editable(content, {
+		var editable = new Snippely.Editable(content, {
 			code: true,
 			enter: true,
 			wrapper: wrapper,
 			activation: 'mousedown',
-			onBlur: function(element){
+			onBlur: function(){
 				history.reset();
 				this.updateContent(wrapper);
-				element.paint(wrapper.retrieve('snip:type'));
+				content.paint(wrapper.retrieve('snip:type'));
 			}.bind(this)
 		});
 		
@@ -99,6 +99,7 @@ Snippely.Snips = {
 		var snippet = Snippely.Snippets.selected;
 		if (!snippet) return;
 		
+		type = type || 'Plain Text';
 		var content = 'Some Content';
 		var callback = function(result){
 			var wrapper = this.create({ id: result.lastInsertRowID, type: type, content: content });
