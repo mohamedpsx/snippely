@@ -40,7 +40,7 @@ Snippely.Snippets = {
 			this.select(element);
 		}.bind(this));
 		
-		new Editable(element, { onBlur: this.update.bind(this) });
+		new Snippely.Editable(element, { onBlur: this.update.bind(this) });
 		
 		return element.inject(this.list);
 	},

@@ -22,6 +22,7 @@ var Snippely = {
 		this.initializeMenus();
 		this.initializeLayout();
 		this.initializeButtons();
+		this.initializeKeyboard();
 		
 		this.database = new Snippely.Database({
 			onOpen: function(database){
@@ -193,6 +194,77 @@ var Snippely = {
 		this.contentTop.setStyle('height', snippetsHeight);
 	},
 	
+	initializeKeyboard: function(){
+		var Groups = this.Groups;
+		var Snippets = this.Snippets;
+		var Snips = this.Snips;
+		var previous = null;
+		
+		this.processKeyboard = function(event){
+			var key = event.key, meta = event.meta, next;
+			var active = Snippets.selected ? Snippets : Groups.selected ? Groups : null;
+			var selected = active && active.selected;
+			
+			switch (key){
+				case 'up':
+					previous = null;
+					if (selected) next = selected.getPrevious();
+					else {
+						next = Groups.elements && Groups.elements.getLast();
+						active = Groups;
+					} break;
+					
+				case 'down':
+					previous = null;
+					if (selected) next = selected.getNext();
+					else {
+						next = Groups.elements && Groups.elements[0];
+						active = Groups;
+					} break;
+					
+				case 'right':
+					if (active == Groups){
+						next = previous || Snippets.elements && Snippets.elements[0];
+						active = Snippets;
+					} break;
+					
+				case 'left':
+					if (active == Snippets){
+						previous = Snippets.selected;
+						Snippets.deselect();
+						active = Groups;
+					} break;
+					
+				case 'enter':
+					if (selected) active.rename(selected);
+					break;
+					
+				case 'backspace':
+					if (selected && meta) active.remove(selected);
+					break;
+					
+				case 'n':
+					if (meta){
+						if (!active) Groups.add();
+						else if (active == Groups) Snippets.add();
+						else Snips.add('Plain Text');
+					}
+					break;
+			}
+			if (next) active.select(next);
+		};
+		
+		this.enableKeyboard();
+	},
+	
+	enableKeyboard: function(){
+		window.addEvent('keydown', this.processKeyboard);
+	},
+	
+	disableKeyboard: function(){
+		window.removeEvent('keydown', this.processKeyboard);
+	},
+	
 	storeProperties: function(){
 		ART.store('window:y', nativeWindow.y);
 		ART.store('window:x', nativeWindow.x);
@@ -243,5 +315,23 @@ var Snippely = {
 	}
 	
 };
+
+// Global Snippely extensions for the Editable Class
+
+Snippely.Editable = new Class({
+	
+	Extends: Editable,
+	
+	focus: function(){
+		arguments.callee.parent();
+		Snippely.disableKeyboard();
+	},
+	
+	blur: function(){
+		arguments.callee.parent();
+		Snippely.enableKeyboard();
+	}
+	
+});
 
 window.addEvent('load', Snippely.initialize.bind(Snippely));

@@ -6,8 +6,8 @@ Snippely.Snippet = {
 		this.description = $('snippet-description');
 		this.container = $('content-bottom');
 		
-		new Editable(this.title, { onBlur: this.updateTitle.bind(this) });
-		new Editable(this.description, { enter: true, onBlur: this.updateDescription.bind(this) });
+		new Snippely.Editable(this.title, { onBlur: this.updateTitle.bind(this) });
+		new Snippely.Editable(this.description, { enter: true, onBlur: this.updateDescription.bind(this) });
 	},
 	
 	load: function(id){
