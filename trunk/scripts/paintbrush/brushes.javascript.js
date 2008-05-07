@@ -1,12 +1,12 @@
 Brushes.JavaScript = {
 	
-	'comment': [Highlighter.RegExps.singleLineComment, Highlighter.RegExps.multiLineComment],
+	'comment': [Paintbrush.RegExps.singleLineComment, Paintbrush.RegExps.multiLineComment],
 	
-	'string': [Highlighter.RegExps.singleQuotedString, Highlighter.RegExps.doubleQuotedString],
+	'string': [Paintbrush.RegExps.singleQuotedString, Paintbrush.RegExps.doubleQuotedString],
 	
-	'integer': Highlighter.RegExps.integer,
+	'integer': Paintbrush.RegExps.integer,
 	
-	'preprocessor': Highlighter.RegExps.preprocessor,
+	'preprocessor': Paintbrush.RegExps.preprocessor,
 	
 	'boolean': 'true false null',
 	

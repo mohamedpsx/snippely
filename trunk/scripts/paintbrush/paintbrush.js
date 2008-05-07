@@ -1,26 +1,19 @@
-// Highlighter is based on dp.SyntaxHighlighter, http://googlecode.com/p/syntaxhighlighter
+// Paintbrush is based on dp.SyntaxHighlighter, http://googlecode.com/p/syntaxhighlighter
 
 var Brushes = {'Note': {}, 'Plain Text': {}};
 
-var Highlighter = new Class({
+var Paintbrush = new Class({
 	
 	initialize: function(brush){
-		
 		this.brush = (typeof brush == 'string') ? Brushes[brush] : brush;
-		
 		this.regExps = [];
-		
 		if (this.brush) this.processBrush();
 	},
 	
-	highlight: function(code){
-		
+	paint: function(code){
 		this.code = (code || '').replace(/^\n*/, '').replace(/\n*$/, '');
-		
 		this.matches = [];
-		
 		if (this.regExps.length) this.matchRegExps();
-		
 		this.element = new Element('div');
 
 		// if no matches found, add entire code as plain text
@@ -30,7 +23,7 @@ var Highlighter = new Class({
 		}
 		
 		var pos	= 0;
-
+		
 		// sort the matches
 		this.matches = this.matches.sort(this.sortCallback);
 
@@ -45,28 +38,22 @@ var Highlighter = new Class({
 		// together adding everything in between that isn't a match.
 		for (i = 0; i < this.matches.length; i++){
 			var match = this.matches[i];
-
 			if (!match) continue;
-
 			this.addBit(this.copy(this.code, pos, match.index));
 			this.addBit(match.value, match.css);
-
 			pos = match.index + match.length;
 		}
 
 		this.addBit(this.code.substr(pos));
-		
 		return this.element;
 	},
 	
 	processBrush: function(){
 		for (var css in this.brush){
-		
 			$splat(this.brush[css]).each(function(regExp){
 				if (typeof regExp == 'string') regExp = new RegExp('\\b' + regExp.escapeRegExp().split(' ').join('\\b|\\b') + '\\b', 'gm');
 				this.regExps.push([regExp, css]);
 			}, this);
-			
 		}
 	},
 	
@@ -78,7 +65,6 @@ var Highlighter = new Class({
 	
 	getMatches: function(regex, css){
 		var match;
-
 		while ((match = regex.exec(this.code))){
 			this.matches[this.matches.length] = this.matchOne(match[0], match.index, css);
 		}
@@ -94,11 +80,9 @@ var Highlighter = new Class({
 	
 	sortCallback: function(m1, m2){
 		// sort matches by index first
-		if (m1.index < m2.index){
-			return -1;
-		} else if (m1.index > m2.index){
-			return 1;
-		} else {
+		if (m1.index < m2.index) return -1;
+		else if (m1.index > m2.index) return 1;
+		else {
 			// if index is the same, sort by length
 			if (m1.length < m2.length) return -1;
 			else if(m1.length > m2.length) return 1;
@@ -108,43 +92,39 @@ var Highlighter = new Class({
 
 	addBit: function(str, css){
 		if (!str) return;
-
 		var span = new Element('span', {'text': str});
 		if (css) span.className = css;
-		
 		this.element.adopt(span);
 	},
 	
 	isInside: function(match){
 		if (!match) return false;
-
 		for (var i = 0; i < this.matches.length; i++){
 			var current = this.matches[i];
 			if (current == null) continue;
 			if ((match.index > current.index) && (match.index < current.index + current.length)) return true;
 		}
-
 		return false;
 	}
 	
 });
 
-Highlighter.RegExps = {
-	multiLineComment: (/\/\*[\s\S]*?\\*\//gm),
+Paintbrush.RegExps = {
+	multiLineComment: (/\/\*[\s\S]*?\*\//gm),
 	singleLineComment: (/\/\/.*$/gm),
 	singleLinePerlComment: (/#.*$/gm),
-	doubleQuotedString: (/"(?:\.|(\\\\\")|[^\""\\n])*/g),
-	singleQuotedString: (/'(?:\.|(\\\\\')|[^\''\n])*'/g),
+	doubleQuotedString: (/"(?:\.|(\\\")|[^\""\n])*"/g),
+	singleQuotedString: (/'(?:\.|(\\\')|[^\''\n])*'/g),
 	integer: (/\b(\d+)\b/gm),
 	preprocessor: (/^\s*#.*/gm)
 };
 
-// Element highlight extension
+// Element paint extension
 
 Element.implement({
 	
 	paint: function(brush){
-		return this.set('html', new Highlighter(brush).highlight(this.get('text')).get('html'));
+		return this.set('html', new Paintbrush(brush).paint(this.get('text')).get('html'));
 	}
 	
 });

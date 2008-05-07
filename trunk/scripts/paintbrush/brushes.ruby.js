@@ -1,12 +1,12 @@
 Brushes.Ruby = {
 	
-	'comment': Highlighter.RegExps.singleLinePerlComments,
+	'comment': Paintbrush.RegExps.singleLinePerlComments,
 	
-	'string': [Highlighter.RegExps.singleQuotedString, Highlighter.RegExps.doubleQuotedString],
+	'string': [Paintbrush.RegExps.singleQuotedString, Paintbrush.RegExps.doubleQuotedString],
 	
-	'integer': Highlighter.RegExps.integer,
+	'integer': Paintbrush.RegExps.integer,
 	
-	'preprocessor': Highlighter.RegExps.preprocessor,
+	'preprocessor': Paintbrush.RegExps.preprocessor,
 	
 	'symbol': (/:[a-z][A-Za-z0-9_]*/g),
 	

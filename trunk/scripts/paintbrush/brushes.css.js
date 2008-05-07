@@ -1,8 +1,8 @@
 Brushes.CSS = {
 	
-	'comment': Highlighter.RegExps.multiLineComment,
+	'comment': Paintbrush.RegExps.multiLineComment,
 	
-	'string': [Highlighter.RegExps.singleQuotedString, Highlighter.RegExps.doubleQuotedString],
+	'string': [Paintbrush.RegExps.singleQuotedString, Paintbrush.RegExps.doubleQuotedString],
 	
 	'integer': new RegExp('(-?\\d+)(\.\\d+)?(px|em|pt|\:|\%|)', 'g'),  
 	
