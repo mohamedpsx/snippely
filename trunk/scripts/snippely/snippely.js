@@ -88,7 +88,7 @@ var Snippely = {
 		
 		//brush menu
 		var brushMenu = new ART.Menu('BrushMenu');
-		for (var name in Brushes) (function(name){
+		for (var name in Paintbrush.Brushes) (function(name){
 			brushMenu.addItem(new ART.Menu.Item(name, {
 				onSelect: Snippely.Snips.updateType.bind(Snippely.Snips, name)
 			}));
