@@ -1,4 +1,4 @@
-Brushes.Ruby = {
+Paintbrush.Brushes.Ruby = {
 	
 	'comment': Paintbrush.RegExps.singleLinePerlComments,
 	

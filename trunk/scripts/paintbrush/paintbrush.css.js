@@ -1,4 +1,4 @@
-Brushes.CSS = {
+Paintbrush.Brushes.CSS = {
 	
 	'comment': Paintbrush.RegExps.multiLineComment,
 	

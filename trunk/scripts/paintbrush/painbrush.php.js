@@ -1,4 +1,4 @@
-Brushes.PHP = {
+Paintbrush.Brushes.PHP = {
 	
 	'comment': [Paintbrush.RegExps.singleLineComment, Paintbrush.RegExps.multiLineComment],
 	
