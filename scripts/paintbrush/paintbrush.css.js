@@ -42,6 +42,6 @@ Paintbrush.Brushes.CSS = {
 
 };
 
-Brushes.CSS.keyword = new RegExp('\\b([a-z_]|)' + Brushes.CSS.keyword.replace(/ /g, '(?=:)\\b|\\b([a-z_\\*]|\\*|)') + '(?=:)\\b', 'g');
+Paintbrush.Brushes.CSS.keyword = new RegExp('\\b([a-z_]|)' + Paintbrush.Brushes.CSS.keyword.replace(/ /g, '(?=:)\\b|\\b([a-z_\\*]|\\*|)') + '(?=:)\\b', 'g');
 
-Brushes.CSS.special = new RegExp('\\b' + Brushes.CSS.special.replace(/ /g, '(?!-)(?!:)\\b|\\b()') + '\:\\b', 'g');
+Paintbrush.Brushes.CSS.special = new RegExp('\\b' + Paintbrush.Brushes.CSS.special.replace(/ /g, '(?!-)(?!:)\\b|\\b()') + '\:\\b', 'g');
