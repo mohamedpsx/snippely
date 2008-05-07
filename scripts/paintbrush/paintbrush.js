@@ -1,11 +1,9 @@
 // Paintbrush is based on dp.SyntaxHighlighter, http://googlecode.com/p/syntaxhighlighter
 
-var Brushes = {'Note': {}, 'Plain Text': {}};
-
 var Paintbrush = new Class({
 	
 	initialize: function(brush){
-		this.brush = (typeof brush == 'string') ? Brushes[brush] : brush;
+		this.brush = (typeof brush == 'string') ? Paintbrush.Brushes[brush] : brush;
 		this.regExps = [];
 		if (this.brush) this.processBrush();
 	},
@@ -108,6 +106,11 @@ var Paintbrush = new Class({
 	}
 	
 });
+
+Paintbrush.Brushes = {
+  'Note': {},
+  'Plain Text': {}
+};
 
 Paintbrush.RegExps = {
 	multiLineComment: (/\/\*[\s\S]*?\*\//gm),

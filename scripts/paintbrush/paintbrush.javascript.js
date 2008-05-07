@@ -1,4 +1,4 @@
-Brushes.JavaScript = {
+Paintbrush.Brushes.JavaScript = {
 	
 	'comment': [Paintbrush.RegExps.singleLineComment, Paintbrush.RegExps.multiLineComment],
 	
