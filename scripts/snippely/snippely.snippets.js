@@ -38,6 +38,43 @@ Snippely.Snippets = {
 		element.addEvent('mousedown', function(event){
 			event.stopPropagation();
 			this.select(element);
+			
+			var clone = new Element('div', {
+				'class': 'clone',
+				'text': element.get('text'),
+				'styles': element.getStyles('left', 'width')
+			}).inject(document.body).position(element.getPosition());
+			
+			var cancel = function(){
+				clone.destroy();
+				if (element) element.setStyle('visibility', 'visible');
+			};
+			
+			new Drag.Move(clone, {
+				droppables: Snippely.Groups.elements,
+				onStart: function(){
+					clone.setStyle('visibility', 'visible');
+					element.setStyle('visibility', 'hidden');
+				},
+				onEnter: function(draggable, droppable){
+					if (droppable.hasClass('selected')) return;
+					droppable.addClass('hovering');
+				},
+				onLeave: function(draggable, droppable){
+					droppable.removeClass('hovering');
+				},
+				onDrop: function(draggable, droppable){
+					if (!droppable || droppable.hasClass('selected')) return;
+					var id = snippet.id, group_id = droppable.retrieve('group:id');
+					var callback = function(){
+						element.destroy();
+						droppable.removeClass('hovering');
+					};
+					Snippely.database.execute(this.Queries.updateGroup, callback, { id: id, group_id: group_id });
+				}.bind(this),
+				onCancel: cancel,
+				onComplete: cancel
+			}).start(event);
 		}.bind(this));
 		
 		new Snippely.Editable(element, { onBlur: this.update.bind(this) });
@@ -157,6 +194,8 @@ Snippely.Snippets.Queries = {
 	remove: "DELETE FROM snippets WHERE id = :id",
 	
 	update: "UPDATE snippets SET title = :title WHERE id = :id",
+	
+	updateGroup: 'UPDATE snippets SET group_id = :group_id WHERE id = :id',
 	
 	removeByGroup: "DELETE FROM snippets WHERE group_id = :group_id"
 	

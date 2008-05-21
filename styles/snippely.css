@@ -17,6 +17,10 @@ body {
 	-webkit-user-select: none;
 }
 
+ul {
+	list-style:none;
+}
+
 .editing {
 	cursor: text;
 	-webkit-user-select: text !important;
@@ -113,6 +117,12 @@ body {
 	font-weight: bold;
 	text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.5);
 	background-color: #425970;
+}
+
+#groups li.hovering {
+	border: solid 2px #217ffd;
+	padding: 2px 4px 3px 23px;
+	-webkit-border-radius: 5px;
 }
 
 #groups li.editing::selection {
@@ -469,5 +479,15 @@ div.editing .content span { color: #333; }
 #blur .art-scrollbar-paint-top    { background-image: url(../images/thumb-top-blur.png); }
 #blur .art-scrollbar-paint-center { background-image: url(../images/thumb-center-blur.png); }
 #blur .art-scrollbar-paint-bottom { background-image: url(../images/thumb-bottom-blur.png); }
+
+div.clone {
+	color:#fff;
+	z-index:10000;
+	opacity:0.8;
+	visibility:hidden;
+	padding:4px 20px;
+	background-color:#637282;
+	position:absolute;
+}
 
 /* @end */
