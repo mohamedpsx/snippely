@@ -69,7 +69,8 @@ Snippely.Snippets = {
 					var callback = function(){
 						element.destroy();
 						droppable.removeClass('hovering');
-					};
+						this.redraw();
+					}.bind(this);
 					Snippely.database.execute(this.Queries.updateGroup, callback, { id: id, group_id: group_id });
 				}.bind(this),
 				onCancel: cancel,
