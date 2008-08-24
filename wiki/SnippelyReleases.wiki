@@ -1,6 +1,4 @@
 #labels Featured
-#Snippely Releases
-
 == Snippely 1.1 ==
 
   * added right click menus
